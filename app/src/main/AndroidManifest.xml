@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CityWatch" >
     <activity
-      android:name=".LoginActivity"
+      android:name=".SignInActivity"
       android:exported="false"
       android:noHistory="true"
       android:theme="@style/Theme.CityWatch" />

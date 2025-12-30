@@ -3,7 +3,7 @@ package com.gitgud.citywatch.util;
 import android.app.Activity;
 import android.content.Intent;
 
-import com.gitgud.citywatch.LoginActivity;
+import com.gitgud.citywatch.SignInActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -44,7 +44,7 @@ public class SessionManager {
     public boolean redirectIfNotLoggedIn(Activity activity) {
         if (isLoggedIn()) return false;
 
-        Intent intent = new Intent(activity, LoginActivity.class);
+        Intent intent = new Intent(activity, SignInActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         activity.startActivity(intent);
         activity.finish();

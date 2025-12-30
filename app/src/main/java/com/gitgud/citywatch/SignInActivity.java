@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.gitgud.citywatch.databinding.ActivityLoginBinding;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class LoginActivity extends AppCompatActivity {
+public class SignInActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private FirebaseAuth auth;
