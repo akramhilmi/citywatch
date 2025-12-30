@@ -35,7 +35,11 @@ public class SignInActivity extends AppCompatActivity {
         });
 
         binding.btnLogin.setOnClickListener(v -> attemptLogin());
-        binding.btnRegister.setOnClickListener(v -> attemptRegister());
+        binding.btnRegister.setOnClickListener(v -> navigateToSignUp());
+    }
+
+    private void navigateToSignUp() {
+        startActivity(new Intent(this, SignUpActivity.class));
     }
 
     private void attemptLogin() {
@@ -59,38 +63,21 @@ public class SignInActivity extends AppCompatActivity {
                 });
     }
 
-    private void attemptRegister() {
-        String email = binding.etEmail.getText().toString().trim();
-        String password = binding.etPassword.getText().toString().trim();
-
-        if (!validateInput(email, password)) return;
-
-        setLoading(true);
-        auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    setLoading(false);
-                    if (task.isSuccessful()) {
-                        navigateToMain();
-                    } else {
-                        String msg = task.getException() != null
-                                ? task.getException().getMessage()
-                                : "Registration failed";
-                        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-                    }
-                });
-    }
-
     private boolean validateInput(String email, String password) {
+        // clear previous errors
+        binding.tilEmail.setError(null);
+        binding.tilPassword.setError(null);
+
         if (TextUtils.isEmpty(email)) {
-            binding.etEmail.setError("Email required");
+            binding.tilEmail.setError("Email required");
             return false;
         }
         if (TextUtils.isEmpty(password)) {
-            binding.etPassword.setError("Password required");
+            binding.tilPassword.setError("Password required");
             return false;
         }
         if (password.length() < 6) {
-            binding.etPassword.setError("Password must be at least 6 characters");
+            binding.tilPassword.setError("Password must be at least 6 characters");
             return false;
         }
         return true;

@@ -11,11 +11,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CityWatch" >
-    <activity
-      android:name=".SignInActivity"
-      android:exported="false"
-      android:noHistory="true"
-      android:theme="@style/Theme.CityWatch" />
+        <activity
+            android:name=".SignUpActivity"
+            android:exported="false"
+            android:parentActivityName=".SignInActivity"
+            android:theme="@style/Theme.CityWatch" />
+        <activity
+            android:name=".SignInActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CityWatch" />
         <activity
             android:name=".MainActivity"
             android:exported="true" >

@@ -12,86 +12,102 @@
     android:id="@+id/tvTitle"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="72dp"
-    android:text="@string/app_name"
-    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-    android:textSize="48sp"
-    android:textStyle="bold"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintVertical_chainStyle="packed" />
-
-  <com.google.android.material.textfield.TextInputEditText
-    android:id="@+id/etEmail"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="32dp"
     android:layout_marginTop="108dp"
-    android:layout_marginEnd="32dp"
-    android:hint="@string/hint_email"
-    android:inputType="textEmailAddress"
+    android:text="@string/app_name"
+    android:textAppearance="?attr/textAppearanceDisplayMedium"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+    app:layout_constraintTop_toTopOf="parent" />
 
-  <com.google.android.material.textfield.TextInputEditText
-    android:id="@+id/etPassword"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="32dp"
-    android:layout_marginTop="32dp"
-    android:layout_marginEnd="32dp"
-    android:hint="@string/hint_password"
-    android:inputType="textPassword"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/etEmail" />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilEmail"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="108dp"
+        android:layout_marginEnd="32dp"
+        android:hint="@string/hint_email"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
-  <com.google.android.material.button.MaterialButton
-    android:id="@+id/btnLogin"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="32dp"
-    android:layout_marginEnd="32dp"
-    android:layout_marginBottom="8dp"
-    android:text="@string/btn_login"
-    app:layout_constraintBottom_toTopOf="@+id/tvOr"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress" />
 
-  <TextView
-    android:id="@+id/tvOr"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:text="@string/label_or"
-    android:textColor="?android:textColorSecondary"
-    app:layout_constraintBottom_toTopOf="@+id/btnRegister"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-  <com.google.android.material.button.MaterialButton
-    android:id="@+id/btnRegister"
-    style="@style/Widget.Material3.Button.OutlinedButton"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="32dp"
-    android:layout_marginEnd="32dp"
-    android:layout_marginBottom="16dp"
-    android:text="@string/btn_register"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent" />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPassword"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:hint="@string/hint_password"
+        app:endIconMode="password_toggle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tilEmail">
 
-  <ProgressBar
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/btn_login"
+        app:layout_constraintBottom_toTopOf="@id/tvOr"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tvOr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/label_or"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        app:layout_constraintBottom_toTopOf="@id/btnRegister"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRegister"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/btn_register"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:indeterminate="true"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnRegister" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

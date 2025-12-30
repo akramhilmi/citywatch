@@ -7,4 +7,11 @@
     <string name="btn_login">Sign in</string>
     <string name="label_or">or</string>
     <string name="btn_register">Create an account</string>
+
+    <!-- Sign Up -->
+    <string name="title_sign_up">Create Account</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_phone">Phone number</string>
+    <string name="hint_confirm_password">Confirm password</string>
+    <string name="btn_sign_up">Sign up</string>
 </resources>
