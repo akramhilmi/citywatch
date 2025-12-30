@@ -1,0 +1,20 @@
+# EditorConfig helps maintain consistent coding styles between editors and IDEs
+# basic settings
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+trim_trailing_whitespace = true
+max_line_length = 120
+
+[*.{kt,kts,java}]
+indent_style = space
+indent_size = 4
+
+[*.{xml,gradle,pro,properties}]
+indent_style = space
+indent_size = 2
+
+# kept intentionally minimal to avoid editor-specific warnings
