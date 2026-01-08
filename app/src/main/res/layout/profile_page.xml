@@ -105,7 +105,7 @@
                     android:layout_height="24dp"
                     android:src="@drawable/ic_arrowright"
                     android:rotation="0"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
             <!-- Email Item -->
@@ -122,7 +122,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@android:drawable/ic_dialog_email"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <LinearLayout
                     android:layout_width="0dp"
