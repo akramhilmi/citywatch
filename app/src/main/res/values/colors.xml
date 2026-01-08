@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+  <color name="black">#FF000000</color>
+  <color name="white">#FFFFFFFF</color>
 
   <color name="md_theme_primary">#855318</color>
   <color name="md_theme_background">#FFF8F5</color>
   <color name="md_theme_onBackground">#211A14</color>
   <color name="md_theme_surfaceVariant">#F2DFD1</color>
   <color name="md_theme_outline">#837468</color>
-  <color name="md_theme_surfaceContainer">#FAEBE0</color>
   <color name="md_theme_surface">#FFF8F5</color>
 
 
-    <color name="profile_bg">#FAF3EB</color>
-    <color name="profile_card_bg">#F5E6D3</color>
-    <color name="text_primary">#1D1B20</color>
-    <color name="text_secondary">#49454F</color>
-    <color name="divider_color">#CAC4D0</color>
+
+  <color name="profile_card_bg">#F5E6D3</color>
+
+
+  <color name="divider_color">#CAC4D0</color>
 
 
 
@@ -42,9 +41,7 @@
   <color name="md_theme_onError">#FFFFFF</color>
   <color name="md_theme_errorContainer">#FFDAD6</color>
   <color name="md_theme_onErrorContainer">#93000A</color>
-
   <color name="md_theme_onSurface">#211A14</color>
-
   <color name="md_theme_onSurfaceVariant">#51453A</color>
   <color name="md_theme_outlineVariant">#D5C3B5</color>
   <color name="md_theme_scrim">#000000</color>
@@ -67,6 +64,7 @@
   <color name="md_theme_surfaceBright">#FFF8F5</color>
   <color name="md_theme_surfaceContainerLowest">#FFFFFF</color>
   <color name="md_theme_surfaceContainerLow">#FFF1E7</color>
+  <color name="md_theme_surfaceContainer">#FAEBE0</color>
   <color name="md_theme_surfaceContainerHigh">#F4E6DB</color>
   <color name="md_theme_surfaceContainerHighest">#EEE0D5</color>
   <color name="md_theme_primary_mediumContrast">#522E00</color>

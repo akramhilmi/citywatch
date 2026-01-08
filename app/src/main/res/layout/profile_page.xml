@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/profile_bg">
+    android:background="@color/md_theme_background">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
@@ -75,7 +75,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_profile"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -88,7 +88,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/label_name"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="@color/md_theme_onSurfaceVariant"
                         android:textSize="12sp" />
 
                     <TextView
@@ -96,7 +96,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Adam Idris"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@color/md_theme_onSurface"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -135,7 +135,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/label_email"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="@color/md_theme_onSurfaceVariant"
                         android:textSize="12sp" />
 
                     <TextView
@@ -143,7 +143,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="adam@gmail.com"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@color/md_theme_onSurface"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -151,7 +151,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                   android:src="@drawable/ic_arrowright"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
             <!-- Phone Item -->
@@ -181,7 +181,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/label_phone"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="@color/md_theme_onSurfaceVariant"
                         android:textSize="12sp" />
 
                     <TextView
@@ -189,7 +189,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="+60 18-366 0898"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@color/md_theme_onSurface"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -197,7 +197,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                   android:src="@drawable/ic_arrowright"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
             <!-- Actions -->
@@ -222,14 +222,14 @@
                     android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/action_update_photo"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/md_theme_onSurface"
                     android:textSize="16sp" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                   android:src="@drawable/ic_arrowright"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -253,14 +253,14 @@
                     android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/action_change_password"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/md_theme_onSurface"
                     android:textSize="16sp" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                   android:src="@drawable/ic_arrowright"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -284,14 +284,14 @@
                     android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/action_sign_out"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/md_theme_onSurface"
                     android:textSize="16sp" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                   android:src="@drawable/ic_arrowright"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -307,7 +307,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@android:drawable/ic_delete"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -315,14 +315,14 @@
                     android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/action_delete_account"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/md_theme_onSurface"
                     android:textSize="16sp" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                   android:src="@drawable/ic_arrowright"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
             <!-- Other Section -->
@@ -347,7 +347,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_darkmode"
-                app:tint="@color/text_secondary" />
+                app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -355,7 +355,7 @@
                   android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/label_dark_mode"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/md_theme_onSurface"
                     android:textSize="16sp" />
 
                 <com.google.android.material.materialswitch.MaterialSwitch
@@ -378,7 +378,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_help"
-                app:tint="@color/text_secondary" />
+                app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -386,14 +386,14 @@
                   android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/action_contact_us"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/md_theme_onSurface"
                     android:textSize="16sp" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                   android:src="@drawable/ic_arrowright"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -410,7 +410,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_shield"
-                app:tint="@color/text_secondary" />
+                app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -418,14 +418,14 @@
                   android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/action_privacy_policy"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/md_theme_onSurface"
                     android:textSize="16sp" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                   android:src="@drawable/ic_arrowright"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -442,7 +442,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_info_details"
-                app:tint="@color/text_secondary" />
+                app:tint="@color/md_theme_onSurfaceVariant" />
 
 
               <TextView
@@ -451,14 +451,14 @@
                 android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/action_about_app"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/md_theme_onSurface"
                     android:textSize="16sp" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                   android:src="@drawable/ic_arrowright"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
         </LinearLayout>
@@ -472,7 +472,6 @@
         android:background="@color/md_theme_surfaceContainer"
         app:itemIconTint="@color/md_theme_onSurface"
         app:itemTextColor="@color/md_theme_onSurface"
-      app:itemActiveIndicatorStyle="@style/Widget.Material3.BottomNavigationView.ActiveIndicator"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
