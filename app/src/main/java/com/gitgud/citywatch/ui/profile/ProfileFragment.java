@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -18,10 +19,15 @@ import com.gitgud.citywatch.SignInActivity;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import com.bumptech.glide.Glide;
 
 public class ProfileFragment extends Fragment {
     private TextView tvNameHeader, tvNameValue, tvEmailValue, tvPhoneValue;
+    private ImageView ivProfileImage;
     private SessionManager sessionManager;
+    private ActivityResultLauncher<String> pickImageLauncher;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -44,12 +50,23 @@ public class ProfileFragment extends Fragment {
 
         sessionManager = new SessionManager();
 
+        // Initialize image picker launcher
+        pickImageLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            uri -> {
+                if (uri != null) {
+                    uploadProfilePicture(uri);
+                }
+            }
+        );
+
         initViews(view);
         loadUserData();
         setupClickListeners(view);
     }
 
     private void initViews(View view) {
+        ivProfileImage = view.findViewById(R.id.ivProfileImage);
         tvNameHeader = view.findViewById(R.id.tvNameHeader);
         tvNameValue = view.findViewById(R.id.tvNameValue);
         tvEmailValue = view.findViewById(R.id.tvEmailValue);
@@ -64,6 +81,9 @@ public class ProfileFragment extends Fragment {
 
             // Set email immediately (from Firebase Auth)
             tvEmailValue.setText(email != null ? email : "Not set");
+
+            // Load profile picture from Firebase Storage
+            loadProfilePicture(userId);
 
             // Fetch name and phone from Firestore
             ApiClient.getUserName(userId).addOnCompleteListener(task -> {
@@ -134,8 +154,11 @@ public class ProfileFragment extends Fragment {
         // Edit phone
         view.findViewById(R.id.btnEditPhone).setOnClickListener(v -> showEditPhoneDialog());
 
-        // TODO :create real edit flow, use placeholders for now
-        view.findViewById(R.id.btnUpdatePhoto).setOnClickListener(v -> Toast.makeText(requireActivity(), "Camera access coming soon", Toast.LENGTH_SHORT).show());
+        // Edit email
+        view.findViewById(R.id.btnEditEmail).setOnClickListener(v -> showEditEmailDialog());
+
+        // Update photo - launch image picker
+        view.findViewById(R.id.btnUpdatePhoto).setOnClickListener(v -> pickImageLauncher.launch("image/*"));
     }
 
     private void showDeleteConfirmation() {
@@ -218,5 +241,80 @@ public class ProfileFragment extends Fragment {
             .setNegativeButton("Cancel", null)
             .show();
     }
-}
 
+    private void showEditEmailDialog() {
+        android.widget.EditText input = new android.widget.EditText(requireActivity());
+        input.setText(tvEmailValue.getText());
+        input.setSelection(input.getText().length());
+        input.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
+        new AlertDialog.Builder(requireActivity())
+            .setTitle("Edit Email")
+            .setView(input)
+            .setPositiveButton("Save", (dialog, which) -> {
+                String newEmail = input.getText().toString().trim();
+                if (!newEmail.isEmpty() && isValidEmail(newEmail)) {
+                    ApiClient.updateUserEmail(newEmail).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            tvEmailValue.setText(newEmail);
+                            Toast.makeText(requireActivity(), "Email updated successfully", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Exception error = task.getException();
+                            String errorMessage = error != null ? error.getMessage() : "Failed to update email";
+                            showErrorDialog("Email Update Failed", errorMessage);
+                        }
+                    });
+                } else {
+                    Toast.makeText(requireActivity(), "Please enter a valid email address", Toast.LENGTH_SHORT).show();
+                }
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void showErrorDialog(String title, String message) {
+        new AlertDialog.Builder(requireActivity())
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show();
+    }
+
+    private boolean isValidEmail(String email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private void loadProfilePicture(String userId) {
+        ApiClient.getProfilePictureUrl(userId).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                String downloadUrl = task.getResult();
+                if (downloadUrl != null && !downloadUrl.isEmpty()) {
+                    // Load image using Glide with scaling to fill the circle
+                    Glide.with(this)
+                            .load(downloadUrl)
+                            .centerCrop()
+                            .into(ivProfileImage);
+                }
+            }
+        });
+    }
+
+    private void uploadProfilePicture(Uri imageUri) {
+        com.google.firebase.auth.FirebaseUser user = ApiClient.getCurrentUser();
+        if (user != null) {
+            Toast.makeText(requireActivity(), "Uploading profile picture...", Toast.LENGTH_SHORT).show();
+
+            ApiClient.uploadProfilePicture(user.getUid(), imageUri).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(requireActivity(), "Profile picture uploaded successfully", Toast.LENGTH_SHORT).show();
+                    // Refresh the fragment to reload user data
+                    loadUserData();
+                } else {
+                    Exception error = task.getException();
+                    String errorMessage = error != null ? error.getMessage() : "Failed to upload profile picture";
+                    showErrorDialog("Upload Failed", errorMessage);
+                }
+            });
+        }
+    }
+}

@@ -34,22 +34,19 @@
                     android:id="@+id/ivProfileImage"
                     android:layout_width="120dp"
                     android:layout_height="120dp"
-                    android:padding="4dp"
-                    android:src="@drawable/ic_pic"
-                    app:contentPadding="8dp"
+                    android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircleImage"
                     app:strokeColor="@color/md_theme_outline"
                     app:strokeWidth="2dp" />
 
-                <TextView
-                    android:id="@+id/tvNameHeader"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Adam Idris"
-                    android:textColor="@color/md_theme_onBackground"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+              <TextView
+                android:id="@+id/tvNameHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="@color/md_theme_onBackground"
+                android:textSize="24sp"
+                android:textStyle="bold" />
             </LinearLayout>
 
             <!-- Account Section -->
@@ -92,13 +89,12 @@
                         android:textColor="@color/md_theme_onSurfaceVariant"
                         android:textSize="12sp" />
 
-                    <TextView
-                        android:id="@+id/tvNameValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Adam Idris"
-                        android:textColor="@color/md_theme_onSurface"
-                        android:textSize="16sp" />
+                  <TextView
+                    android:id="@+id/tvNameValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/md_theme_onSurface"
+                    android:textSize="16sp" />
                 </LinearLayout>
 
                 <ImageView
@@ -139,13 +135,12 @@
                         android:textColor="@color/md_theme_onSurfaceVariant"
                         android:textSize="12sp" />
 
-                    <TextView
-                        android:id="@+id/tvEmailValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="adam@gmail.com"
-                        android:textColor="@color/md_theme_onSurface"
-                        android:textSize="16sp" />
+                  <TextView
+                    android:id="@+id/tvEmailValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/md_theme_onSurface"
+                    android:textSize="16sp" />
                 </LinearLayout>
 
                 <ImageView
@@ -185,13 +180,12 @@
                         android:textColor="@color/md_theme_onSurfaceVariant"
                         android:textSize="12sp" />
 
-                    <TextView
-                        android:id="@+id/tvPhoneValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="+60 18-366 0898"
-                        android:textColor="@color/md_theme_onSurface"
-                        android:textSize="16sp" />
+                  <TextView
+                    android:id="@+id/tvPhoneValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/md_theme_onSurface"
+                    android:textSize="16sp" />
                 </LinearLayout>
 
                 <ImageView

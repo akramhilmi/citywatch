@@ -7,6 +7,10 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import android.net.Uri;
 
 /**
  * Communicates with Firebase backend services and Cloud Functions.
@@ -164,6 +168,65 @@ public class ApiClient {
             put("userId", userId);
             put("newPhone", newPhone);
         }}).continueWith(task -> null);
+    }
+
+    /**
+     * Update user email in Firebase Auth with verification
+     * Sends verification link to new email before updating
+     */
+    public static com.google.android.gms.tasks.Task<Void> updateUserEmail(String newEmail) {
+        com.google.firebase.auth.FirebaseUser user = auth.getCurrentUser();
+        if (user != null) {
+            return user.verifyBeforeUpdateEmail(newEmail);
+        }
+        throw new IllegalStateException("No current user to update email");
+    }
+
+    /**
+     * Upload profile picture to Firebase Storage
+     * Stores image in profile_pictures/{userId}.jpg
+     */
+    public static com.google.android.gms.tasks.Task<String> uploadProfilePicture(String userId, Uri imageUri) {
+        if (imageUri == null) {
+            throw new IllegalArgumentException("Image URI cannot be null");
+        }
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference profilePicturesRef = storage.getReference().child("profile_pictures/" + userId + ".jpg");
+
+        return profilePicturesRef.putFile(imageUri)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException() != null ? task.getException() : new Exception("Upload failed");
+                    }
+                    return profilePicturesRef.getDownloadUrl();
+                })
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        return downloadUri != null ? downloadUri.toString() : null;
+                    }
+                    throw task.getException() != null ? task.getException() : new Exception("Failed to get download URL");
+                });
+    }
+
+    /**
+     * Get profile picture download URL from Firebase Storage
+     * Returns the download URL for the user's profile picture
+     */
+    public static com.google.android.gms.tasks.Task<String> getProfilePictureUrl(String userId) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference profilePicturesRef = storage.getReference().child("profile_pictures/" + userId + ".jpg");
+
+        return profilePicturesRef.getDownloadUrl()
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        return downloadUri != null ? downloadUri.toString() : null;
+                    }
+                    // If file doesn't exist, return null instead of throwing error
+                    return null;
+                });
     }
 }
 
