@@ -31,4 +31,8 @@
     <string name="action_contact_us">Contact us</string>
     <string name="action_privacy_policy">Privacy policy</string>
     <string name="action_about_app">About app</string>
+
+  <!--Home-->
+  <string name="report_statistics">Report Statistics</string>
+  <string name="your_reports">Your Reports</string>
 </resources>
