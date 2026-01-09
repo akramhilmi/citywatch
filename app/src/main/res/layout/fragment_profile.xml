@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/md_theme_background">
+    android:background="@color/md_theme_background"
+    tools:context=".ui.profile.ProfileFragment">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -150,7 +151,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                  android:src="@drawable/ic_arrowright"
+                    android:src="@drawable/ic_arrowright"
                     app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
@@ -196,7 +197,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                  android:src="@drawable/ic_arrowright"
+                    android:src="@drawable/ic_arrowright"
                     app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
@@ -228,7 +229,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                  android:src="@drawable/ic_arrowright"
+                    android:src="@drawable/ic_arrowright"
                     app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
@@ -259,7 +260,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                  android:src="@drawable/ic_arrowright"
+                    android:src="@drawable/ic_arrowright"
                     app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
@@ -290,7 +291,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                  android:src="@drawable/ic_arrowright"
+                    android:src="@drawable/ic_arrowright"
                     app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
@@ -321,20 +322,20 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                  android:src="@drawable/ic_arrowright"
+                    android:src="@drawable/ic_arrowright"
                     app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
             <!-- Other Section -->
-          <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"
-            android:text="@string/section_other"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/section_other"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -343,16 +344,16 @@
                 android:orientation="horizontal"
                 android:paddingVertical="12dp">
 
-              <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_darkmode"
-                app:tint="@color/md_theme_onSurfaceVariant" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_darkmode"
+                    app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                  android:layout_marginStart="16dp"
+                    android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/label_dark_mode"
                     android:textColor="@color/md_theme_onSurface"
@@ -374,16 +375,16 @@
                 android:orientation="horizontal"
                 android:paddingVertical="12dp">
 
-              <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_help"
-                app:tint="@color/md_theme_onSurfaceVariant" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_help"
+                    app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                  android:layout_marginStart="16dp"
+                    android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/action_contact_us"
                     android:textColor="@color/md_theme_onSurface"
@@ -392,7 +393,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                  android:src="@drawable/ic_arrowright"
+                    android:src="@drawable/ic_arrowright"
                     app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
@@ -405,17 +406,16 @@
                 android:orientation="horizontal"
                 android:paddingVertical="12dp">
 
-
-              <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_shield"
-                app:tint="@color/md_theme_onSurfaceVariant" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_shield"
+                    app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                  android:layout_marginStart="16dp"
+                    android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/action_privacy_policy"
                     android:textColor="@color/md_theme_onSurface"
@@ -424,7 +424,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                  android:src="@drawable/ic_arrowright"
+                    android:src="@drawable/ic_arrowright"
                     app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
@@ -437,18 +437,16 @@
                 android:orientation="horizontal"
                 android:paddingVertical="12dp">
 
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_info_details"
+                    app:tint="@color/md_theme_onSurfaceVariant" />
 
-              <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_info_details"
-                app:tint="@color/md_theme_onSurfaceVariant" />
-
-
-              <TextView
+                <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                    android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:text="@string/action_about_app"
                     android:textColor="@color/md_theme_onSurface"
@@ -457,7 +455,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                  android:src="@drawable/ic_arrowright"
+                    android:src="@drawable/ic_arrowright"
                     app:tint="@color/md_theme_onSurfaceVariant" />
             </LinearLayout>
 
@@ -465,16 +463,5 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/md_theme_surfaceContainer"
-        app:itemIconTint="@color/md_theme_onSurface"
-        app:itemTextColor="@color/md_theme_onSurface"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
+

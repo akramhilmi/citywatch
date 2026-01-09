@@ -7,9 +7,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 
 import com.gitgud.citywatch.util.SessionManager;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,32 +31,14 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Setup toolbar
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        // Setup bottom navigation
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                // Handle home navigation
-                return true;
-            } else if (itemId == R.id.nav_community) {
-                // Handle community navigation
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                // Handle profile navigation
-                return true;
-            }
-            return false;
-        });
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Setup bottom navigation after view hierarchy is created
+        setupBottomNavMenu();
     }
 
     @Override
@@ -61,5 +46,19 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         // re-check on resume in case token expired or user logged out elsewhere
         sessionManager.redirectIfNotLoggedIn(this);
+    }
+
+    private void setupBottomNavMenu() {
+        try {
+            NavHostFragment host = (NavHostFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.nav_host_fragment);
+
+            assert host != null;
+            NavController navController = host.getNavController();
+            BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+            NavigationUI.setupWithNavController(bottomNav, navController);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
