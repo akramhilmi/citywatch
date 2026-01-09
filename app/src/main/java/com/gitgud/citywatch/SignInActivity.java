@@ -9,7 +9,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.gitgud.citywatch.databinding.ActivitySignInBinding;
-import com.gitgud.citywatch.util.MockBackend;
+import com.gitgud.citywatch.util.ApiClient;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -45,7 +45,7 @@ public class SignInActivity extends AppCompatActivity {
         if (!validateInput(email, password)) return;
 
         setLoading(true);
-        MockBackend.signIn(email, password)
+        ApiClient.signIn(email, password)
                 .addOnCompleteListener(this, task -> {
                     setLoading(false);
                     if (task.isSuccessful()) {
@@ -64,7 +64,7 @@ public class SignInActivity extends AppCompatActivity {
         binding.tilEmail.setError(null);
         binding.tilPassword.setError(null);
 
-        if (!MockBackend.validateSignInInput(email, password)) {
+        if (!ApiClient.validateSignInInput(email, password)) {
             if (email.isEmpty()) {
                 binding.tilEmail.setError("Email required");
             }

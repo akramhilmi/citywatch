@@ -8,7 +8,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.gitgud.citywatch.databinding.ActivitySignUpBinding;
-import com.gitgud.citywatch.util.MockBackend;
+import com.gitgud.citywatch.util.ApiClient;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -35,7 +35,7 @@ public class SignUpActivity extends AppCompatActivity {
         if (!validateInput(name, email, phone, password, confirmPassword)) return;
 
         setLoading(true);
-        MockBackend.signUp(email, password, name, phone)
+        ApiClient.signUp(email, password, name, phone)
                 .addOnCompleteListener(this, task -> {
                     setLoading(false);
                     if (task.isSuccessful()) {
@@ -57,7 +57,7 @@ public class SignUpActivity extends AppCompatActivity {
         binding.tilPassword.setError(null);
         binding.tilConfirmPassword.setError(null);
 
-        if (!MockBackend.validateSignUpInput(name, email, phone, password, confirmPassword)) {
+        if (!ApiClient.validateSignUpInput(name, email, phone, password, confirmPassword)) {
             if (name.isEmpty()) {
                 binding.tilName.setError("Name required");
             }
