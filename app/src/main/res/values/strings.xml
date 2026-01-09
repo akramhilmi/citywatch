@@ -1,19 +1,40 @@
 <resources>
     <string name="app_name">CityWatch</string>
 
-    <!-- Login -->
+    <!--login-->
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
     <string name="btn_login">Sign in</string>
     <string name="label_or">or</string>
     <string name="btn_register">Create an account</string>
 
-    <!-- Sign Up -->
+    <!--sign up-->
     <string name="title_sign_up">Create Account</string>
     <string name="hint_name">Name</string>
     <string name="hint_phone">Phone number</string>
     <string name="hint_confirm_password">Confirm password</string>
     <string name="btn_sign_up">Sign up</string>
+
+    <!--profile-->
+    <string name="profile_title">PROFILE</string>
+    <string name="section_account">Account</string>
+    <string name="label_name">Name</string>
+    <string name="label_email">Email</string>
+    <string name="label_phone">Phone</string>
+    <string name="action_update_photo">Update profile photo</string>
+    <string name="action_change_password">Change password</string>
+    <string name="action_sign_out">Sign out</string>
+    <string name="action_delete_account">Delete account</string>
+
+    <string name="section_other">Other</string>
+    <string name="label_dark_mode">Dark mode</string>
+    <string name="action_contact_us">Contact us</string>
+    <string name="action_privacy_policy">Privacy policy</string>
+    <string name="action_about_app">About app</string>
+
+  <!--Home-->
+  <string name="report_statistics">Report Statistics</string>
+  <string name="your_reports">Your Reports</string>
 
     <!-- Main Activity Navigation -->
     <string name="nav_home">Home</string>
