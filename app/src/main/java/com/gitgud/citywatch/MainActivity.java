@@ -1,5 +1,6 @@
 package com.gitgud.citywatch;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -9,6 +10,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.gitgud.citywatch.util.SessionManager;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        setupBottomNavigation();
     }
 
     @Override
@@ -37,5 +41,17 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         // re-check on resume in case token expired or user logged out elsewhere
         sessionManager.redirectIfNotLoggedIn(this);
+    }
+
+    private void setupBottomNavigation() {
+        BottomNavigationView nav = findViewById(R.id.bottom_navigation);
+        nav.setSelectedItemId(R.id.nav_home);
+        nav.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.nav_profile) {
+                startActivity(new Intent(this, PageActivity.class));
+                return true;
+            }
+            return item.getItemId() == R.id.nav_home;
+        });
     }
 }
