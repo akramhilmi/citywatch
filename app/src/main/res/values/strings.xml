@@ -14,4 +14,9 @@
     <string name="hint_phone">Phone number</string>
     <string name="hint_confirm_password">Confirm password</string>
     <string name="btn_sign_up">Sign up</string>
+
+    <!-- Main Activity Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_community">Community</string>
+    <string name="nav_profile">Profile</string>
 </resources>

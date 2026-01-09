@@ -50,6 +50,7 @@ dependencies {
     // firebase
     implementation(platform(libs.firebase.bom))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore")
     implementation(libs.firebase.auth)
 
     testImplementation(libs.junit)

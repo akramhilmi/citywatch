@@ -2,20 +2,17 @@ package com.gitgud.citywatch;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.gitgud.citywatch.databinding.ActivitySignUpBinding;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.UserProfileChangeRequest;
+import com.gitgud.citywatch.util.MockBackend;
 
 public class SignUpActivity extends AppCompatActivity {
 
     private ActivitySignUpBinding binding;
-    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +20,6 @@ public class SignUpActivity extends AppCompatActivity {
 
         binding = ActivitySignUpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        auth = FirebaseAuth.getInstance();
 
         binding.toolbar.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
         binding.btnSignUp.setOnClickListener(v -> attemptSignUp());
@@ -40,22 +35,12 @@ public class SignUpActivity extends AppCompatActivity {
         if (!validateInput(name, email, phone, password, confirmPassword)) return;
 
         setLoading(true);
-        auth.createUserWithEmailAndPassword(email, password)
+        MockBackend.signUp(email, password, name, phone)
                 .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful() && auth.getCurrentUser() != null) {
-                        // update display name
-                        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
-                                .setDisplayName(name)
-                                .build();
-
-                        auth.getCurrentUser().updateProfile(profileUpdate)
-                                .addOnCompleteListener(profileTask -> {
-                                    setLoading(false);
-                                    // TODO: store phone number in Firestore/Realtime DB (Firebase Auth doesn't store phone directly)
-                                    navigateToMain();
-                                });
+                    setLoading(false);
+                    if (task.isSuccessful()) {
+                        navigateToMain();
                     } else {
-                        setLoading(false);
                         String msg = task.getException() != null
                                 ? task.getException().getMessage()
                                 : "Registration failed";
@@ -72,28 +57,24 @@ public class SignUpActivity extends AppCompatActivity {
         binding.tilPassword.setError(null);
         binding.tilConfirmPassword.setError(null);
 
-        if (TextUtils.isEmpty(name)) {
-            binding.tilName.setError("Name required");
-            return false;
-        }
-        if (TextUtils.isEmpty(email)) {
-            binding.tilEmail.setError("Email required");
-            return false;
-        }
-        if (TextUtils.isEmpty(phone)) {
-            binding.tilPhone.setError("Phone number required");
-            return false;
-        }
-        if (TextUtils.isEmpty(password)) {
-            binding.tilPassword.setError("Password required");
-            return false;
-        }
-        if (password.length() < 6) {
-            binding.tilPassword.setError("Password must be at least 6 characters");
-            return false;
-        }
-        if (!password.equals(confirmPassword)) {
-            binding.tilConfirmPassword.setError("Passwords do not match");
+        if (!MockBackend.validateSignUpInput(name, email, phone, password, confirmPassword)) {
+            if (name.isEmpty()) {
+                binding.tilName.setError("Name required");
+            }
+            if (email.isEmpty()) {
+                binding.tilEmail.setError("Email required");
+            }
+            if (phone.isEmpty()) {
+                binding.tilPhone.setError("Phone number required");
+            }
+            if (password.isEmpty()) {
+                binding.tilPassword.setError("Password required");
+            } else if (password.length() < 6) {
+                binding.tilPassword.setError("Password must be at least 6 characters");
+            }
+            if (!password.equals(confirmPassword)) {
+                binding.tilConfirmPassword.setError("Passwords do not match");
+            }
             return false;
         }
         return true;

@@ -2,7 +2,6 @@ package com.gitgud.citywatch;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
@@ -10,12 +9,11 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.gitgud.citywatch.databinding.ActivitySignInBinding;
-import com.google.firebase.auth.FirebaseAuth;
+import com.gitgud.citywatch.util.MockBackend;
 
 public class SignInActivity extends AppCompatActivity {
 
     private ActivitySignInBinding binding;
-    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +21,6 @@ public class SignInActivity extends AppCompatActivity {
 
         binding = ActivitySignInBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        auth = FirebaseAuth.getInstance();
 
         // disable back navigation completely
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -49,7 +45,7 @@ public class SignInActivity extends AppCompatActivity {
         if (!validateInput(email, password)) return;
 
         setLoading(true);
-        auth.signInWithEmailAndPassword(email, password)
+        MockBackend.signIn(email, password)
                 .addOnCompleteListener(this, task -> {
                     setLoading(false);
                     if (task.isSuccessful()) {
@@ -68,16 +64,16 @@ public class SignInActivity extends AppCompatActivity {
         binding.tilEmail.setError(null);
         binding.tilPassword.setError(null);
 
-        if (TextUtils.isEmpty(email)) {
-            binding.tilEmail.setError("Email required");
-            return false;
-        }
-        if (TextUtils.isEmpty(password)) {
-            binding.tilPassword.setError("Password required");
-            return false;
-        }
-        if (password.length() < 6) {
-            binding.tilPassword.setError("Password must be at least 6 characters");
+        if (!MockBackend.validateSignInInput(email, password)) {
+            if (email.isEmpty()) {
+                binding.tilEmail.setError("Email required");
+            }
+            if (password.isEmpty()) {
+                binding.tilPassword.setError("Password required");
+            }
+            if (!password.isEmpty() && password.length() < 6) {
+                binding.tilPassword.setError("Password must be at least 6 characters");
+            }
             return false;
         }
         return true;
