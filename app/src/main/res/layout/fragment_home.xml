@@ -1,17 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@color/md_theme_surface"
+  tools:context=".ui.home.HomeFragment">
+
+  <!-- TODO: Add content here for Home fragment -->
+
+  <LinearLayout
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/md_theme_surface"
-    tools:context=".ui.home.HomeFragment">
+    android:layout_height="wrap_content"
+    android:background="@color/md_theme_primary"
+    android:orientation="vertical"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
 
-    <!-- TODO: Add content here for Home fragment -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="Home" />
+      android:id="@+id/tvReportStatistics"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="20dp"
+      android:layout_marginTop="20dp"
+      android:gravity="center"
+      android:text="@string/report_statistics"
+      android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
+      android:textColor="@color/md_theme_onPrimary" />
 
-</FrameLayout>
+    <TableLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+
+      <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:id="@+id/textView3"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="40dp"
+          android:layout_marginTop="20dp"
+          android:layout_marginRight="40dp"
+          android:layout_marginBottom="20dp"
+          android:layout_weight="1"
+          android:background="@drawable/report_statistics_data"
+          android:text="TextView" />
+
+        <TextView
+          android:id="@+id/textView2"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="40dp"
+          android:layout_marginTop="20dp"
+          android:layout_marginRight="40dp"
+          android:layout_marginBottom="20dp"
+          android:layout_weight="1"
+          android:background="@drawable/report_statistics_data"
+          android:text="TextView" />
+      </TableRow>
+
+      <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+          android:id="@+id/textView4"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="40dp"
+          android:layout_marginTop="20dp"
+          android:layout_marginRight="40dp"
+          android:layout_marginBottom="20dp"
+          android:layout_weight="1"
+          android:background="@drawable/report_statistics_data"
+          android:text="TextView" />
+
+        <TextView
+          android:id="@+id/textView5"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="40dp"
+          android:layout_marginTop="20dp"
+          android:layout_marginRight="40dp"
+          android:layout_marginBottom="20dp"
+          android:layout_weight="1"
+          android:background="@drawable/report_statistics_data"
+          android:text="TextView" />
+      </TableRow>
+
+    </TableLayout>
+
+  </LinearLayout>
+
+  <TextView
+    android:id="@+id/tvYourReports"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="20dp"
+    android:layout_marginTop="20dp"
+    android:text="@string/your_reports"
+    android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
+    android:textColor="@color/md_theme_onSurface"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+  <com.google.android.material.floatingactionbutton.FloatingActionButton
+    android:id="@+id/btnAddReportHome"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="20dp"
+    android:layout_marginBottom="20dp"
+    android:clickable="true"
+    android:src="@drawable/ic_add"
+    app:fabCustomSize="96dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:maxImageSize="36dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
 
