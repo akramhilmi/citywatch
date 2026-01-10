@@ -57,6 +57,8 @@ dependencies {
 
     // image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.cardview)
+    implementation(libs.recyclerview)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
