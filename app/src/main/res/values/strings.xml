@@ -35,7 +35,9 @@
   <!--Home-->
   <string name="report_statistics">Report Statistics</string>
   <string name="your_reports">Your Reports</string>
-  <string name="home">Home</string>
-  <string name="community">Community</string>
-  <string name="profile">Profile</string>
+
+    <!-- Main Activity Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_community">Community</string>
+    <string name="nav_profile">Profile</string>
 </resources>

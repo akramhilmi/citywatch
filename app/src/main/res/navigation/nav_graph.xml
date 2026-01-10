@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_home">
+
+    <!-- Home Fragment -->
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.gitgud.citywatch.ui.home.HomeFragment"
+        android:label="@string/nav_home">
+        <action
+            android:id="@+id/action_home_to_community"
+            app:destination="@id/nav_community" />
+        <action
+            android:id="@+id/action_home_to_profile"
+            app:destination="@id/nav_profile" />
+    </fragment>
+
+    <!-- Community Fragment -->
+    <fragment
+        android:id="@+id/nav_community"
+        android:name="com.gitgud.citywatch.ui.community.CommunityFragment"
+        android:label="@string/nav_community">
+        <action
+            android:id="@+id/action_community_to_home"
+            app:destination="@id/nav_home" />
+        <action
+            android:id="@+id/action_community_to_profile"
+            app:destination="@id/nav_profile" />
+    </fragment>
+
+    <!-- Profile Fragment -->
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.gitgud.citywatch.ui.profile.ProfileFragment"
+        android:label="@string/nav_profile">
+        <action
+            android:id="@+id/action_profile_to_home"
+            app:destination="@id/nav_home" />
+        <action
+            android:id="@+id/action_profile_to_community"
+            app:destination="@id/nav_community" />
+    </fragment>
+
+</navigation>

@@ -1,0 +1,106 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Dependencies
+node_modules/
+*.npm
+*.yarn
+.npm
+.yarn
+
+# Production
+lib/
+dist/
+build/
+
+# Misc
+*.pem
+.DS_Store
+*.plist
+*.xcconfig
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.history/
+.ionide
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log
+ui-debug.log
+
+# Cloud Functions specific
+.runtimeconfig.json
+.env.*.json
+
+# Testing
+coverage/
+.nyc_output/
+
+# OS
+Thumbs.db
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# Node version managers
+.nvm
+.nvmrc.swp
+
+# Package manager lock files (optional - uncomment if you want to track)
+package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Compiled output
+out/
+dist/
+lib/
+esm/
+
+# ESLint cache
+.eslintcache
+

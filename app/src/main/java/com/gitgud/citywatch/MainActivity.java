@@ -1,6 +1,5 @@
 package com.gitgud.citywatch;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -8,6 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 
 import com.gitgud.citywatch.util.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -27,13 +30,15 @@ public class MainActivity extends AppCompatActivity {
 
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        setupBottomNavigation();
+        // Setup bottom navigation after view hierarchy is created
+        setupBottomNavMenu();
     }
 
     @Override
@@ -43,15 +48,17 @@ public class MainActivity extends AppCompatActivity {
         sessionManager.redirectIfNotLoggedIn(this);
     }
 
-    private void setupBottomNavigation() {
-        BottomNavigationView nav = findViewById(R.id.bottom_navigation);
-        nav.setSelectedItemId(R.id.nav_home);
-        nav.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_profile) {
-                startActivity(new Intent(this, PageActivity.class));
-                return true;
-            }
-            return item.getItemId() == R.id.nav_home;
-        });
+    private void setupBottomNavMenu() {
+        try {
+            NavHostFragment host = (NavHostFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.nav_host_fragment);
+
+            assert host != null;
+            NavController navController = host.getNavController();
+            BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+            NavigationUI.setupWithNavController(bottomNav, navController);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
