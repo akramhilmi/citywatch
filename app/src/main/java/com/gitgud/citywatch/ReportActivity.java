@@ -64,13 +64,8 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void setupDropdowns() {
-        String[] hazardTypes = {"Pothole"};
-        AutoCompleteTextView hazardSpinner = findViewById(R.id.spinnerHazardType);
-        if (hazardSpinner != null) {
-            hazardSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, hazardTypes));
-        }
-
-        String[] localGovs = {"Kuala Lumpur City Hall (DBKL)"};
+        //local government dropdown
+        String[] localGovs = {"Kuala Lumpur City Hall (DBKL)","Majlis Bandaraya Petaling Jaya(MBPJ)","Majlis Bandaraya Subang Jaya(MBSJ)"};
         AutoCompleteTextView govSpinner = findViewById(R.id.spinnerLocalGov);
         if (govSpinner != null) {
             govSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, localGovs));
@@ -80,7 +75,7 @@ public class ReportActivity extends AppCompatActivity {
     private void setupLocation() {
         TextInputEditText etLocation = findViewById(R.id.etMapsLocation);
         if (etLocation != null) {
-            etLocation.setText(""); // Clear placeholder link
+            etLocation.setText(""); //clear placeholder link
             etLocation.setOnClickListener(v -> {
                 Uri gmmIntentUri = Uri.parse("geo:0,0?q=Hazards");
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
@@ -108,7 +103,16 @@ public class ReportActivity extends AppCompatActivity {
         MaterialCardView btnSubmit = findViewById(R.id.btnSubmit);
         if (btnSubmit != null) {
             btnSubmit.setOnClickListener(v -> {
-                Toast.makeText(this, "Report submitted successfully!", Toast.LENGTH_SHORT).show();
+                //get hazard type
+                TextInputEditText etHazardType = findViewById(R.id.etHazardType);
+                String hazardType = etHazardType != null ? etHazardType.getText().toString() : "";
+
+                if (hazardType.isEmpty()) {
+                    Toast.makeText(this, "Please enter a Hazard type", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Toast.makeText(this, "Report submitted: " + hazardType, Toast.LENGTH_SHORT).show();
                 finish();
             });
         }
