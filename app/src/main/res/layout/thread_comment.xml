@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/threadComment"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="@color/md_theme_surface">
+
+  <com.google.android.material.imageview.ShapeableImageView
+    android:id="@+id/ivThreadCommentProfile"
+    android:layout_width="30dp"
+    android:layout_height="30dp"
+    android:scaleType="centerCrop"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:shapeAppearanceOverlay="@style/CircleImage"
+    app:srcCompat="@drawable/ic_profile"
+    app:strokeColor="@color/md_theme_outline"
+    app:strokeWidth="2dp" />
+
+  <TextView
+    android:id="@+id/tvThreadCommentName"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:text="Name"
+    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+    android:textColor="@color/md_theme_onSurface"
+    app:layout_constraintBottom_toBottomOf="@id/ivThreadCommentProfile"
+    app:layout_constraintStart_toEndOf="@id/ivThreadCommentProfile"
+    app:layout_constraintTop_toTopOf="@id/ivThreadCommentProfile" />
+
+  <TextView
+    android:id="@+id/tvThreadCommentContent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:text="This is a comment"
+    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+    android:textColor="@color/md_theme_onSurface"
+    app:layout_constraintTop_toBottomOf="@id/ivThreadCommentProfile" />
+
+  <ImageButton
+    android:id="@+id/btnThreadCommentUpvote"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:background="@null"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/tvThreadCommentContent"
+    app:srcCompat="@drawable/ic_thumb_up" />
+
+  <TextView
+    android:id="@+id/tvThreadCommentVotes"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:text="67"
+    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+    app:layout_constraintBottom_toBottomOf="@id/btnThreadCommentUpvote"
+    app:layout_constraintStart_toEndOf="@+id/btnThreadCommentUpvote"
+    app:layout_constraintTop_toTopOf="@+id/btnThreadCommentUpvote" />
+
+  <ImageButton
+    android:id="@+id/btnThreadCommentDownvote"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="10dp"
+    android:background="@null"
+    app:layout_constraintStart_toEndOf="@+id/tvThreadCommentVotes"
+    app:layout_constraintTop_toBottomOf="@+id/tvThreadCommentContent"
+    app:srcCompat="@drawable/ic_thumb_down" />
+</androidx.constraintlayout.widget.ConstraintLayout>

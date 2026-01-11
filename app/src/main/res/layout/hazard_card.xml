@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/hazard_card"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  app:cardBackgroundColor="@color/md_theme_surfaceContainerHigh"
+  app:cardCornerRadius="10dp"
+  app:contentPadding="20dp">
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.imageview.ShapeableImageView
+      android:id="@+id/ivCardProfile"
+      android:layout_width="30dp"
+      android:layout_height="30dp"
+      android:scaleType="centerCrop"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:shapeAppearanceOverlay="@style/CircleImage"
+      app:srcCompat="@drawable/ic_profile"
+      app:strokeColor="@color/md_theme_outline"
+      app:strokeWidth="2dp" />
+
+    <TextView
+      android:id="@+id/tvCardName"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:text="Name"
+      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+      app:layout_constraintBottom_toBottomOf="@+id/ivCardProfile"
+      app:layout_constraintStart_toEndOf="@+id/ivCardProfile"
+      app:layout_constraintTop_toTopOf="@+id/ivCardProfile" />
+
+    <TextView
+      android:id="@+id/tvCardTitle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:text="Title"
+      android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/ivCardProfile" />
+
+    <TextView
+      android:id="@+id/tvTagTertiary"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:background="@drawable/hazard_tag_tertiary"
+      android:text="Resolved"
+      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+      android:textColor="@color/md_theme_onTertiary"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/tvCardTitle" />
+
+    <TextView
+      android:id="@+id/tvTagSecondary"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="5dp"
+      android:background="@drawable/hazard_tag_secondary"
+      android:text="DBKL"
+      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+      android:textColor="@color/md_theme_onSecondary"
+      app:layout_constraintBottom_toBottomOf="@+id/tvTagTertiary"
+      app:layout_constraintStart_toEndOf="@+id/tvTagTertiary"
+      app:layout_constraintTop_toTopOf="@+id/tvTagTertiary" />
+
+    <ImageView
+      android:id="@+id/ivCardPhoto"
+      android:layout_width="332dp"
+      android:layout_height="332dp"
+      android:layout_marginTop="10dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/tvTagTertiary"
+      tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+    <ImageButton
+      android:id="@+id/btnUpvote"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:background="@null"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/ivCardPhoto"
+      app:srcCompat="@drawable/ic_thumb_up" />
+
+    <TextView
+      android:id="@+id/tvVotes"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:text="67"
+      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+      app:layout_constraintBottom_toBottomOf="@id/btnUpvote"
+      app:layout_constraintStart_toEndOf="@+id/btnUpvote"
+      app:layout_constraintTop_toTopOf="@+id/btnUpvote" />
+
+    <ImageButton
+      android:id="@+id/btnDownvote"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="10dp"
+      android:background="@null"
+      app:layout_constraintStart_toEndOf="@+id/tvVotes"
+      app:layout_constraintTop_toBottomOf="@+id/ivCardPhoto"
+      app:srcCompat="@drawable/ic_thumb_down" />
+
+    <TextView
+      android:id="@+id/tvComments"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="67"
+      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+      app:layout_constraintBottom_toBottomOf="@id/btnComments"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="@+id/btnComments" />
+
+    <ImageButton
+      android:id="@+id/btnComments"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:layout_marginEnd="8dp"
+      android:background="@null"
+      app:layout_constraintEnd_toStartOf="@+id/tvComments"
+      app:layout_constraintTop_toBottomOf="@+id/ivCardPhoto"
+      app:srcCompat="@drawable/ic_comment" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

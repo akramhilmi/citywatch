@@ -107,6 +107,14 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
+  <androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/rvCards"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="20dp"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/tvYourReports" />
+
   <com.google.android.material.floatingactionbutton.FloatingActionButton
     android:id="@+id/btnAddReportHome"
     android:layout_width="wrap_content"
