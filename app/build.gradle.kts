@@ -59,6 +59,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.cardview)
     implementation(libs.recyclerview)
+    implementation(libs.legacy.support.v4)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

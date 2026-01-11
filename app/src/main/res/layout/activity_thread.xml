@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:id="@+id/activity_thread"
@@ -7,186 +7,221 @@
   android:layout_height="match_parent"
   android:background="@color/md_theme_surface"
   android:padding="20dp"
+  android:fillViewport="true"
   tools:context=".ThreadActivity">
 
-  <ImageButton
-    android:id="@+id/btnThreadBack"
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:background="?attr/selectableItemBackgroundBorderless"
-    android:contentDescription="Back"
-    android:padding="12dp"
-    android:scaleType="fitCenter"
-    android:src="@drawable/ic_arrowback"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    app:tint="@color/md_theme_onBackground" />
-
-  <com.google.android.material.imageview.ShapeableImageView
-    android:id="@+id/ivThreadProfile"
-    android:layout_width="30dp"
-    android:layout_height="30dp"
-    android:layout_marginTop="20dp"
-    android:scaleType="centerCrop"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/btnThreadBack"
-    app:shapeAppearanceOverlay="@style/CircleImage"
-    app:srcCompat="@drawable/ic_profile"
-    app:strokeColor="@color/md_theme_outline"
-    app:strokeWidth="2dp" />
-
-  <TextView
-    android:id="@+id/tvThreadName"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:text="Name"
-    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-    app:layout_constraintBottom_toBottomOf="@+id/ivThreadProfile"
-    app:layout_constraintStart_toEndOf="@+id/ivThreadProfile"
-    app:layout_constraintTop_toTopOf="@+id/ivThreadProfile" />
-
-  <TextView
-    android:id="@+id/tvThreadTitle"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:text="Title"
-    android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/ivThreadProfile" />
-
-  <TextView
-    android:id="@+id/tvThreadTagTertiary"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:background="@drawable/hazard_tag_tertiary"
-    android:text="Resolved"
-    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-    android:textColor="@color/md_theme_onTertiary"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/tvThreadTitle" />
-
-  <TextView
-    android:id="@+id/tvThreadTagSecondary"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="5dp"
-    android:background="@drawable/hazard_tag_secondary"
-    android:text="DBKL"
-    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-    android:textColor="@color/md_theme_onSecondary"
-    app:layout_constraintBottom_toBottomOf="@+id/tvThreadTagTertiary"
-    app:layout_constraintStart_toEndOf="@+id/tvThreadTagTertiary"
-    app:layout_constraintTop_toTopOf="@+id/tvThreadTagTertiary" />
-
-  <androidx.cardview.widget.CardView
-    android:id="@+id/cvPhoto"
+  <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="20dp"
-    app:cardCornerRadius="8dp"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/tvThreadTagTertiary">
+    android:layout_height="match_parent"
+    tools:layout_editor_absoluteX="20dp"
+    tools:layout_editor_absoluteY="20dp">
 
-    <ImageView
-      android:id="@+id/ivThreadPhoto"
+    <ImageButton
+      android:id="@+id/btnThreadBack"
+      android:layout_width="48dp"
+      android:layout_height="48dp"
+      android:background="?attr/selectableItemBackgroundBorderless"
+      android:contentDescription="Back"
+      android:padding="12dp"
+      android:scaleType="fitCenter"
+      android:src="@drawable/ic_arrowback"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:tint="@color/md_theme_onBackground" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+      android:id="@+id/ivThreadProfile"
+      android:layout_width="30dp"
+      android:layout_height="30dp"
+      android:layout_marginTop="20dp"
+      android:scaleType="centerCrop"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/btnThreadBack"
+      app:shapeAppearanceOverlay="@style/CircleImage"
+      app:srcCompat="@drawable/ic_profile"
+      app:strokeColor="@color/md_theme_outline"
+      app:strokeWidth="2dp" />
+
+    <TextView
+      android:id="@+id/tvThreadName"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:text="Name"
+      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+      app:layout_constraintBottom_toBottomOf="@+id/ivThreadProfile"
+      app:layout_constraintStart_toEndOf="@+id/ivThreadProfile"
+      app:layout_constraintTop_toTopOf="@+id/ivThreadProfile" />
+
+    <TextView
+      android:id="@+id/tvThreadTitle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:text="Title"
+      android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/ivThreadProfile" />
+
+    <TextView
+      android:id="@+id/tvThreadTagTertiary"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:background="@drawable/hazard_tag_tertiary"
+      android:text="Resolved"
+      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+      android:textColor="@color/md_theme_onTertiary"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/tvThreadTitle" />
+
+    <TextView
+      android:id="@+id/tvThreadTagSecondary"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="5dp"
+      android:background="@drawable/hazard_tag_secondary"
+      android:text="DBKL"
+      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+      android:textColor="@color/md_theme_onSecondary"
+      app:layout_constraintBottom_toBottomOf="@+id/tvThreadTagTertiary"
+      app:layout_constraintStart_toEndOf="@+id/tvThreadTagTertiary"
+      app:layout_constraintTop_toTopOf="@+id/tvThreadTagTertiary" />
+
+    <androidx.cardview.widget.CardView
+      android:id="@+id/cvPhoto"
       android:layout_width="332dp"
       android:layout_height="332dp"
-      tools:srcCompat="@tools:sample/backgrounds/scenic" />
-  </androidx.cardview.widget.CardView>
+      android:layout_marginTop="20dp"
+      app:cardCornerRadius="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/tvThreadTagTertiary">
 
-  <TextView
-    android:id="@+id/tvThreadDesc"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="20dp"
-    android:text="TextView"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/cvPhoto" />
+      <ImageView
+        android:id="@+id/ivThreadPhoto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+    </androidx.cardview.widget.CardView>
 
-  <ImageButton
-    android:id="@+id/btnThreadLocation"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:background="@null"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/tvThreadDesc"
-    app:srcCompat="@drawable/ic_location" />
+    <TextView
+      android:id="@+id/tvThreadDesc"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:text="TextView"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/cvPhoto" />
 
-  <ImageButton
-    android:id="@+id/btnThreadUpvote"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="20dp"
-    android:background="@null"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-    app:srcCompat="@drawable/ic_thumb_up" />
 
-  <TextView
-    android:id="@+id/tvThreadVotes"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:text="67"
-    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-    app:layout_constraintBottom_toBottomOf="@id/btnThreadUpvote"
-    app:layout_constraintStart_toEndOf="@+id/btnThreadUpvote"
-    app:layout_constraintTop_toTopOf="@+id/btnThreadUpvote" />
 
-  <ImageButton
-    android:id="@+id/btnThreadDownvote"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="20dp"
-    android:background="@null"
-    app:layout_constraintStart_toEndOf="@+id/tvThreadVotes"
-    app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-    app:srcCompat="@drawable/ic_thumb_down" />
+    <ImageButton
+      android:id="@+id/btnThreadLocation"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:background="@null"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/tvThreadDesc"
+      app:srcCompat="@drawable/ic_location" />
 
-  <TextView
-    android:id="@+id/tvThreadComments"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="67"
-    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-    app:layout_constraintBottom_toBottomOf="@id/btnThreadComments"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="@+id/btnThreadComments" />
+    <ImageButton
+      android:id="@+id/btnThreadUpvote"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:background="@null"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
+      app:srcCompat="@drawable/ic_thumb_up" />
 
-  <ImageButton
-    android:id="@+id/btnThreadComments"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="20dp"
-    android:layout_marginEnd="8dp"
-    android:background="@null"
-    app:layout_constraintEnd_toStartOf="@+id/tvThreadComments"
-    app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-    app:srcCompat="@drawable/ic_comment" />
+    <TextView
+      android:id="@+id/tvThreadVotes"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:text="67"
+      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+      app:layout_constraintBottom_toBottomOf="@id/btnThreadUpvote"
+      app:layout_constraintStart_toEndOf="@+id/btnThreadUpvote"
+      app:layout_constraintTop_toTopOf="@+id/btnThreadUpvote" />
 
-  <TextView
-    android:id="@+id/tvThreadLocation"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:text="TextView"
-    app:layout_constraintTop_toTopOf="@+id/btnThreadLocation"
-    app:layout_constraintStart_toEndOf="@+id/btnThreadLocation"
-    app:layout_constraintBottom_toBottomOf="@+id/btnThreadLocation" />
+    <ImageButton
+      android:id="@+id/btnThreadDownvote"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="20dp"
+      android:background="@null"
+      app:layout_constraintStart_toEndOf="@+id/tvThreadVotes"
+      app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
+      app:srcCompat="@drawable/ic_thumb_down" />
 
-  <com.google.android.material.divider.MaterialDivider
-    android:id="@+id/divider"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="20dp"
-    android:background="@color/md_theme_outlineVariant"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/btnThreadUpvote" />
+    <TextView
+      android:id="@+id/tvThreadComments"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="67"
+      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+      app:layout_constraintBottom_toBottomOf="@id/btnThreadComments"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="@+id/btnThreadComments" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageButton
+      android:id="@+id/btnThreadComments"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:layout_marginEnd="8dp"
+      android:background="@null"
+      app:layout_constraintEnd_toStartOf="@+id/tvThreadComments"
+      app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
+      app:srcCompat="@drawable/ic_comment" />
+
+    <TextView
+      android:id="@+id/tvThreadLocation"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:text="TextView"
+      app:layout_constraintBottom_toBottomOf="@+id/btnThreadLocation"
+      app:layout_constraintStart_toEndOf="@+id/btnThreadLocation"
+      app:layout_constraintTop_toTopOf="@+id/btnThreadLocation" />
+
+    <com.google.android.material.divider.MaterialDivider
+      android:id="@+id/divider"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:background="@color/md_theme_outlineVariant"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/btnThreadUpvote" />
+
+    <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/rvComments"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/divider" />
+
+    <com.google.android.material.textfield.TextInputLayout
+      android:id="@+id/tilComment"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      app:endIconDrawable="@drawable/ic_send"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/rvComments">
+
+      <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
