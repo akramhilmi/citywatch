@@ -13,6 +13,7 @@ setGlobalOptions({
 
 const db = admin.firestore();
 const auth = admin.auth();
+const bucket = admin.storage().bucket();
 
 /**
  * Retrieve user name from Firestore
@@ -165,3 +166,94 @@ exports.onUserDeleted = onDocumentDeleted("users/{userId}", async (event) => {
     logger.error("Error in onUserDeleted trigger:", error);
   }
 });
+
+/**
+ * Submit a new report to Firestore
+ * Creates a new document with auto-generated ID in the 'reports' collection
+ *
+ * @param description Report description
+ * @param hazardType Type of hazard (e.g., "Pothole")
+ * @param localGov Local government authority
+ * @param locationDetails Street/area details
+ * @param latitude Latitude coordinate
+ * @param longitude Longitude coordinate
+ * @returns documentId The auto-generated report document ID
+ */
+exports.submitReport = onCall(async (request) => {
+  try {
+    const {
+      description,
+      hazardType,
+      localGov,
+      locationDetails,
+      latitude,
+      longitude,
+    } = request.data;
+
+    // Validate required fields
+    if (!description ||
+      !hazardType ||
+      !localGov ||
+      !locationDetails ||
+      latitude === undefined ||
+      longitude === undefined) {
+      throw new Error("All fields are required");
+    }
+
+    // Create report data
+    const reportData = {
+      description,
+      hazardType,
+      localGov,
+      locationDetails,
+      mapsLocation: new admin.firestore.GeoPoint(latitude, longitude),
+      status: "In progress",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    // Add to Firestore and get document ID
+    const docRef = await db.collection("reports").add(reportData);
+
+    logger.info(`Report created with ID: ${docRef.id}`);
+    return {documentId: docRef.id, success: true};
+  } catch (error) {
+    logger.error("Error submitting report:", error);
+    throw new Error(`Failed to submit report: ${error.message}`);
+  }
+});
+
+/**
+ * Upload report photo from base64 encoded string
+ * Stores image in report_photos/{documentId}.jpg
+ *
+ * @param documentId The report document ID
+ * @param imageBase64 Base64 encoded image data
+ * @returns success status
+ */
+exports.uploadReportPhoto = onCall(async (request) => {
+  try {
+    const {documentId, imageBase64} = request.data;
+
+    if (!documentId || !imageBase64) {
+      throw new Error("Document ID and image data are required");
+    }
+
+    // Decode base64 to buffer
+    const imageBuffer = Buffer.from(imageBase64, "base64");
+
+    // Upload to Storage
+    const file = bucket.file(`report_photos/${documentId}.jpg`);
+    await file.save(imageBuffer, {
+      metadata: {
+        contentType: "image/jpeg",
+      },
+    });
+
+    logger.info(`Report photo uploaded for document: ${documentId}`);
+    return {success: true, message: "Photo uploaded successfully"};
+  } catch (error) {
+    logger.error("Error uploading report photo:", error);
+    throw new Error(`Failed to upload photo: ${error.message}`);
+  }
+});
+

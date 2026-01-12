@@ -1,16 +1,19 @@
 package com.gitgud.citywatch.util;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.text.TextUtils;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import android.net.Uri;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Communicates with Firebase backend services and Cloud Functions.
@@ -225,6 +228,103 @@ public class ApiClient {
                         return downloadUri != null ? downloadUri.toString() : null;
                     }
                     // If file doesn't exist, return null instead of throwing error
+                    return null;
+                });
+    }
+
+    /**
+     * Submit a new report to Firestore via Cloud Function
+     * Creates a new document with auto-generated ID in the 'reports' collection
+     *
+     * @param description Report description
+     * @param hazardType Type of hazard (e.g., "Pothole")
+     * @param localGov Local government authority
+     * @param locationDetails Street/area details
+     * @param latitude Latitude coordinate
+     * @param longitude Longitude coordinate
+     * @return Task that completes with the auto-generated document ID
+     */
+    public static com.google.android.gms.tasks.Task<String> submitReport(
+            String description,
+            String hazardType,
+            String localGov,
+            String locationDetails,
+            double latitude,
+            double longitude) {
+
+        HttpsCallableReference submitReportFunc = functions.getHttpsCallable("submitReport");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("description", description);
+        data.put("hazardType", hazardType);
+        data.put("localGov", localGov);
+        data.put("locationDetails", locationDetails);
+        data.put("latitude", latitude);
+        data.put("longitude", longitude);
+
+        return submitReportFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.Map<String, Object> result = (java.util.Map<String, Object>) task.getResult().getData();
+                        return (String) result.get("documentId");
+                    }
+                    throw task.getException() != null ? task.getException() : new Exception("Failed to submit report");
+                });
+    }
+
+    /**
+     * Upload report photo to Firebase Storage
+     * Stores image in report_photos/{documentId}.jpg
+     *
+     * @param documentId The report document ID
+     * @param imageUri The image URI from gallery picker
+    /**
+     * Upload report photo to Firebase Storage via Cloud Function
+     * Stores image in report_photos/{documentId}.jpg
+     *
+     * @param documentId The report document ID
+     * @param imageBase64 Base64 encoded image data
+     * @return Task that completes when upload is done
+     */
+    public static com.google.android.gms.tasks.Task<Void> uploadReportPhoto(String documentId, String imageBase64) {
+        if (documentId == null || imageBase64 == null) {
+            throw new IllegalArgumentException("Document ID and image data are required");
+        }
+
+        // Call Cloud Function
+        HttpsCallableReference uploadReportPhotoFunc = functions.getHttpsCallable("uploadReportPhoto");
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("documentId", documentId);
+        data.put("imageBase64", imageBase64);
+
+        return uploadReportPhotoFunc.call(data)
+                .continueWith(task -> null);
+    }
+
+    /**
+     * Upload report photo from bitmap to Firebase Storage via Cloud Function
+     * Stores image in report_photos/{documentId}.jpg
+     *
+     * @param documentId The report document ID
+     * @param imageBase64 Base64 encoded bitmap image data
+     * @return Task that completes when upload is done
+     */
+    public static com.google.android.gms.tasks.Task<Void> uploadReportPhotoBitmap(String documentId, String imageBase64) {
+        if (documentId == null || imageBase64 == null) {
+            throw new IllegalArgumentException("Document ID and image data are required");
+        }
+
+        // Call Cloud Function
+        HttpsCallableReference uploadReportPhotoFunc = functions.getHttpsCallable("uploadReportPhoto");
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("documentId", documentId);
+        data.put("imageBase64", imageBase64);
+
+        return uploadReportPhotoFunc.call(data)
+                .continueWith(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException() != null ? task.getException() : new Exception("Upload failed");
+                    }
                     return null;
                 });
     }
