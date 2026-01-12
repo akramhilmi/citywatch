@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.card.MaterialCardView;
@@ -33,6 +34,7 @@ public class ReportActivity extends AppCompatActivity {
     private double selectedLatitude = 0, selectedLongitude = 0; // for map picker
     private android.net.Uri selectedImageUri = null; // for image upload
     private android.graphics.Bitmap selectedImageBitmap = null; // for image upload
+    private AlertDialog progressDialog; // for submission progress
 
     //setup gallery launcher
     private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
@@ -160,15 +162,21 @@ public class ReportActivity extends AppCompatActivity {
             return;
         }
 
+        // Show progress dialog
+        showProgressDialog("Submitting report...");
+
         // Submit report via ApiClient
         ApiClient.submitReport(description, hazardType, localGov, locationDetails, selectedLatitude, selectedLongitude)
                 .addOnSuccessListener(documentId -> {
+                    // Update progress dialog
+                    updateProgressDialog("Uploading photo...");
                     // Upload image with document ID as filename
                     uploadReportImage(documentId);
                 })
-                .addOnFailureListener(e ->
-                    Toast.makeText(ReportActivity.this, "Failed to submit report", Toast.LENGTH_SHORT).show()
-                );
+                .addOnFailureListener(e -> {
+                    dismissProgressDialog();
+                    Toast.makeText(ReportActivity.this, "Failed to submit report", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void uploadReportImage(String documentId) {
@@ -180,14 +188,17 @@ public class ReportActivity extends AppCompatActivity {
 
                 ApiClient.uploadReportPhoto(documentId, imageBase64)
                         .addOnSuccessListener(aVoid -> {
+                            dismissProgressDialog();
                             Toast.makeText(ReportActivity.this, "Report submitted successfully!", Toast.LENGTH_SHORT).show();
                             setResult(RESULT_OK);
                             finish();
                         })
-                        .addOnFailureListener(e ->
-                            Toast.makeText(ReportActivity.this, "Report created, but image upload failed", Toast.LENGTH_SHORT).show()
-                        );
+                        .addOnFailureListener(e -> {
+                            dismissProgressDialog();
+                            Toast.makeText(ReportActivity.this, "Report created, but image upload failed", Toast.LENGTH_SHORT).show();
+                        });
             } catch (Exception e) {
+                dismissProgressDialog();
                 Toast.makeText(ReportActivity.this, "Failed to read image", Toast.LENGTH_SHORT).show();
             }
         } else if (selectedImageBitmap != null) {
@@ -199,13 +210,15 @@ public class ReportActivity extends AppCompatActivity {
 
             ApiClient.uploadReportPhotoBitmap(documentId, imageBase64)
                     .addOnSuccessListener(aVoid -> {
+                        dismissProgressDialog();
                         Toast.makeText(ReportActivity.this, "Report submitted successfully!", Toast.LENGTH_SHORT).show();
                         setResult(RESULT_OK);
                         finish();
                     })
-                    .addOnFailureListener(e ->
-                        Toast.makeText(ReportActivity.this, "Report created, but image upload failed", Toast.LENGTH_SHORT).show()
-                    );
+                    .addOnFailureListener(e -> {
+                        dismissProgressDialog();
+                        Toast.makeText(ReportActivity.this, "Report created, but image upload failed", Toast.LENGTH_SHORT).show();
+                    });
         }
     }
 
@@ -224,5 +237,52 @@ public class ReportActivity extends AppCompatActivity {
         }
         inputStream.close();
         return outputStream.toByteArray();
+    }
+
+    private void showProgressDialog(String message) {
+        dismissProgressDialog();
+
+        android.widget.LinearLayout progressLayout = new android.widget.LinearLayout(this);
+        progressLayout.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+        progressLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        progressLayout.setPadding(48, 48, 48, 48);
+        progressLayout.setGravity(android.view.Gravity.CENTER);
+
+        android.widget.ProgressBar progressBar = new android.widget.ProgressBar(this);
+        progressBar.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                100, 100));
+        progressLayout.addView(progressBar);
+
+        android.widget.TextView textView = new android.widget.TextView(this);
+        textView.setText(message);
+        textView.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+        textView.setPadding(0, 24, 0, 0);
+        progressLayout.addView(textView);
+
+        progressDialog = new AlertDialog.Builder(this)
+                .setView(progressLayout)
+                .setCancelable(false)
+                .create();
+        progressDialog.show();
+    }
+
+    private void updateProgressDialog(String message) {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            android.widget.LinearLayout layout = (android.widget.LinearLayout) progressDialog.findViewById(android.R.id.custom);
+            if (layout != null && layout.getChildCount() > 1) {
+                android.widget.TextView textView = (android.widget.TextView) layout.getChildAt(1);
+                textView.setText(message);
+            }
+        }
+    }
+
+    private void dismissProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 }
