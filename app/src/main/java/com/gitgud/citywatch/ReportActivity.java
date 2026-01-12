@@ -17,9 +17,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.Locale;
+
 public class ReportActivity extends AppCompatActivity {
 
     private ImageView ivPhotoPlaceholder;
+    private TextInputEditText etMapsLocation;
+    private double selectedLatitude = 0, selectedLongitude = 0; // for map picker
 
     //setup gallery launcher
     private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
@@ -39,12 +43,25 @@ public class ReportActivity extends AppCompatActivity {
             }
         });
 
+    // setup location picker launcher
+    private final ActivityResultLauncher<Intent> pickLocation =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                selectedLatitude = result.getData().getDoubleExtra("latitude", 0);
+                selectedLongitude = result.getData().getDoubleExtra("longitude", 0);
+                String locationName = result.getData().getStringExtra("locationName");
+                etMapsLocation.setText(locationName != null ? locationName :
+                    String.format(Locale.US, "%.4f, %.4f", selectedLatitude, selectedLongitude));
+            }
+        });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.report_page);
 
         ivPhotoPlaceholder = findViewById(R.id.ivPhotoPlaceholder);
+        etMapsLocation = findViewById(R.id.etMapsLocation);
 
         setupHeader();
         setupDropdowns();
@@ -78,20 +95,16 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void setupLocation() {
-        TextInputEditText etLocation = findViewById(R.id.etMapsLocation);
-        if (etLocation != null) {
-            etLocation.setText(""); // Clear placeholder link
-            etLocation.setOnClickListener(v -> {
-                Uri gmmIntentUri = Uri.parse("geo:0,0?q=Hazards");
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                try {
-                    startActivity(mapIntent);
-                } catch (Exception e) {
-                    Toast.makeText(this, "Google Maps not found", Toast.LENGTH_SHORT).show();
-                }
-            });
+        if (etMapsLocation != null) {
+            etMapsLocation.setText("");
+            etMapsLocation.setOnClickListener(v -> openLocationPicker());
+            etMapsLocation.setFocusable(false);
         }
+    }
+
+    private void openLocationPicker() {
+        Intent intent = new Intent(this, LocationPickerActivity.class);
+        pickLocation.launch(intent);
     }
 
     private void setupButtons() {
