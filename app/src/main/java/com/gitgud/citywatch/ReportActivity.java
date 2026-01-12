@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.gitgud.citywatch.util.ApiClient;
+import com.gitgud.citywatch.util.SessionManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -162,11 +163,20 @@ public class ReportActivity extends AppCompatActivity {
             return;
         }
 
+        // Get current user ID from SessionManager
+        String userId = SessionManager.getCurrentUserId();
+
+        if (userId == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Show progress dialog
         showProgressDialog("Submitting report...");
 
-        // Submit report via ApiClient
-        ApiClient.submitReport(description, hazardType, localGov, locationDetails, selectedLatitude, selectedLongitude)
+        // Submit report via ApiClient with user ID
+        ApiClient.submitReport(description, hazardType, localGov, locationDetails,
+                selectedLatitude, selectedLongitude, userId)
                 .addOnSuccessListener(documentId -> {
                     // Update progress dialog
                     updateProgressDialog("Uploading photo...");

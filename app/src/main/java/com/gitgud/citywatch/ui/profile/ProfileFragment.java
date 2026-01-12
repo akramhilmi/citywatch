@@ -317,6 +317,7 @@ public class ProfileFragment extends Fragment {
                             .centerCrop()
                             .into(ivProfileImage);
                 }
+                android.util.Log.d("Photo", downloadUrl);
             }
             decrementPendingFetches();
         });

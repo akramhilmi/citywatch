@@ -1,0 +1,25 @@
+{
+  "env": {
+    "node": true,
+    "es2021": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2021
+  },
+  "rules": {
+    "no-var": "off",
+    "prefer-const": "off",
+    "prefer-arrow-callback": "off",
+    "no-unused-vars": "off",
+    "no-console": "off",
+    "quotes": "off",
+    "semi": "off",
+    "comma-dangle": "off",
+    "indent": "off",
+    "require-jsdoc": "off",
+    "operator-linebreak": "off",
+    "max-len": "off"
+  }
+}
+
