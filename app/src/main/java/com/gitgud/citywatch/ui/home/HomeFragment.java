@@ -18,6 +18,8 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
+    // TODO: Fetch all reports and only list current user's
+
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }

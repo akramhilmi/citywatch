@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,8 @@ public class ProfileFragment extends Fragment {
     private ImageView ivProfileImage;
     private SessionManager sessionManager;
     private ActivityResultLauncher<String> pickImageLauncher;
+    private FrameLayout loadingOverlay;
+    private int pendingFetches = 0; // tracks pending data fetches from Firebase
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -71,9 +74,14 @@ public class ProfileFragment extends Fragment {
         tvNameValue = view.findViewById(R.id.tvNameValue);
         tvEmailValue = view.findViewById(R.id.tvEmailValue);
         tvPhoneValue = view.findViewById(R.id.tvPhoneValue);
+        loadingOverlay = view.findViewById(R.id.loadingOverlay);
     }
 
     private void loadUserData() {
+        // Show loading spinner
+        pendingFetches = 3; // name, phone, and profile picture
+        loadingOverlay.setVisibility(View.VISIBLE);
+
         com.google.firebase.auth.FirebaseUser user = ApiClient.getCurrentUser();
         if (user != null) {
             String userId = user.getUid();
@@ -81,6 +89,7 @@ public class ProfileFragment extends Fragment {
 
             // Set email immediately (from Firebase Auth)
             tvEmailValue.setText(email != null ? email : "Not set");
+            decrementPendingFetches(); // Email doesn't require a fetch
 
             // Load profile picture from Firebase Storage
             loadProfilePicture(userId);
@@ -96,6 +105,7 @@ public class ProfileFragment extends Fragment {
                     tvNameHeader.setText("User");
                     tvNameValue.setText("Not set");
                 }
+                decrementPendingFetches();
             });
 
             ApiClient.getUserPhone(userId).addOnCompleteListener(task -> {
@@ -105,7 +115,19 @@ public class ProfileFragment extends Fragment {
                 } else {
                     tvPhoneValue.setText("Not set");
                 }
+                decrementPendingFetches();
             });
+        } else {
+            // Hide spinner if user is not available
+            pendingFetches = 0;
+            loadingOverlay.setVisibility(View.GONE);
+        }
+    }
+
+    private void decrementPendingFetches() {
+        pendingFetches--;
+        if (pendingFetches <= 0) {
+            loadingOverlay.setVisibility(View.GONE);
         }
     }
 
@@ -295,7 +317,9 @@ public class ProfileFragment extends Fragment {
                             .centerCrop()
                             .into(ivProfileImage);
                 }
+                android.util.Log.d("Photo", downloadUrl);
             }
+            decrementPendingFetches();
         });
     }
 

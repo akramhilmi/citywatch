@@ -55,6 +55,9 @@ dependencies {
     implementation("com.google.firebase:firebase-functions")
     implementation("com.google.firebase:firebase-storage")
 
+    // osmdroid for map view
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+
     // image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.cardview)
