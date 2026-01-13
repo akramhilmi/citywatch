@@ -1,6 +1,6 @@
 package com.gitgud.citywatch.util;
 
-import com.gitgud.citywatch.MainActivity;
+import com.gitgud.citywatch.SignInActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -70,14 +70,14 @@ public class SessionManager {
     }
 
     /**
-     * Redirect to MainActivity if user is not logged in
+     * Redirect to SignInActivity if user is not logged in
      * @param currentActivity The current activity to finish
      * @return True if redirected, false if user is authenticated
      */
     public static boolean redirectIfNotLoggedIn(android.app.Activity currentActivity) {
         if (!isUserAuthenticated()) {
             android.content.Intent intent = new android.content.Intent(
-                    currentActivity, MainActivity.class);
+                    currentActivity, SignInActivity.class);
             intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK |
                     android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
             currentActivity.startActivity(intent);
