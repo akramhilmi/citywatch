@@ -1,132 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:background="@color/md_theme_surface"
-  tools:context=".ui.home.HomeFragment">
-
-  <!-- TODO: Add content here for Home fragment -->
-
-  <LinearLayout
-    android:id="@+id/linearLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/md_theme_primary"
-    android:orientation="vertical"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_surface"
+    tools:context=".ui.home.HomeFragment">
 
-    <TextView
-      android:id="@+id/tvReportStatistics"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="20dp"
-      android:layout_marginTop="20dp"
-      android:gravity="center"
-      android:text="@string/report_statistics"
-      android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
-      android:textColor="@color/md_theme_onPrimary" />
-
-    <TableLayout
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
-
-      <TableRow
+  <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <TextView
-          android:id="@+id/textView3"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginLeft="40dp"
-          android:layout_marginTop="20dp"
-          android:layout_marginRight="40dp"
-          android:layout_marginBottom="20dp"
-          android:layout_weight="1"
-          android:background="@drawable/report_statistics_data"
-          android:text="TextView" />
-
-        <TextView
-          android:id="@+id/textView2"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginLeft="40dp"
-          android:layout_marginTop="20dp"
-          android:layout_marginRight="40dp"
-          android:layout_marginBottom="20dp"
-          android:layout_weight="1"
-          android:background="@drawable/report_statistics_data"
-          android:text="TextView" />
-      </TableRow>
-
-      <TableRow
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clReportStatistics"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+          android:id="@+id/linearLayout"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@color/md_theme_primary"
+          android:orientation="vertical"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent">
+
+          <TextView
+            android:id="@+id/tvReportStatistics"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="@string/report_statistics"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
+            android:textColor="@color/md_theme_onPrimary" />
+
+          <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="20dp">
+
+            <TableRow
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+              <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/report_statistics_data"
+                android:text="TextView" />
+
+              <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/report_statistics_data"
+                android:text="TextView" />
+            </TableRow>
+
+            <TableRow
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+              <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/report_statistics_data"
+                android:text="TextView" />
+
+              <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/report_statistics_data"
+                android:text="TextView" />
+            </TableRow>
+
+          </TableLayout>
+
+        </LinearLayout>
 
         <TextView
-          android:id="@+id/textView4"
+          android:id="@+id/tvYourReports"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginLeft="40dp"
+          android:layout_marginStart="20dp"
           android:layout_marginTop="20dp"
-          android:layout_marginRight="40dp"
-          android:layout_marginBottom="20dp"
-          android:layout_weight="1"
-          android:background="@drawable/report_statistics_data"
-          android:text="TextView" />
+          android:text="@string/your_reports"
+          android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
+          android:textColor="@color/md_theme_onSurface"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-        <TextView
-          android:id="@+id/textView5"
+        <ProgressBar
+          android:id="@+id/progressSpinner"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginLeft="40dp"
+          android:visibility="gone"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="@id/tvYourReports" />
+
+        <androidx.recyclerview.widget.RecyclerView
+          android:id="@+id/rvCards"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
           android:layout_marginTop="20dp"
-          android:layout_marginRight="40dp"
-          android:layout_marginBottom="20dp"
-          android:layout_weight="1"
-          android:background="@drawable/report_statistics_data"
-          android:text="TextView" />
-      </TableRow>
+          android:nestedScrollingEnabled="false"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@+id/tvYourReports" />
 
-    </TableLayout>
-
-  </LinearLayout>
-
-  <TextView
-    android:id="@+id/tvYourReports"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="20dp"
-    android:layout_marginTop="20dp"
-    android:text="@string/your_reports"
-    android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
-    android:textColor="@color/md_theme_onSurface"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
-  <androidx.recyclerview.widget.RecyclerView
-    android:id="@+id/rvCards"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="20dp"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/tvYourReports" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 
   <com.google.android.material.floatingactionbutton.FloatingActionButton
-    android:id="@+id/btnAddReportHome"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginEnd="20dp"
-    android:layout_marginBottom="20dp"
-    android:clickable="true"
-    android:src="@drawable/ic_add"
-    app:fabCustomSize="96dp"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:maxImageSize="36dp" />
+        android:id="@+id/btnAddReportHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:clickable="true"
+        android:src="@drawable/ic_add"
+        app:fabCustomSize="96dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:maxImageSize="36dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
