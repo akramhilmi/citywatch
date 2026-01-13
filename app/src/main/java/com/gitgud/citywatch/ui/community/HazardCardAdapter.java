@@ -23,9 +23,21 @@ import java.util.List;
 public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.HazardViewHolder> {
 
     private List<HazardCard> hazardCards;
+    private OnCardClickListener onCardClickListener;
+
+    /**
+     * Interface for card click events
+     */
+    public interface OnCardClickListener {
+        void onCardClick(HazardCard hazardCard);
+    }
 
     public HazardCardAdapter(List<HazardCard> hazardCards) {
         this.hazardCards = hazardCards;
+    }
+
+    public void setOnCardClickListener(OnCardClickListener listener) {
+        this.onCardClickListener = listener;
     }
 
     @NonNull
@@ -39,7 +51,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
     @Override
     public void onBindViewHolder(@NonNull HazardViewHolder holder, int position) {
         HazardCard hazard = hazardCards.get(position);
-        holder.bind(hazard);
+        holder.bind(hazard, onCardClickListener);
     }
 
     @Override
@@ -62,6 +74,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
         private final ImageButton btnUpvote;
         private final ImageButton btnDownvote;
         private final TextView tvVotes;
+        private final TextView tvComments;
 
         HazardViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -74,9 +87,10 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             btnUpvote = itemView.findViewById(R.id.btnUpvote);
             btnDownvote = itemView.findViewById(R.id.btnDownvote);
             tvVotes = itemView.findViewById(R.id.tvVotes);
+            tvComments = itemView.findViewById(R.id.tvComments);
         }
 
-        void bind(HazardCard hazard) {
+        void bind(HazardCard hazard, OnCardClickListener listener) {
             // Set user name with time ago estimate
             String userName = hazard.getUserName() != null ? hazard.getUserName() : "Anonymous";
             String timeAgo = getTimeAgoEstimate(hazard.getCreatedAt());
@@ -101,11 +115,21 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             tvVotes.setText(String.valueOf(hazard.getScore()));
             updateVoteButtonStates(hazard.getUserVote());
 
+            // Set comment count
+            tvComments.setText(String.valueOf(hazard.getComments()));
+
             // Upvote button listener
             btnUpvote.setOnClickListener(v -> handleVote(hazard, 1));
 
             // Downvote button listener
             btnDownvote.setOnClickListener(v -> handleVote(hazard, -1));
+
+            // Card click listener - navigate to thread
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onCardClick(hazard);
+                }
+            });
         }
 
         /**

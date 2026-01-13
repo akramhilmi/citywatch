@@ -88,14 +88,15 @@
       android:background="@null"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/ivCardPhoto"
-      app:srcCompat="@drawable/ic_thumb_up" />
+      app:srcCompat="@drawable/ic_thumb_up"
+      app:tint="@color/md_theme_onSurfaceVariant" />
 
     <TextView
       android:id="@+id/tvVotes"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginStart="8dp"
-      android:text="67"
+      android:text="0"
       android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
       app:layout_constraintBottom_toBottomOf="@id/btnUpvote"
       app:layout_constraintStart_toEndOf="@+id/btnUpvote"
@@ -110,13 +111,14 @@
       android:background="@null"
       app:layout_constraintStart_toEndOf="@+id/tvVotes"
       app:layout_constraintTop_toBottomOf="@+id/ivCardPhoto"
-      app:srcCompat="@drawable/ic_thumb_down" />
+      app:srcCompat="@drawable/ic_thumb_down"
+      app:tint="@color/md_theme_onSurfaceVariant" />
 
     <TextView
       android:id="@+id/tvComments"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="67"
+      android:text="0"
       android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
       app:layout_constraintBottom_toBottomOf="@id/btnComments"
       app:layout_constraintEnd_toEndOf="parent"
@@ -131,7 +133,8 @@
       android:background="@null"
       app:layout_constraintEnd_toStartOf="@+id/tvComments"
       app:layout_constraintTop_toBottomOf="@+id/ivCardPhoto"
-      app:srcCompat="@drawable/ic_comment" />
+      app:srcCompat="@drawable/ic_comment"
+      app:tint="@color/md_theme_onSurfaceVariant" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 
