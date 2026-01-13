@@ -73,7 +73,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_profile"
+                    android:src="@drawable/ic_portrait"
                     app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <LinearLayout
@@ -119,7 +119,7 @@
               <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@android:drawable/ic_dialog_email"
+                android:src="@drawable/ic_email"
                 app:tint="@color/md_theme_onSurface" />
 
                 <LinearLayout
@@ -165,7 +165,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_phone"
-                android:tint="@color/md_theme_onSurface" />
+                app:tint="@color/md_theme_onSurface" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -209,7 +209,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_camera"
+                    android:src="@drawable/ic_photo_camera"
                     app:tint="@color/black" />
 
                 <TextView
@@ -240,7 +240,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_edit"
+                    android:src="@drawable/ic_password"
                     app:tint="@color/black" />
 
                 <TextView
@@ -271,7 +271,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@android:drawable/ic_lock_power_off"
+                    android:src="@drawable/ic_logout"
                     app:tint="@color/md_theme_onBackground" />
 
                 <TextView
@@ -302,7 +302,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@android:drawable/ic_delete"
+                    android:src="@drawable/ic_delete"
                     app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <TextView
@@ -342,7 +342,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_darkmode"
+                    android:src="@drawable/ic_dark_mode"
                     app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <TextView
@@ -373,7 +373,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_help"
+                    android:src="@drawable/ic_contact_support"
                     app:tint="@color/md_theme_onSurfaceVariant" />
 
                 <TextView
@@ -432,11 +432,11 @@
                 android:orientation="horizontal"
                 android:paddingVertical="12dp">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_info_details"
-                    app:tint="@color/md_theme_onSurfaceVariant" />
+              <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_info"
+                app:tint="@color/md_theme_onSurface" />
 
                 <TextView
                     android:layout_width="0dp"

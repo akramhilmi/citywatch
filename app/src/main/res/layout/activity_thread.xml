@@ -127,7 +127,7 @@
       app:srcCompat="@drawable/ic_location"
       app:tint="@color/md_theme_onSurfaceVariant" />
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
       android:id="@+id/btnThreadUpvote"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -135,8 +135,9 @@
       android:background="@null"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-      app:srcCompat="@drawable/ic_thumb_up"
-      app:tint="@color/md_theme_onSurfaceVariant" />
+      app:icon="@drawable/ic_thumb_up_selector"
+      android:checkable="true"
+      style="@style/Widget.Material3.Button.IconButton" />
 
     <TextView
       android:id="@+id/tvThreadVotes"
@@ -149,7 +150,7 @@
       app:layout_constraintStart_toEndOf="@+id/btnThreadUpvote"
       app:layout_constraintTop_toTopOf="@+id/btnThreadUpvote" />
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
       android:id="@+id/btnThreadDownvote"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -158,8 +159,9 @@
       android:background="@null"
       app:layout_constraintStart_toEndOf="@+id/tvThreadVotes"
       app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-      app:srcCompat="@drawable/ic_thumb_down"
-      app:tint="@color/md_theme_onSurfaceVariant" />
+      app:icon="@drawable/ic_thumb_down_selector"
+      android:checkable="true"
+      style="@style/Widget.Material3.Button.IconButton"/>
 
     <TextView
       android:id="@+id/tvThreadComments"

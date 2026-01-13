@@ -72,7 +72,7 @@ public class ReportActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.report_page);
+        setContentView(R.layout.activity_report);
 
         ivPhotoPlaceholder = findViewById(R.id.ivPhotoPlaceholder);
         etMapsLocation = findViewById(R.id.etMapsLocation);

@@ -88,7 +88,7 @@
       android:background="@null"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/ivCardPhoto"
-      app:srcCompat="@drawable/ic_thumb_up"
+      app:srcCompat="@drawable/ic_thumb_up_selector"
       app:tint="@color/md_theme_onSurfaceVariant" />
 
     <TextView
@@ -111,7 +111,7 @@
       android:background="@null"
       app:layout_constraintStart_toEndOf="@+id/tvVotes"
       app:layout_constraintTop_toBottomOf="@+id/ivCardPhoto"
-      app:srcCompat="@drawable/ic_thumb_down"
+      app:srcCompat="@drawable/ic_thumb_down_selector"
       app:tint="@color/md_theme_onSurfaceVariant" />
 
     <TextView

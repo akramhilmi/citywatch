@@ -20,6 +20,7 @@ import com.gitgud.citywatch.model.Comment;
 import com.gitgud.citywatch.ui.thread.CommentAdapter;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -39,8 +40,8 @@ public class ThreadActivity extends AppCompatActivity {
     private TextView tvTagSecondary;
     private ImageView ivPhoto;
     private TextView tvDescription;
-    private ImageButton btnUpvote;
-    private ImageButton btnDownvote;
+    private MaterialButton btnUpvote;
+    private MaterialButton btnDownvote;
     private TextView tvVotes;
     private TextView tvComments;
     private RecyclerView rvComments;
@@ -158,7 +159,7 @@ public class ThreadActivity extends AppCompatActivity {
 
         // Set votes and update button states
         tvVotes.setText(String.valueOf(currentScore));
-        updateVoteButtonStates();
+        //updateVoteButtonStates();
 
         // Set comment count from intent
         tvComments.setText(String.valueOf(commentCount));
@@ -207,10 +208,10 @@ public class ThreadActivity extends AppCompatActivity {
         int previousVote = currentUserVote;
 
         // Optimistic UI update
-        currentScore = previousScore - previousVote + (actualVoteType == 0 ? 0 : actualVoteType);
+        currentScore = previousScore - previousVote + (actualVoteType);
         currentUserVote = actualVoteType;
         tvVotes.setText(String.valueOf(currentScore));
-        updateVoteButtonStates();
+        //updateVoteButtonStates();
 
         // Call Cloud Function
         ApiClient.voteReport(documentId, userId, actualVoteType)
@@ -218,33 +219,33 @@ public class ThreadActivity extends AppCompatActivity {
                     currentScore = result.score;
                     currentUserVote = result.userVote;
                     tvVotes.setText(String.valueOf(currentScore));
-                    updateVoteButtonStates();
+                    //updateVoteButtonStates();
                 })
                 .addOnFailureListener(e -> {
                     // Revert on failure
                     currentScore = previousScore;
                     currentUserVote = previousVote;
                     tvVotes.setText(String.valueOf(currentScore));
-                    updateVoteButtonStates();
+                    //updateVoteButtonStates();
                     Toast.makeText(this, "Failed to vote", Toast.LENGTH_SHORT).show();
                 });
     }
 
-    private void updateVoteButtonStates() {
-        int activeColor = getColor(R.color.md_theme_primary);
-        int inactiveColor = getColor(R.color.md_theme_onSurfaceVariant);
-
-        if (currentUserVote == 1) {
-            btnUpvote.setColorFilter(activeColor);
-            btnDownvote.setColorFilter(inactiveColor);
-        } else if (currentUserVote == -1) {
-            btnUpvote.setColorFilter(inactiveColor);
-            btnDownvote.setColorFilter(activeColor);
-        } else {
-            btnUpvote.setColorFilter(inactiveColor);
-            btnDownvote.setColorFilter(inactiveColor);
-        }
-    }
+//    private void updateVoteButtonStates() {
+//        int activeColor = getColor(R.color.md_theme_primary);
+//        int inactiveColor = getColor(R.color.md_theme_onSurfaceVariant);
+//
+//        if (currentUserVote == 1) {
+//            btnUpvote.setColorFilter(activeColor);
+//            btnDownvote.setColorFilter(inactiveColor);
+//        } else if (currentUserVote == -1) {
+//            btnUpvote.setColorFilter(inactiveColor);
+//            btnDownvote.setColorFilter(activeColor);
+//        } else {
+//            btnUpvote.setColorFilter(inactiveColor);
+//            btnDownvote.setColorFilter(inactiveColor);
+//        }
+//    }
 
     private String getTimeAgoEstimate(long createdAtTimestamp) {
         if (createdAtTimestamp == 0) {
