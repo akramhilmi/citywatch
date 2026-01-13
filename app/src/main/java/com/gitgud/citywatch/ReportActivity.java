@@ -2,7 +2,6 @@ package com.gitgud.citywatch;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Base64;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
@@ -20,7 +19,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -30,7 +28,7 @@ public class ReportActivity extends AppCompatActivity {
     private TextInputEditText etMapsLocation;
     private TextInputEditText etLocationDetails;
     private TextInputEditText etDescription;
-    private AutoCompleteTextView spinnerHazardType;
+    private TextInputEditText etHazardType;
     private AutoCompleteTextView spinnerLocalGov;
     private double selectedLatitude = 0, selectedLongitude = 0; // for map picker
     private android.net.Uri selectedImageUri = null; // for image upload
@@ -80,7 +78,7 @@ public class ReportActivity extends AppCompatActivity {
         etMapsLocation = findViewById(R.id.etMapsLocation);
         etLocationDetails = findViewById(R.id.etLocationDetails);
         etDescription = findViewById(R.id.etDescription);
-        spinnerHazardType = findViewById(R.id.spinnerHazardType);
+        etHazardType = findViewById(R.id.etHazardType);
         spinnerLocalGov = findViewById(R.id.spinnerLocalGov);
 
         setupHeader();
@@ -142,7 +140,7 @@ public class ReportActivity extends AppCompatActivity {
     private void submitReport() {
         // Validate required fields
         String description = etDescription.getText() != null ? etDescription.getText().toString().trim() : "";
-        String hazardType = spinnerHazardType.getText() != null ? spinnerHazardType.getText().toString().trim() : "";
+        String hazardType = etHazardType.getText() != null ? etHazardType.getText().toString().trim() : "";
         String localGov = spinnerLocalGov.getText() != null ? spinnerLocalGov.getText().toString().trim() : "";
         String locationDetails = etLocationDetails.getText() != null ? etLocationDetails.getText().toString().trim() : "";
 
