@@ -101,13 +101,8 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void setupDropdowns() {
-        String[] hazardTypes = {"Pothole"};
-        AutoCompleteTextView hazardSpinner = findViewById(R.id.spinnerHazardType);
-        if (hazardSpinner != null) {
-            hazardSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, hazardTypes));
-        }
-
-        String[] localGovs = {"Kuala Lumpur City Hall (DBKL)"};
+        //local government dropdown
+        String[] localGovs = {"Kuala Lumpur City Hall (DBKL)","Majlis Bandaraya Petaling Jaya(MBPJ)","Majlis Bandaraya Subang Jaya(MBSJ)"};
         AutoCompleteTextView govSpinner = findViewById(R.id.spinnerLocalGov);
         if (govSpinner != null) {
             govSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, localGovs));
