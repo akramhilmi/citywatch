@@ -100,6 +100,10 @@ public class CommunityFragment extends Fragment {
                     hazardCardList.clear();
                     hazardCardList.addAll(reports);
 
+                    // Sort by date (newest first)
+                    hazardCardList.sort((c1, c2) ->
+                        Long.compare(c2.getCreatedAt(), c1.getCreatedAt()));
+
                     // Fetch user votes for all reports
                     fetchUserVotes();
                 })
@@ -146,6 +150,3 @@ public class CommunityFragment extends Fragment {
             startActivity(new Intent(getActivity(), ReportActivity.class)));
     }
 }
-
-
-
