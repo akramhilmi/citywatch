@@ -1,8 +1,8 @@
 package com.gitgud.citywatch;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
@@ -12,19 +12,37 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.gitgud.citywatch.util.ApiClient;
+import com.gitgud.citywatch.util.SessionManager;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Locale;
 
 public class ReportActivity extends AppCompatActivity {
 
     private ImageView ivPhotoPlaceholder;
+    private TextInputEditText etMapsLocation;
+    private TextInputEditText etLocationDetails;
+    private TextInputEditText etDescription;
+    private AutoCompleteTextView spinnerHazardType;
+    private AutoCompleteTextView spinnerLocalGov;
+    private double selectedLatitude = 0, selectedLongitude = 0; // for map picker
+    private android.net.Uri selectedImageUri = null; // for image upload
+    private android.graphics.Bitmap selectedImageBitmap = null; // for image upload
+    private AlertDialog progressDialog; // for submission progress
 
     //setup gallery launcher
     private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
         registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
             if (uri != null) {
+                selectedImageUri = uri;
+                selectedImageBitmap = null;
                 ivPhotoPlaceholder.setImageURI(uri);
                 prepareImageView();
             }
@@ -34,8 +52,22 @@ public class ReportActivity extends AppCompatActivity {
     private final ActivityResultLauncher<Void> takePhoto =
         registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), bitmap -> {
             if (bitmap != null) {
+                selectedImageBitmap = bitmap;
+                selectedImageUri = null;
                 ivPhotoPlaceholder.setImageBitmap(bitmap);
                 prepareImageView();
+            }
+        });
+
+    // setup location picker launcher
+    private final ActivityResultLauncher<Intent> pickLocation =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                selectedLatitude = result.getData().getDoubleExtra("latitude", 0);
+                selectedLongitude = result.getData().getDoubleExtra("longitude", 0);
+                String locationName = result.getData().getStringExtra("locationName");
+                etMapsLocation.setText(locationName != null ? locationName :
+                    String.format(Locale.US, "%.4f, %.4f", selectedLatitude, selectedLongitude));
             }
         });
 
@@ -45,6 +77,11 @@ public class ReportActivity extends AppCompatActivity {
         setContentView(R.layout.report_page);
 
         ivPhotoPlaceholder = findViewById(R.id.ivPhotoPlaceholder);
+        etMapsLocation = findViewById(R.id.etMapsLocation);
+        etLocationDetails = findViewById(R.id.etLocationDetails);
+        etDescription = findViewById(R.id.etDescription);
+        spinnerHazardType = findViewById(R.id.spinnerHazardType);
+        spinnerLocalGov = findViewById(R.id.spinnerLocalGov);
 
         setupHeader();
         setupDropdowns();
@@ -78,20 +115,16 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void setupLocation() {
-        TextInputEditText etLocation = findViewById(R.id.etMapsLocation);
-        if (etLocation != null) {
-            etLocation.setText(""); // Clear placeholder link
-            etLocation.setOnClickListener(v -> {
-                Uri gmmIntentUri = Uri.parse("geo:0,0?q=Hazards");
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                try {
-                    startActivity(mapIntent);
-                } catch (Exception e) {
-                    Toast.makeText(this, "Google Maps not found", Toast.LENGTH_SHORT).show();
-                }
-            });
+        if (etMapsLocation != null) {
+            etMapsLocation.setText("");
+            etMapsLocation.setOnClickListener(v -> openLocationPicker());
+            etMapsLocation.setFocusable(false);
         }
+    }
+
+    private void openLocationPicker() {
+        Intent intent = new Intent(this, LocationPickerActivity.class);
+        pickLocation.launch(intent);
     }
 
     private void setupButtons() {
@@ -107,10 +140,159 @@ public class ReportActivity extends AppCompatActivity {
 
         MaterialCardView btnSubmit = findViewById(R.id.btnSubmit);
         if (btnSubmit != null) {
-            btnSubmit.setOnClickListener(v -> {
-                Toast.makeText(this, "Report submitted successfully!", Toast.LENGTH_SHORT).show();
-                finish();
-            });
+            btnSubmit.setOnClickListener(v -> submitReport());
+        }
+    }
+
+    private void submitReport() {
+        // Validate required fields
+        String description = etDescription.getText() != null ? etDescription.getText().toString().trim() : "";
+        String hazardType = spinnerHazardType.getText() != null ? spinnerHazardType.getText().toString().trim() : "";
+        String localGov = spinnerLocalGov.getText() != null ? spinnerLocalGov.getText().toString().trim() : "";
+        String locationDetails = etLocationDetails.getText() != null ? etLocationDetails.getText().toString().trim() : "";
+
+        if (description.isEmpty() || hazardType.isEmpty() || localGov.isEmpty() ||
+            locationDetails.isEmpty() || selectedLatitude == 0 || selectedLongitude == 0) {
+            Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if image was selected
+        if (selectedImageUri == null && selectedImageBitmap == null) {
+            Toast.makeText(this, "Please select a photo", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Get current user ID from SessionManager
+        String userId = SessionManager.getCurrentUserId();
+
+        if (userId == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Show progress dialog
+        showProgressDialog("Submitting report...");
+
+        // Submit report via ApiClient with user ID
+        ApiClient.submitReport(description, hazardType, localGov, locationDetails,
+                selectedLatitude, selectedLongitude, userId)
+                .addOnSuccessListener(documentId -> {
+                    // Update progress dialog
+                    updateProgressDialog("Uploading photo...");
+                    // Upload image with document ID as filename
+                    uploadReportImage(documentId);
+                })
+                .addOnFailureListener(e -> {
+                    dismissProgressDialog();
+                    Toast.makeText(ReportActivity.this, "Failed to submit report", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void uploadReportImage(String documentId) {
+        if (selectedImageUri != null) {
+            // Upload from URI (gallery picker)
+            try {
+                byte[] imageBytes = readUriToBytes(selectedImageUri);
+                String imageBase64 = android.util.Base64.encodeToString(imageBytes, android.util.Base64.DEFAULT);
+
+                ApiClient.uploadReportPhoto(documentId, imageBase64)
+                        .addOnSuccessListener(aVoid -> {
+                            dismissProgressDialog();
+                            Toast.makeText(ReportActivity.this, "Report submitted successfully!", Toast.LENGTH_SHORT).show();
+                            setResult(RESULT_OK);
+                            finish();
+                        })
+                        .addOnFailureListener(e -> {
+                            dismissProgressDialog();
+                            Toast.makeText(ReportActivity.this, "Report created, but image upload failed", Toast.LENGTH_SHORT).show();
+                        });
+            } catch (Exception e) {
+                dismissProgressDialog();
+                Toast.makeText(ReportActivity.this, "Failed to read image", Toast.LENGTH_SHORT).show();
+            }
+        } else if (selectedImageBitmap != null) {
+            // Upload from Bitmap (camera)
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            selectedImageBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, baos);
+            byte[] imageData = baos.toByteArray();
+            String imageBase64 = android.util.Base64.encodeToString(imageData, android.util.Base64.DEFAULT);
+
+            ApiClient.uploadReportPhotoBitmap(documentId, imageBase64)
+                    .addOnSuccessListener(aVoid -> {
+                        dismissProgressDialog();
+                        Toast.makeText(ReportActivity.this, "Report submitted successfully!", Toast.LENGTH_SHORT).show();
+                        setResult(RESULT_OK);
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        dismissProgressDialog();
+                        Toast.makeText(ReportActivity.this, "Report created, but image upload failed", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
+    private byte[] readUriToBytes(android.net.Uri uri) throws java.io.IOException {
+        android.content.ContentResolver resolver = getContentResolver();
+        java.io.InputStream inputStream = resolver.openInputStream(uri);
+        if (inputStream == null) {
+            throw new IOException("Cannot open image stream");
+        }
+
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, length);
+        }
+        inputStream.close();
+        return outputStream.toByteArray();
+    }
+
+    private void showProgressDialog(String message) {
+        dismissProgressDialog();
+
+        android.widget.LinearLayout progressLayout = new android.widget.LinearLayout(this);
+        progressLayout.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+        progressLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        progressLayout.setPadding(48, 48, 48, 48);
+        progressLayout.setGravity(android.view.Gravity.CENTER);
+
+        android.widget.ProgressBar progressBar = new android.widget.ProgressBar(this);
+        progressBar.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                100, 100));
+        progressLayout.addView(progressBar);
+
+        android.widget.TextView textView = new android.widget.TextView(this);
+        textView.setText(message);
+        textView.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+        textView.setPadding(0, 24, 0, 0);
+        progressLayout.addView(textView);
+
+        progressDialog = new AlertDialog.Builder(this)
+                .setView(progressLayout)
+                .setCancelable(false)
+                .create();
+        progressDialog.show();
+    }
+
+    private void updateProgressDialog(String message) {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            android.widget.LinearLayout layout = (android.widget.LinearLayout) progressDialog.findViewById(android.R.id.custom);
+            if (layout != null && layout.getChildCount() > 1) {
+                android.widget.TextView textView = (android.widget.TextView) layout.getChildAt(1);
+                textView.setText(message);
+            }
+        }
+    }
+
+    private void dismissProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
         }
     }
 }

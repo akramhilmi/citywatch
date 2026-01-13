@@ -1,54 +1,90 @@
 package com.gitgud.citywatch.util;
 
-import android.app.Activity;
-import android.content.Intent;
-
-import com.gitgud.citywatch.SignInActivity;
+import com.gitgud.citywatch.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 /**
- * Manages Firebase auth session state.
- * Provides helpers to check login status and redirect when needed.
+ * Manages user session and authentication state
  */
 public class SessionManager {
 
-    private final FirebaseAuth auth;
+    private static final FirebaseAuth auth = FirebaseAuth.getInstance();
 
-    public SessionManager() {
-        this.auth = FirebaseAuth.getInstance();
-    }
-
-    public boolean isLoggedIn() {
-        return auth.getCurrentUser() != null;
-    }
-
-    public FirebaseUser getCurrentUser() {
-        return auth.getCurrentUser();
-    }
-
-    public String getToken() {
+    /**
+     * Get current Firebase user ID
+     * @return User ID if authenticated, null otherwise
+     */
+    public static String getCurrentUserId() {
         FirebaseUser user = auth.getCurrentUser();
         return user != null ? user.getUid() : null;
     }
 
-    public void logout() {
+    /**
+     * Get current Firebase user
+     * @return FirebaseUser if authenticated, null otherwise
+     */
+    public static FirebaseUser getCurrentUser() {
+        return auth.getCurrentUser();
+    }
+
+    /**
+     * Get current user's email
+     * @return Email if authenticated, null otherwise
+     */
+    public static String getCurrentUserEmail() {
+        FirebaseUser user = auth.getCurrentUser();
+        return user != null ? user.getEmail() : null;
+    }
+
+    /**
+     * Get current user's display name
+     * @return Display name if set, null otherwise
+     */
+    public static String getCurrentUserDisplayName() {
+        FirebaseUser user = auth.getCurrentUser();
+        return user != null ? user.getDisplayName() : null;
+    }
+
+    /**
+     * Check if user is authenticated
+     * @return True if user is authenticated, false otherwise
+     */
+    public static boolean isUserAuthenticated() {
+        return auth.getCurrentUser() != null;
+    }
+
+    /**
+     * Logout current user
+     */
+    public static void logout() {
         auth.signOut();
     }
 
     /**
-     * Redirects to LoginActivity if not authenticated.
-     * Clears back stack so user can't navigate back.
-     * @return true if redirected, false if already logged in
+     * Get Firebase Auth instance
+     * @return FirebaseAuth instance
      */
-    public boolean redirectIfNotLoggedIn(Activity activity) {
-        if (isLoggedIn()) return false;
+    public static FirebaseAuth getAuth() {
+        return auth;
+    }
 
-        Intent intent = new Intent(activity, SignInActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        activity.startActivity(intent);
-        activity.finish();
-        return true;
+    /**
+     * Redirect to MainActivity if user is not logged in
+     * @param currentActivity The current activity to finish
+     * @return True if redirected, false if user is authenticated
+     */
+    public static boolean redirectIfNotLoggedIn(android.app.Activity currentActivity) {
+        if (!isUserAuthenticated()) {
+            android.content.Intent intent = new android.content.Intent(
+                    currentActivity, MainActivity.class);
+            intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK |
+                    android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            currentActivity.startActivity(intent);
+            currentActivity.finish();
+            return true;
+        }
+        return false;
     }
 }
 
