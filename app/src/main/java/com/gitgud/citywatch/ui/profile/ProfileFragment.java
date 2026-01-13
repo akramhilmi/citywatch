@@ -310,14 +310,22 @@ public class ProfileFragment extends Fragment {
         ApiClient.getProfilePictureUrl(userId).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String downloadUrl = task.getResult();
-                if (downloadUrl != null && !downloadUrl.isEmpty()) {
-                    // Load image using Glide with scaling to fill the circle
-                    Glide.with(this)
-                            .load(downloadUrl)
-                            .centerCrop()
-                            .into(ivProfileImage);
+                // Load image using Glide with a fallback if URL is null
+                Glide.with(this)
+                        .load(downloadUrl)
+                        .placeholder(R.drawable.ic_profile) // Shows while loading or if URL is null
+                        .error(R.drawable.ic_profile)       // Shows if loading fails
+                        .centerCrop()
+                        .into(ivProfileImage);
+
+                if (downloadUrl != null) {
+                    android.util.Log.d("Photo", "Loaded: " + downloadUrl);
+                } else {
+                    android.util.Log.d("Photo", "No profile picture found, using default");
                 }
-                android.util.Log.d("Photo", downloadUrl);
+            } else {
+                // If the task itself fails, still use the default
+                ivProfileImage.setImageResource(R.drawable.ic_profile);
             }
             decrementPendingFetches();
         });
