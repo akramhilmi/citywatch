@@ -40,9 +40,9 @@
         <TableLayout
           android:layout_width="match_parent"
           android:layout_height="match_parent"
-          android:paddingLeft="40dp"
+          android:paddingLeft="30dp"
           android:paddingTop="20dp"
-          android:paddingRight="40dp"
+          android:paddingRight="30dp"
           android:paddingBottom="20dp">
 
           <TableRow
@@ -52,14 +52,14 @@
             <LinearLayout
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_marginRight="40dp"
+              android:layout_marginRight="30dp"
               android:layout_marginBottom="20dp"
               android:layout_weight="1"
               android:background="@drawable/report_statistics_data"
               android:orientation="vertical">
 
               <TextView
-                android:id="@+id/tv6"
+                android:id="@+id/tvNumberSubmitted"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="67"
@@ -68,10 +68,10 @@
                 android:textColor="@color/md_theme_onSurface" />
 
               <TextView
-                android:id="@+id/tv4"
+                android:id="@+id/tvSubmitted"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text="Submitted"
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="@color/md_theme_onSurfaceVariant" />
@@ -86,7 +86,7 @@
               android:orientation="vertical">
 
               <TextView
-                android:id="@+id/tsdgv6"
+                android:id="@+id/tvNumberConfirmed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="67"
@@ -95,10 +95,10 @@
                 android:textColor="@color/md_theme_onSurface" />
 
               <TextView
-                android:id="@+id/tvaf4"
+                android:id="@+id/tvConfirmed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text="Confirmed"
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="@color/md_theme_onSurfaceVariant" />
@@ -113,13 +113,13 @@
             <LinearLayout
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_marginRight="40dp"
+              android:layout_marginRight="30dp"
               android:layout_weight="1"
               android:background="@drawable/report_statistics_data"
               android:orientation="vertical">
 
               <TextView
-                android:id="@+id/tva6"
+                android:id="@+id/tvNumberInProgress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="67"
@@ -128,10 +128,10 @@
                 android:textColor="@color/md_theme_onSurface" />
 
               <TextView
-                android:id="@+id/tav4"
+                android:id="@+id/tvInProgress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text="In progress"
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="@color/md_theme_onSurfaceVariant" />
@@ -145,7 +145,7 @@
               android:orientation="vertical">
 
               <TextView
-                android:id="@+id/tafsdv6"
+                android:id="@+id/tvNumberResolved"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="67"
@@ -154,10 +154,10 @@
                 android:textColor="@color/md_theme_onSurface" />
 
               <TextView
-                android:id="@+id/tafdsv4"
+                android:id="@+id/tvResolved"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text="Resolved"
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="@color/md_theme_onSurfaceVariant" />
@@ -195,8 +195,8 @@
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:layout_below="@id/tvYourReports"
-          android:layout_marginTop="20dp"
-          android:nestedScrollingEnabled="false" />
+          android:nestedScrollingEnabled="false"
+          android:padding="20dp" />
 
       </RelativeLayout>
 

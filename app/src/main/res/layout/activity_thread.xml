@@ -6,15 +6,14 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:background="@color/md_theme_surface"
-  android:padding="20dp"
   android:fillViewport="true"
   tools:context=".ThreadActivity">
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:layout_editor_absoluteX="20dp"
-    tools:layout_editor_absoluteY="20dp">
+    android:background="@color/md_theme_surface"
+    android:padding="20dp">
 
     <ImageButton
       android:id="@+id/btnThreadBack"
@@ -115,7 +114,6 @@
       app:layout_constraintTop_toBottomOf="@+id/cvPhoto" />
 
 
-
     <ImageButton
       android:id="@+id/btnThreadLocation"
       android:layout_width="wrap_content"
@@ -129,15 +127,15 @@
 
     <com.google.android.material.button.MaterialButton
       android:id="@+id/btnThreadUpvote"
+      style="@style/Widget.Material3.Button.IconButton"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginTop="20dp"
       android:background="@null"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-      app:icon="@drawable/ic_thumb_up_selector"
       android:checkable="true"
-      style="@style/Widget.Material3.Button.IconButton" />
+      app:icon="@drawable/ic_thumb_up_selector"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation" />
 
     <TextView
       android:id="@+id/tvThreadVotes"
@@ -152,16 +150,16 @@
 
     <com.google.android.material.button.MaterialButton
       android:id="@+id/btnThreadDownvote"
+      style="@style/Widget.Material3.Button.IconButton"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginStart="8dp"
       android:layout_marginTop="20dp"
       android:background="@null"
-      app:layout_constraintStart_toEndOf="@+id/tvThreadVotes"
-      app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-      app:icon="@drawable/ic_thumb_down_selector"
       android:checkable="true"
-      style="@style/Widget.Material3.Button.IconButton"/>
+      app:icon="@drawable/ic_thumb_down_selector"
+      app:layout_constraintStart_toEndOf="@+id/tvThreadVotes"
+      app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation" />
 
     <TextView
       android:id="@+id/tvThreadComments"
@@ -190,12 +188,12 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginStart="8dp"
-      android:text="View on map"
-      android:textColor="@color/md_theme_primary"
-      android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+      android:background="?attr/selectableItemBackgroundBorderless"
       android:clickable="true"
       android:focusable="true"
-      android:background="?attr/selectableItemBackgroundBorderless"
+      android:text="View on map"
+      android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+      android:textColor="@color/md_theme_primary"
       app:layout_constraintBottom_toBottomOf="@+id/btnThreadLocation"
       app:layout_constraintStart_toEndOf="@+id/btnThreadLocation"
       app:layout_constraintTop_toTopOf="@+id/btnThreadLocation" />
@@ -236,8 +234,8 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="10dp"
       android:layout_marginEnd="12dp"
-      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toStartOf="@+id/btnCommentSubmit"
+      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/rvComments">
 
       <com.google.android.material.textfield.TextInputEditText

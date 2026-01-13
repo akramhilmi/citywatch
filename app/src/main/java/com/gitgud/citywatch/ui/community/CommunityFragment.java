@@ -59,6 +59,10 @@ public class CommunityFragment extends Fragment {
         rvCommunityCards.setLayoutManager(gridLayoutManager);
         rvCommunityCards.setAdapter(adapter);
 
+        // Using 20dp directly if the above isn't what you want:
+        int spacingInDp = (int) (20 * getResources().getDisplayMetrics().density);
+        rvCommunityCards.addItemDecoration(new SpacingItemDecoration(spacingInDp));
+
         // Set card click listener to navigate to ThreadActivity
         adapter.setOnCardClickListener(hazardCard -> {
             Intent intent = new Intent(getActivity(), com.gitgud.citywatch.ThreadActivity.class);

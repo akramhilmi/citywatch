@@ -21,6 +21,7 @@ import com.gitgud.citywatch.model.HazardCard;
 import com.gitgud.citywatch.ui.community.HazardCardAdapter;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
+import com.gitgud.citywatch.ui.community.SpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +61,10 @@ public class HomeFragment extends Fragment {
 
         rvYourReports.setLayoutManager(new LinearLayoutManager(getContext()));
         rvYourReports.setAdapter(adapter);
+
+        // Add 20dp spacing between cards
+        int spacingInDp = (int) (20 * getResources().getDisplayMetrics().density);
+        rvYourReports.addItemDecoration(new SpacingItemDecoration(spacingInDp));
 
         // Set card click listener to navigate to ThreadActivity
         adapter.setOnCardClickListener(hazardCard -> {
