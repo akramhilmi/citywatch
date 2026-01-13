@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableReference;
 import com.google.firebase.storage.FirebaseStorage;
@@ -354,8 +353,9 @@ public class ApiClient {
      */
     public static com.google.android.gms.tasks.Task<java.util.List<com.gitgud.citywatch.model.HazardCard>> getAllReports() {
         HttpsCallableReference getAllReportsFunc = functions.getHttpsCallable("getAllReports");
+        java.util.Map<String, Object> data = buildAuthenticatedData(new java.util.HashMap<>());
 
-        return getAllReportsFunc.call(new java.util.HashMap<>())
+        return getAllReportsFunc.call(data)
                 .continueWithTask(task -> {
                     if (task.isSuccessful()) {
                         java.util.List<java.util.Map<String, Object>> resultList =
@@ -374,8 +374,11 @@ public class ApiClient {
                             hazardCard.setUserName((String) reportMap.get("userName"));
                             hazardCard.setUserId((String) reportMap.get("userId"));
 
-                            // DEBUG
-                            android.util.Log.d("test report userId", hazardCard.getUserId());
+                            // Set latitude and longitude directly
+                            Number latNum = (Number) reportMap.get("latitude");
+                            Number lonNum = (Number) reportMap.get("longitude");
+                            hazardCard.setLatitude(latNum != null ? latNum.doubleValue() : 0.0);
+                            hazardCard.setLongitude(lonNum != null ? lonNum.doubleValue() : 0.0);
 
                             Number votesNum = (Number) reportMap.get("votes");
                             hazardCard.setVotes(votesNum != null ? votesNum.longValue() : 0L);
@@ -385,6 +388,9 @@ public class ApiClient {
 
                             Number scoreNum = (Number) reportMap.get("score");
                             hazardCard.setScore(scoreNum != null ? scoreNum.longValue() : 0L);
+
+                            Number commentsNum = (Number) reportMap.get("comments");
+                            hazardCard.setComments(commentsNum != null ? commentsNum.longValue() : 0L);
 
                             hazardCards.add(hazardCard);
                         }
@@ -509,5 +515,250 @@ public class ApiClient {
             this.userVote = userVote;
         }
     }
-}
 
+    // ==================== Comment Methods ====================
+
+    /**
+     * Submit a new comment to a report via Cloud Function
+     * @param content Comment content
+     * @param reportId The report document ID
+     * @param userId Current user ID
+     * @return Task that completes with the auto-generated comment ID
+     */
+    public static com.google.android.gms.tasks.Task<String> submitComment(
+            String content, String reportId, String userId) {
+        HttpsCallableReference submitCommentFunc = functions.getHttpsCallable("submitComment");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("content", content);
+        data.put("reportId", reportId);
+        data.put("userId", userId);
+
+        return submitCommentFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.Map<String, Object> result =
+                                (java.util.Map<String, Object>) task.getResult().getData();
+                        return (String) result.get("commentId");
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to submit comment");
+                });
+    }
+
+    /**
+     * Get all comments for a specific report via Cloud Function
+     * @param reportId The report document ID
+     * @return Task that completes with list of Comment objects
+     */
+    public static com.google.android.gms.tasks.Task<java.util.List<com.gitgud.citywatch.model.Comment>> getCommentsForReport(
+            String reportId) {
+        HttpsCallableReference getCommentsFunc = functions.getHttpsCallable("getCommentsForReport");
+        java.util.Map<String, Object> data = buildAuthenticatedData("reportId", reportId);
+
+        return getCommentsFunc.call(data)
+                .continueWithTask(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.List<java.util.Map<String, Object>> resultList =
+                                (java.util.List<java.util.Map<String, Object>>) task.getResult().getData();
+
+                        java.util.List<com.gitgud.citywatch.model.Comment> comments = new java.util.ArrayList<>();
+
+                        for (java.util.Map<String, Object> commentMap : resultList) {
+                            com.gitgud.citywatch.model.Comment comment = new com.gitgud.citywatch.model.Comment();
+                            comment.setCommentId((String) commentMap.get("commentId"));
+                            comment.setContent((String) commentMap.get("content"));
+                            comment.setReportId((String) commentMap.get("reportId"));
+                            comment.setUserId((String) commentMap.get("userId"));
+                            comment.setUserName((String) commentMap.get("userName"));
+
+                            Number datetimeNum = (Number) commentMap.get("datetime");
+                            comment.setDatetime(datetimeNum != null ? datetimeNum.longValue() : 0L);
+
+                            Number scoreNum = (Number) commentMap.get("score");
+                            comment.setScore(scoreNum != null ? scoreNum.longValue() : 0L);
+
+                            comments.add(comment);
+                        }
+
+                        // Fetch profile pictures for all comments
+                        return com.google.android.gms.tasks.Tasks.whenAllSuccess(
+                                        fetchProfilePicturesForComments(comments))
+                                .continueWith(photoTask -> comments);
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to fetch comments");
+                });
+    }
+
+    /**
+     * Fetch profile pictures for all comments
+     */
+    private static java.util.List<com.google.android.gms.tasks.Task<String>> fetchProfilePicturesForComments(
+            java.util.List<com.gitgud.citywatch.model.Comment> comments) {
+        java.util.List<com.google.android.gms.tasks.Task<String>> tasks = new java.util.ArrayList<>();
+
+        for (com.gitgud.citywatch.model.Comment comment : comments) {
+            if (comment.getUserId() != null && !comment.getUserId().isEmpty()) {
+                com.google.android.gms.tasks.Task<String> profileTask = getProfilePictureUrl(comment.getUserId())
+                        .continueWith(task -> {
+                            if (task.isSuccessful()) {
+                                comment.setProfilePictureUrl(task.getResult());
+                            }
+                            return task.getResult();
+                        });
+                tasks.add(profileTask);
+            }
+        }
+
+        return tasks;
+    }
+
+    /**
+     * Vote on a comment (upvote, downvote, or remove vote)
+     * @param commentId The comment document ID
+     * @param userId The current user's ID
+     * @param voteType 1 for upvote, -1 for downvote, 0 to remove vote
+     * @return Task with new score and user's vote status
+     */
+    public static com.google.android.gms.tasks.Task<VoteResult> voteComment(
+            String commentId, String userId, int voteType) {
+        HttpsCallableReference voteCommentFunc = functions.getHttpsCallable("voteComment");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("commentId", commentId);
+        data.put("userId", userId);
+        data.put("voteType", voteType);
+
+        return voteCommentFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.Map<String, Object> result =
+                                (java.util.Map<String, Object>) task.getResult().getData();
+                        long score = ((Number) result.get("score")).longValue();
+                        int userVote = ((Number) result.get("userVote")).intValue();
+                        return new VoteResult(score, userVote);
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to vote on comment");
+                });
+    }
+
+    /**
+     * Delete a comment via Cloud Function
+     * @param commentId The comment document ID
+     * @param userId The current user's ID (must be the comment author)
+     * @return Task that completes when deletion is done
+     */
+    public static com.google.android.gms.tasks.Task<Void> deleteComment(String commentId, String userId) {
+        HttpsCallableReference deleteCommentFunc = functions.getHttpsCallable("deleteComment");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("commentId", commentId);
+        data.put("userId", userId);
+
+        return deleteCommentFunc.call(data)
+                .continueWith(task -> null);
+    }
+
+    /**
+     * Get user's votes for multiple comments
+     * @param commentIds List of comment document IDs
+     * @param userId The current user's ID
+     * @return Task with map of commentId to vote status
+     */
+    public static com.google.android.gms.tasks.Task<java.util.Map<String, Integer>> getUserVotesForComments(
+            java.util.List<String> commentIds, String userId) {
+        HttpsCallableReference getUserVotesFunc = functions.getHttpsCallable("getUserVotesForComments");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("commentIds", commentIds);
+        data.put("userId", userId);
+
+        return getUserVotesFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.Map<String, Object> result =
+                                (java.util.Map<String, Object>) task.getResult().getData();
+                        java.util.Map<String, Object> votesRaw =
+                                (java.util.Map<String, Object>) result.get("votes");
+
+                        java.util.Map<String, Integer> votes = new java.util.HashMap<>();
+                        if (votesRaw != null) {
+                            for (java.util.Map.Entry<String, Object> entry : votesRaw.entrySet()) {
+                                votes.put(entry.getKey(), ((Number) entry.getValue()).intValue());
+                            }
+                        }
+                        return votes;
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to get comment votes");
+                });
+    }
+
+    /**
+     * Get comment count for a report
+     * @param reportId The report document ID
+     * @return Task with comment count
+     */
+    public static com.google.android.gms.tasks.Task<Integer> getCommentCount(String reportId) {
+        HttpsCallableReference getCommentCountFunc = functions.getHttpsCallable("getCommentCount");
+        java.util.Map<String, Object> data = buildAuthenticatedData("reportId", reportId);
+
+        return getCommentCountFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.Map<String, Object> result =
+                                (java.util.Map<String, Object>) task.getResult().getData();
+                        Number count = (Number) result.get("count");
+                        return count != null ? count.intValue() : 0;
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to get comment count");
+                });
+    }
+
+    /**
+     * Get current user ID from Firebase Auth
+     * @return Current user ID or null if not authenticated
+     */
+    public static String getCurrentUserId() {
+        com.google.firebase.auth.FirebaseUser user = auth.getCurrentUser();
+        return user != null ? user.getUid() : null;
+    }
+
+    /**
+     * Build a data map with userId parameter for cloud function calls
+     * Includes userId if user is authenticated, otherwise returns empty map
+     * @param additionalData Additional key-value pairs to include in the map
+     * @return Map with userId and additional data
+     */
+    private static java.util.Map<String, Object> buildAuthenticatedData(
+            java.util.Map<String, Object> additionalData) {
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        String userId = getCurrentUserId();
+
+        if (userId != null) {
+            data.put("userId", userId);
+        }
+
+        if (additionalData != null) {
+            data.putAll(additionalData);
+        }
+
+        return data;
+    }
+
+    /**
+     * Build a data map with userId parameter for cloud function calls
+     * Convenience overload for single key-value pair
+     * @param key The key for the additional parameter
+     * @param value The value for the additional parameter
+     * @return Map with userId and the additional key-value pair
+     */
+    private static java.util.Map<String, Object> buildAuthenticatedData(String key, Object value) {
+        java.util.Map<String, Object> additionalData = new java.util.HashMap<>();
+        additionalData.put(key, value);
+        return buildAuthenticatedData(additionalData);
+    }
+}

@@ -59,6 +59,33 @@ public class CommunityFragment extends Fragment {
         rvCommunityCards.setLayoutManager(gridLayoutManager);
         rvCommunityCards.setAdapter(adapter);
 
+        // Set card click listener to navigate to ThreadActivity
+        adapter.setOnCardClickListener(hazardCard -> {
+            Intent intent = new Intent(getActivity(), com.gitgud.citywatch.ThreadActivity.class);
+            intent.putExtra("documentId", hazardCard.getDocumentId());
+            intent.putExtra("userName", hazardCard.getUserName());
+            intent.putExtra("userId", hazardCard.getUserId());
+            intent.putExtra("hazardType", hazardCard.getHazardType());
+            intent.putExtra("locationDetails", hazardCard.getLocationDetails());
+            intent.putExtra("status", hazardCard.getStatus());
+            intent.putExtra("localGov", hazardCard.getLocalGov());
+            intent.putExtra("description", hazardCard.getDescription());
+            intent.putExtra("photoUrl", hazardCard.getPhotoUrl());
+            intent.putExtra("profilePictureUrl", hazardCard.getProfilePictureUrl());
+            intent.putExtra("score", hazardCard.getScore());
+            intent.putExtra("userVote", hazardCard.getUserVote());
+            intent.putExtra("createdAt", hazardCard.getCreatedAt());
+            intent.putExtra("comments", hazardCard.getComments());
+
+            // Add map location data
+            intent.putExtra("latitude", hazardCard.getLatitude());
+            intent.putExtra("longitude", hazardCard.getLongitude());
+            android.util.Log.d("CommunityFragment", "Passing location to ThreadActivity: " +
+                hazardCard.getLatitude() + ", " + hazardCard.getLongitude());
+
+            startActivity(intent);
+        });
+
         // Show spinner and load reports from Firestore
         progressSpinner.setVisibility(View.VISIBLE);
         loadReports();

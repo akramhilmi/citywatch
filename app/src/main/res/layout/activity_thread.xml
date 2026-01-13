@@ -106,10 +106,11 @@
 
     <TextView
       android:id="@+id/tvThreadDesc"
-      android:layout_width="wrap_content"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginTop="20dp"
-      android:text="TextView"
+      android:text="Description"
+      android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/cvPhoto" />
 
@@ -123,7 +124,8 @@
       android:background="@null"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/tvThreadDesc"
-      app:srcCompat="@drawable/ic_location" />
+      app:srcCompat="@drawable/ic_location"
+      app:tint="@color/md_theme_onSurfaceVariant" />
 
     <ImageButton
       android:id="@+id/btnThreadUpvote"
@@ -133,7 +135,8 @@
       android:background="@null"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-      app:srcCompat="@drawable/ic_thumb_up" />
+      app:srcCompat="@drawable/ic_thumb_up"
+      app:tint="@color/md_theme_onSurfaceVariant" />
 
     <TextView
       android:id="@+id/tvThreadVotes"
@@ -155,7 +158,8 @@
       android:background="@null"
       app:layout_constraintStart_toEndOf="@+id/tvThreadVotes"
       app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-      app:srcCompat="@drawable/ic_thumb_down" />
+      app:srcCompat="@drawable/ic_thumb_down"
+      app:tint="@color/md_theme_onSurfaceVariant" />
 
     <TextView
       android:id="@+id/tvThreadComments"
@@ -176,14 +180,20 @@
       android:background="@null"
       app:layout_constraintEnd_toStartOf="@+id/tvThreadComments"
       app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-      app:srcCompat="@drawable/ic_comment" />
+      app:srcCompat="@drawable/ic_comment"
+      app:tint="@color/md_theme_onSurfaceVariant" />
 
     <TextView
       android:id="@+id/tvThreadLocation"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginStart="8dp"
-      android:text="TextView"
+      android:text="View on map"
+      android:textColor="@color/md_theme_primary"
+      android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+      android:clickable="true"
+      android:focusable="true"
+      android:background="?attr/selectableItemBackgroundBorderless"
       app:layout_constraintBottom_toBottomOf="@+id/btnThreadLocation"
       app:layout_constraintStart_toEndOf="@+id/btnThreadLocation"
       app:layout_constraintTop_toTopOf="@+id/btnThreadLocation" />
@@ -198,6 +208,18 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/btnThreadUpvote" />
 
+    <TextView
+      android:id="@+id/tvCommentsLoading"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:text="Loading comments..."
+      android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+      android:textColor="@color/md_theme_onSurfaceVariant"
+      android:visibility="gone"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/divider" />
+
     <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/rvComments"
       android:layout_width="match_parent"
@@ -208,19 +230,33 @@
 
     <com.google.android.material.textfield.TextInputLayout
       android:id="@+id/tilComment"
-      android:layout_width="match_parent"
+      android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_marginTop="10dp"
-      app:endIconDrawable="@drawable/ic_send"
+      android:layout_marginEnd="12dp"
       app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toStartOf="@+id/btnCommentSubmit"
       app:layout_constraintTop_toBottomOf="@+id/rvComments">
 
       <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/etComment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:hint="Add a comment..." />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/btnCommentSubmit"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:text="Post"
+      android:textSize="12sp"
+      app:icon="@drawable/ic_send"
+      app:iconGravity="textStart"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/rvComments" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 

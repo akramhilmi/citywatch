@@ -16,21 +16,6 @@ const auth = admin.auth();
 const bucket = admin.storage().bucket();
 
 /**
- * Validate required fields in request data
- * @param {Object} data - The data object to validate
- * @param {Array<string>} requiredFields - Array of required field names
- * @throws {Error} If any required field is missing
- * @return {void}
- */
- function validateRequiredFields(data, requiredFields) {
-  for (const field of requiredFields) {
-    if (!data[field] && data[field] !== 0) {
-      throw new Error(`Field '${field}' is required`);
-    }
-  }
- }
-
-/**
  * Retrieve user name from Firestore
  * @param {Object} request - The request object
  * @return {Promise<string|null>} User name or null if not found
@@ -232,8 +217,9 @@ exports.submitReport = onCall(async (request) => {
       mapsLocation: new admin.firestore.GeoPoint(latitude, longitude),
       status: "In progress",
       user: db.collection("users").doc(userId),
-      // userId: userId,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      score: 0,
+      comments: 0,
     };
 
     // Add to Firestore and get document ID
@@ -313,18 +299,30 @@ exports.getAllReports = onCall(async (request) => {
         }
       }
 
+      // Extract latitude and longitude from GeoPoint
+      let latitude = 0;
+      let longitude = 0;
+      if (reportData.mapsLocation) {
+        latitude = reportData.mapsLocation.latitude || 0;
+        longitude = reportData.mapsLocation.longitude || 0;
+        logger.info(
+            `Report ${reportId} location: lat=${latitude}, lon=${longitude}`);
+      }
+
       reports.push({
         documentId: reportId,
         description: reportData.description || "",
         hazardType: reportData.hazardType || "",
         localGov: reportData.localGov || "",
         locationDetails: reportData.locationDetails || "",
-        mapsLocation: reportData.mapsLocation || null,
+        latitude,
+        longitude,
         status: reportData.status || "In progress",
         userName,
         userId: reportData.user.id || "",
         score: reportData.score || 0,
         createdAt: reportData.createdAt ? reportData.createdAt.toMillis() : 0,
+        comments: reportData.comments || 0,
       });
     }
 
@@ -352,7 +350,8 @@ exports.voteReport = onCall(async (request) => {
 
     // voteType: 1 = upvote, -1 = downvote, 0 = remove vote
     if (voteType !== 1 && voteType !== -1 && voteType !== 0) {
-      throw new Error("Invalid vote type. Use 1 (upvote), -1 (downvote), or 0 (remove)");
+      throw new Error(
+          "Invalid vote type. Use 1 (upvote), -1 (downvote), or 0 (remove)");
     }
 
     const reportRef = db.collection("reports").doc(reportId);
@@ -400,7 +399,9 @@ exports.voteReport = onCall(async (request) => {
       return {newScore, userVote};
     });
 
-    logger.info(`Vote processed for report ${reportId} by user ${userId}: ${result.userVote}`);
+    logger.info(
+        `Vote for report ${reportId} by ${userId}: ${result.userVote}`,
+    );
     return {
       success: true,
       score: result.newScore,
@@ -468,3 +469,301 @@ exports.getUserVotesForReports = onCall(async (request) => {
   }
 });
 
+/**
+ * Submit a new comment to a report
+ * @param {Object} request - The request object
+ * @return {Promise<Object>} Comment ID and success status
+ */
+exports.submitComment = onCall(async (request) => {
+  try {
+    const {content, reportId, userId} = request.data;
+
+    if (!content || !reportId || !userId) {
+      throw new Error("Content, report ID, and user ID are required");
+    }
+
+    // Validate that report exists
+    const reportDoc = await db.collection("reports").doc(reportId).get();
+    if (!reportDoc.exists) {
+      throw new Error("Report not found");
+    }
+
+    // Validate that user exists
+    const userDoc = await db.collection("users").doc(userId).get();
+    if (!userDoc.exists) {
+      throw new Error("User not found");
+    }
+
+    // Create comment data with references
+    const commentData = {
+      content,
+      datetime: admin.firestore.FieldValue.serverTimestamp(),
+      report: db.collection("reports").doc(reportId),
+      user: db.collection("users").doc(userId),
+      score: 0,
+    };
+
+    // Add to Firestore
+    const docRef = await db.collection("comments").add(commentData);
+
+    // Increment comment count in report
+    await db.collection("reports").doc(reportId).update({
+      comments: admin.firestore.FieldValue.increment(1),
+    });
+
+    logger.info(`Comment created with ID: ${docRef.id} by user: ${userId}`);
+    return {commentId: docRef.id, success: true};
+  } catch (error) {
+    logger.error("Error submitting comment:", error);
+    throw new Error(`Failed to submit comment: ${error.message}`);
+  }
+});
+
+/**
+ * Delete a comment and decrement comment count
+ * @param {Object} request - The request object
+ * @return {Promise<Object>} Success message
+ */
+exports.deleteComment = onCall(async (request) => {
+  try {
+    const {commentId, userId} = request.data;
+
+    if (!commentId || !userId) {
+      throw new Error("Comment ID and user ID are required");
+    }
+
+    // Get the comment document
+    const commentDoc = await db.collection("comments").doc(commentId).get();
+    if (!commentDoc.exists) {
+      throw new Error("Comment not found");
+    }
+
+    const commentData = commentDoc.data();
+
+    // Verify user is the comment author
+    if (commentData.user.id !== userId) {
+      throw new Error("You can only delete your own comments");
+    }
+
+    // Get the report ID from the comment
+    const reportRef = commentData.report;
+    const reportId = reportRef.id;
+
+    // Delete the comment
+    await db.collection("comments").doc(commentId).delete();
+
+    // Decrement comment count in report
+    await db.collection("reports").doc(reportId).update({
+      comments: admin.firestore.FieldValue.increment(-1),
+    });
+
+    logger.info(`Comment ${commentId} deleted by user ${userId}`);
+    return {success: true, message: "Comment deleted successfully"};
+  } catch (error) {
+    logger.error("Error deleting comment:", error);
+    throw new Error(`Failed to delete comment: ${error.message}`);
+  }
+});
+
+/**
+ * Get all comments for a specific report
+ * @param {Object} request - The request object
+ * @return {Promise<Array>} Array of comment objects
+ */
+exports.getCommentsForReport = onCall(async (request) => {
+  try {
+    const {reportId} = request.data;
+
+    if (!reportId) {
+      throw new Error("Report ID is required");
+    }
+
+    const reportRef = db.collection("reports").doc(reportId);
+    const snapshot = await db.collection("comments")
+        .where("report", "==", reportRef)
+        .orderBy("datetime", "desc")
+        .get();
+
+    if (snapshot.empty) {
+      logger.info(`No comments found for report: ${reportId}`);
+      return [];
+    }
+
+    const comments = [];
+
+    for (const doc of snapshot.docs) {
+      const commentData = doc.data();
+      const commentId = doc.id;
+
+      // Get user name from user reference
+      let userName = "Anonymous";
+      let userId = "";
+      if (commentData.user) {
+        try {
+          userId = commentData.user.id;
+          const userDoc = await commentData.user.get();
+          if (userDoc.exists && userDoc.data().name) {
+            userName = userDoc.data().name;
+          }
+        } catch (userError) {
+          logger.warn(`Could not fetch user for comment ${commentId}`,
+              userError);
+        }
+      }
+
+      comments.push({
+        commentId,
+        content: commentData.content || "",
+        datetime: commentData.datetime ?
+            commentData.datetime.toMillis() : 0,
+        reportId,
+        userId,
+        userName,
+        score: commentData.score || 0,
+      });
+    }
+
+    logger.info(`Fetched ${comments.length} comments for report: ${reportId}`);
+    return comments;
+  } catch (error) {
+    logger.error("Error fetching comments:", error);
+    throw new Error(`Failed to fetch comments: ${error.message}`);
+  }
+});
+
+/**
+ * Vote on a comment (upvote or downvote)
+ * Each user can only have one vote per comment
+ * @param {Object} request - The request object
+ * @return {Promise<Object>} New score and user's vote status
+ */
+exports.voteComment = onCall(async (request) => {
+  try {
+    const {commentId, userId, voteType} = request.data;
+
+    if (!commentId || !userId) {
+      throw new Error("Comment ID and User ID are required");
+    }
+
+    // voteType: 1 = upvote, -1 = downvote, 0 = remove vote
+    if (voteType !== 1 && voteType !== -1 && voteType !== 0) {
+      throw new Error(
+          "Invalid vote type. Use 1 (upvote), -1 (downvote), or 0 (remove)");
+    }
+
+    const commentRef = db.collection("comments").doc(commentId);
+    const voteRef = commentRef.collection("votes").doc(userId);
+
+    // Run as transaction to prevent race conditions
+    const result = await db.runTransaction(async (transaction) => {
+      const commentDoc = await transaction.get(commentRef);
+      const voteDoc = await transaction.get(voteRef);
+
+      if (!commentDoc.exists) {
+        throw new Error("Comment not found");
+      }
+
+      const currentScore = commentDoc.data().score || 0;
+      const previousVote = voteDoc.exists ? voteDoc.data().vote : 0;
+
+      // Calculate score change
+      let scoreChange = 0;
+
+      if (voteType === 0) {
+        // Remove vote
+        scoreChange = -previousVote;
+        transaction.delete(voteRef);
+      } else if (previousVote === voteType) {
+        // Same vote again: toggle off
+        scoreChange = -previousVote;
+        transaction.delete(voteRef);
+      } else {
+        // New vote or changing vote
+        scoreChange = voteType - previousVote;
+        transaction.set(voteRef, {vote: voteType});
+      }
+
+      const newScore = currentScore + scoreChange;
+      transaction.update(commentRef, {score: newScore});
+
+      // Determine user's current vote status after this action
+      let userVote = 0;
+      if (voteType !== 0 && previousVote !== voteType) {
+        userVote = voteType;
+      }
+
+      return {newScore, userVote};
+    });
+
+    logger.info(
+        `Comment vote processed for ${commentId} by user ${userId}: ${
+          result.userVote}`);
+    return {
+      success: true,
+      score: result.newScore,
+      userVote: result.userVote,
+    };
+  } catch (error) {
+    logger.error("Error processing comment vote:", error);
+    throw new Error(`Failed to process vote: ${error.message}`);
+  }
+});
+
+/**
+ * Get user's votes for multiple comments (batch)
+ * @param {Object} request - The request object
+ * @return {Promise<Object>} Map of commentId to vote status
+ */
+exports.getUserVotesForComments = onCall(async (request) => {
+  try {
+    const {commentIds, userId} = request.data;
+
+    if (!commentIds || !userId || !Array.isArray(commentIds)) {
+      throw new Error("Comment IDs array and User ID are required");
+    }
+
+    const votes = {};
+
+    // Fetch votes for all comments in parallel
+    const votePromises = commentIds.map(async (commentId) => {
+      const voteDoc = await db.collection("comments").doc(commentId)
+          .collection("votes").doc(userId).get();
+      votes[commentId] = voteDoc.exists ? voteDoc.data().vote : 0;
+    });
+
+    await Promise.all(votePromises);
+
+    return {votes};
+  } catch (error) {
+    logger.error("Error getting user votes for comments:", error);
+    throw new Error(`Failed to get user votes: ${error.message}`);
+  }
+});
+
+/**
+ * Get the count of comments for a report
+ * @param {Object} request - The request object
+ * @return {Promise<Object>} Comment count
+ */
+exports.getCommentCount = onCall(async (request) => {
+  try {
+    const {reportId} = request.data;
+
+    if (!reportId) {
+      throw new Error("Report ID is required");
+    }
+
+    const reportRef = db.collection("reports").doc(reportId);
+    const snapshot = await db.collection("comments")
+        .where("report", "==", reportRef)
+        .count()
+        .get();
+
+    const count = snapshot.data().count;
+    logger.info(`Comment count for report ${reportId}: ${count}`);
+    return {count};
+  } catch (error) {
+    logger.error("Error getting comment count:", error);
+    throw new Error(`Failed to get comment count: ${error.message}`);
+  }
+});
