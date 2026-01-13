@@ -1,154 +1,218 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/md_theme_surface"
-    tools:context=".ui.home.HomeFragment">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@color/md_theme_surface"
+  tools:context=".ui.home.HomeFragment">
 
   <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-      <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clReportStatistics"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
 
-        <LinearLayout
-          android:id="@+id/linearLayout"
-          android:layout_width="match_parent"
+      <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/md_theme_primary"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+          android:id="@+id/tvReportStatistics"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:background="@color/md_theme_primary"
-          android:orientation="vertical"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent">
+          android:layout_marginStart="20dp"
+          android:layout_marginTop="20dp"
+          android:gravity="center"
+          android:text="@string/report_statistics"
+          android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
+          android:textColor="@color/md_theme_onPrimary" />
 
-          <TextView
-            android:id="@+id/tvReportStatistics"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:text="@string/report_statistics"
-            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
-            android:textColor="@color/md_theme_onPrimary" />
+        <TableLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:paddingLeft="40dp"
+          android:paddingTop="20dp"
+          android:paddingRight="40dp"
+          android:paddingBottom="20dp">
 
-          <TableLayout
+          <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="20dp">
+            android:layout_height="match_parent">
 
-            <TableRow
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-              <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="40dp"
-                android:layout_marginBottom="20dp"
-                android:layout_weight="1"
-                android:background="@drawable/report_statistics_data"
-                android:text="TextView" />
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginRight="40dp"
+              android:layout_marginBottom="20dp"
+              android:layout_weight="1"
+              android:background="@drawable/report_statistics_data"
+              android:orientation="vertical">
 
               <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv6"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="40dp"
-                android:layout_marginBottom="20dp"
-                android:layout_weight="1"
-                android:background="@drawable/report_statistics_data"
-                android:text="TextView" />
-            </TableRow>
-
-            <TableRow
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+                android:text="67"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                android:textColor="@color/md_theme_onSurface" />
 
               <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv4"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="40dp"
-                android:layout_marginBottom="20dp"
-                android:layout_weight="1"
-                android:background="@drawable/report_statistics_data"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:textColor="@color/md_theme_onSurfaceVariant" />
+            </LinearLayout>
+
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="20dp"
+              android:layout_weight="1"
+              android:background="@drawable/report_statistics_data"
+              android:orientation="vertical">
 
               <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
+                android:id="@+id/tsdgv6"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="40dp"
-                android:layout_marginBottom="20dp"
-                android:layout_weight="1"
-                android:background="@drawable/report_statistics_data"
-                android:text="TextView" />
-            </TableRow>
+                android:text="67"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                android:textColor="@color/md_theme_onSurface" />
 
-          </TableLayout>
+              <TextView
+                android:id="@+id/tvaf4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:textColor="@color/md_theme_onSurfaceVariant" />
+            </LinearLayout>
 
-        </LinearLayout>
+          </TableRow>
+
+          <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginRight="40dp"
+              android:layout_weight="1"
+              android:background="@drawable/report_statistics_data"
+              android:orientation="vertical">
+
+              <TextView
+                android:id="@+id/tva6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="67"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                android:textColor="@color/md_theme_onSurface" />
+
+              <TextView
+                android:id="@+id/tav4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:textColor="@color/md_theme_onSurfaceVariant" />
+            </LinearLayout>
+
+            <LinearLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:background="@drawable/report_statistics_data"
+              android:orientation="vertical">
+
+              <TextView
+                android:id="@+id/tafsdv6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="67"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                android:textColor="@color/md_theme_onSurface" />
+
+              <TextView
+                android:id="@+id/tafdsv4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:textColor="@color/md_theme_onSurfaceVariant" />
+            </LinearLayout>
+
+          </TableRow>
+
+        </TableLayout>
+
+      </LinearLayout>
+
+      <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <TextView
           android:id="@+id/tvYourReports"
-          android:layout_width="wrap_content"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginStart="20dp"
           android:layout_marginTop="20dp"
           android:text="@string/your_reports"
           android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
-          android:textColor="@color/md_theme_onSurface"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+          android:textColor="@color/md_theme_onSurface" />
 
         <ProgressBar
           android:id="@+id/progressSpinner"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:visibility="gone"
-          app:layout_constraintBottom_toBottomOf="parent"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="@id/tvYourReports" />
+          android:layout_centerInParent="true" />
 
         <androidx.recyclerview.widget.RecyclerView
           android:id="@+id/rvCards"
           android:layout_width="match_parent"
-          android:layout_height="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_below="@id/tvYourReports"
           android:layout_marginTop="20dp"
-          android:nestedScrollingEnabled="false"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@+id/tvYourReports" />
+          android:nestedScrollingEnabled="false" />
 
-      </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+      </RelativeLayout>
+
+    </LinearLayout>
+  </androidx.core.widget.NestedScrollView>
 
   <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnAddReportHome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:clickable="true"
-        android:src="@drawable/ic_add"
-        app:fabCustomSize="96dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:maxImageSize="36dp" />
+    android:id="@+id/btnAddReportHome"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="20dp"
+    android:layout_marginBottom="20dp"
+    android:layout_gravity="bottom|right"
+    android:clickable="true"
+    android:src="@drawable/ic_add"
+    app:fabCustomSize="96dp"
+    app:maxImageSize="36dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
