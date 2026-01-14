@@ -95,7 +95,7 @@
                 app:layout_constraintStart_toEndOf="@+id/tvThreadTagTertiary"
                 app:layout_constraintTop_toTopOf="@+id/tvThreadTagTertiary" />
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cvPhoto"
                 android:layout_width="0dp"
                 android:layout_height="300dp"
@@ -112,7 +112,7 @@
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
                     tools:srcCompat="@tools:sample/backgrounds/scenic" />
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:id="@+id/tvThreadDesc"

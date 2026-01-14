@@ -2,6 +2,7 @@ package com.gitgud.citywatch;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
@@ -26,6 +27,7 @@ import java.util.Locale;
 public class ReportActivity extends AppCompatActivity {
 
     private ImageView ivPhotoPlaceholder;
+    private MaterialCardView cvUploadPhoto;
     private TextInputEditText etMapsLocation;
     private TextInputEditText etLocationDetails;
     private TextInputEditText etDescription;
@@ -44,6 +46,7 @@ public class ReportActivity extends AppCompatActivity {
                 selectedImageUri = uri;
                 selectedImageBitmap = null;
                 ivPhotoPlaceholder.setImageURI(uri);
+                cvUploadPhoto.setVisibility(View.VISIBLE);
                 prepareImageView();
             }
         });
@@ -55,6 +58,7 @@ public class ReportActivity extends AppCompatActivity {
                 selectedImageBitmap = bitmap;
                 selectedImageUri = null;
                 ivPhotoPlaceholder.setImageBitmap(bitmap);
+                cvUploadPhoto.setVisibility(View.VISIBLE);
                 prepareImageView();
             }
         });
@@ -79,6 +83,7 @@ public class ReportActivity extends AppCompatActivity {
         dataRepository = DataRepository.getInstance(this);
 
         ivPhotoPlaceholder = findViewById(R.id.ivPhotoPlaceholder);
+        cvUploadPhoto = findViewById(R.id.cvUploadPhoto);
         etMapsLocation = findViewById(R.id.etMapsLocation);
         etLocationDetails = findViewById(R.id.etLocationDetails);
         etDescription = findViewById(R.id.etDescription);

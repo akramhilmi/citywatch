@@ -64,6 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="320dp"
         android:layout_marginTop="12dp"
+        android:visibility="gone"
         app:cardBackgroundColor="@color/md_theme_surfaceContainerHigh"
         app:cardCornerRadius="28dp"
         app:strokeColor="@color/md_theme_outlineVariant"
