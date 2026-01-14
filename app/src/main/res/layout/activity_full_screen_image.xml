@@ -20,6 +20,7 @@
     android:layout_margin="16dp"
     android:background="?attr/selectableItemBackgroundBorderless"
     android:contentDescription="Close"
+    android:src="@drawable/ic_close"
     app:tint="@android:color/white" />
 
 </RelativeLayout>
