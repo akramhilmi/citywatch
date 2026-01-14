@@ -27,6 +27,7 @@ const {
 const {
   getUserName,
   getUserPhone,
+  getIsAdmin,
   updateUserName,
   updateUserPhone,
   deleteAccount,
@@ -86,6 +87,7 @@ exports.onUserDeleted = onUserDeleted;
 // User Management
 exports.getUserName = getUserName;
 exports.getUserPhone = getUserPhone;
+exports.getIsAdmin = getIsAdmin;
 exports.updateUserName = updateUserName;
 exports.updateUserPhone = updateUserPhone;
 exports.deleteAccount = deleteAccount;

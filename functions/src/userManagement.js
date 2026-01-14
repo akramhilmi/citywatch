@@ -50,6 +50,29 @@ const getUserPhone = onCall(async (request) => {
 });
 
 /**
+ * Retrieve user admin status from Firestore
+ * Returns true if user has isAdmin field set to true, false otherwise
+ */
+const getIsAdmin = onCall(async (request) => {
+  try {
+    const {userId} = request.data;
+    if (!userId) {
+      throw new Error("User ID is required");
+    }
+
+    const userDoc = await db.collection("users").doc(userId).get();
+    if (!userDoc.exists) {
+      return false;
+    }
+
+    return userDoc.data().isAdmin === true;
+  } catch (error) {
+    logger.error("Error fetching user admin status:", error);
+    throw new Error(`Failed to fetch user admin status: ${error.message}`);
+  }
+});
+
+/**
  * Update user name in both Auth profile and Firestore
  */
 const updateUserName = onCall(async (request) => {
@@ -143,6 +166,7 @@ const sendPasswordResetEmail = onCall(async (request) => {
 module.exports = {
   getUserName,
   getUserPhone,
+  getIsAdmin,
   updateUserName,
   updateUserPhone,
   deleteAccount,

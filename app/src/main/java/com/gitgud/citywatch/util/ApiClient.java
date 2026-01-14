@@ -116,6 +116,23 @@ public class ApiClient {
     }
 
     /**
+     * Fetch user admin status from Cloud Function
+     * Returns true if user has isAdmin field set to true, false otherwise
+     */
+    public static com.google.android.gms.tasks.Task<Boolean> getIsAdmin(String userId) {
+        HttpsCallableReference getIsAdminFunc = functions.getHttpsCallable("getIsAdmin");
+        return getIsAdminFunc.call(new java.util.HashMap<String, Object>() {{
+            put("userId", userId);
+        }}).continueWith(task -> {
+            if (task.isSuccessful()) {
+                Object result = task.getResult().getData();
+                return result instanceof Boolean ? (Boolean) result : false;
+            }
+            throw task.getException() != null ? task.getException() : new Exception("Failed to get admin status");
+        });
+    }
+
+    /**
      * Delete user account via Cloud Function
      */
     public static com.google.android.gms.tasks.Task<Void> deleteAccount(String userId) {
