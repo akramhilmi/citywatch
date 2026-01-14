@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.gitgud.citywatch.R;
 import com.gitgud.citywatch.model.HazardCard;
+import com.gitgud.citywatch.data.repository.DataRepository;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
 
     private List<HazardCard> hazardCards;
     private OnCardClickListener onCardClickListener;
+    private DataRepository dataRepository;
 
     /**
      * Interface for card click events
@@ -34,6 +36,11 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
 
     public HazardCardAdapter(List<HazardCard> hazardCards) {
         this.hazardCards = hazardCards;
+        this.dataRepository = null; // Will be set via setDataRepository
+    }
+
+    public void setDataRepository(DataRepository repository) {
+        this.dataRepository = repository;
     }
 
     public void setOnCardClickListener(OnCardClickListener listener) {
@@ -51,7 +58,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
     @Override
     public void onBindViewHolder(@NonNull HazardViewHolder holder, int position) {
         HazardCard hazard = hazardCards.get(position);
-        holder.bind(hazard, onCardClickListener);
+        holder.bind(hazard, onCardClickListener, dataRepository);
     }
 
     @Override
@@ -90,7 +97,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             tvComments = itemView.findViewById(R.id.tvComments);
         }
 
-        void bind(HazardCard hazard, OnCardClickListener listener) {
+        void bind(HazardCard hazard, OnCardClickListener listener, DataRepository dataRepository) {
             // Set user name with time ago estimate
             String userName = hazard.getUserName() != null ? hazard.getUserName() : "Anonymous";
             String timeAgo = getTimeAgoEstimate(hazard.getCreatedAt());
@@ -119,10 +126,10 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             tvComments.setText(String.valueOf(hazard.getComments()));
 
             // Upvote button listener
-            btnUpvote.setOnClickListener(v -> handleVote(hazard, 1));
+            btnUpvote.setOnClickListener(v -> handleVote(hazard, 1, dataRepository));
 
             // Downvote button listener
-            btnDownvote.setOnClickListener(v -> handleVote(hazard, -1));
+            btnDownvote.setOnClickListener(v -> handleVote(hazard, -1, dataRepository));
 
             // Card click listener - navigate to thread
             itemView.setOnClickListener(v -> {
@@ -136,8 +143,9 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
          * Handle vote button click
          * @param hazard The hazard card being voted on
          * @param voteType 1 for upvote, -1 for downvote
+         * @param dataRepository The data repository for cache updates
          */
-        private void handleVote(HazardCard hazard, int voteType) {
+        private void handleVote(HazardCard hazard, int voteType, DataRepository dataRepository) {
             String userId = com.gitgud.citywatch.util.SessionManager.getCurrentUserId();
             if (userId == null) {
                 android.widget.Toast.makeText(itemView.getContext(),
@@ -159,24 +167,47 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             tvVotes.setText(String.valueOf(newScore));
             updateVoteButtonStates(newUserVote);
 
-            // Call Cloud Function
-            com.gitgud.citywatch.util.ApiClient.voteReport(hazard.getDocumentId(), userId, actualVoteType)
-                    .addOnSuccessListener(result -> {
-                        // Update with server response
-                        hazard.setScore(result.score);
-                        hazard.setUserVote(result.userVote);
-                        tvVotes.setText(String.valueOf(result.score));
-                        updateVoteButtonStates(result.userVote);
-                    })
-                    .addOnFailureListener(e -> {
-                        // Revert on failure
-                        hazard.setScore(previousScore);
-                        hazard.setUserVote(previousVote);
-                        tvVotes.setText(String.valueOf(previousScore));
-                        updateVoteButtonStates(previousVote);
-                        android.widget.Toast.makeText(itemView.getContext(),
-                                "Failed to vote", android.widget.Toast.LENGTH_SHORT).show();
-                    });
+            // Use DataRepository if available, otherwise fall back to ApiClient
+            if (dataRepository != null) {
+                dataRepository.voteReport(hazard.getDocumentId(), actualVoteType,
+                        new DataRepository.VoteCallback() {
+                            @Override
+                            public void onSuccess(long score, int userVote) {
+                                hazard.setScore(score);
+                                hazard.setUserVote(userVote);
+                                tvVotes.setText(String.valueOf(score));
+                                updateVoteButtonStates(userVote);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                hazard.setScore(previousScore);
+                                hazard.setUserVote(previousVote);
+                                tvVotes.setText(String.valueOf(previousScore));
+                                updateVoteButtonStates(previousVote);
+                                android.widget.Toast.makeText(itemView.getContext(),
+                                        "Failed to vote", android.widget.Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            } else {
+                // Fallback to ApiClient
+                com.gitgud.citywatch.util.ApiClient.voteReport(
+                        hazard.getDocumentId(), userId, actualVoteType)
+                        .addOnSuccessListener(result -> {
+                            hazard.setScore(result.score);
+                            hazard.setUserVote(result.userVote);
+                            tvVotes.setText(String.valueOf(result.score));
+                            updateVoteButtonStates(result.userVote);
+                        })
+                        .addOnFailureListener(e -> {
+                            hazard.setScore(previousScore);
+                            hazard.setUserVote(previousVote);
+                            tvVotes.setText(String.valueOf(previousScore));
+                            updateVoteButtonStates(previousVote);
+                            android.widget.Toast.makeText(itemView.getContext(),
+                                    "Failed to vote", android.widget.Toast.LENGTH_SHORT).show();
+                        });
+            }
         }
 
         /**

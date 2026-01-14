@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gitgud.citywatch.R;
 import com.gitgud.citywatch.ReportActivity;
 import com.gitgud.citywatch.model.HazardCard;
-import com.gitgud.citywatch.util.ApiClient;
+import com.gitgud.citywatch.data.repository.DataRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,8 @@ public class CommunityFragment extends Fragment {
     private ProgressBar progressSpinner;
     private HazardCardAdapter adapter;
     private List<HazardCard> hazardCardList;
+    private DataRepository dataRepository;
+    private boolean hasCachedData = false;
 
     public CommunityFragment() {
         // Required empty public constructor
@@ -48,11 +50,15 @@ public class CommunityFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Initialize repository
+        dataRepository = DataRepository.getInstance(requireContext());
+
         // Initialize views
         rvCommunityCards = view.findViewById(R.id.rvCommunityCards);
         progressSpinner = view.findViewById(R.id.progressSpinner);
         hazardCardList = new ArrayList<>();
         adapter = new HazardCardAdapter(hazardCardList);
+        adapter.setDataRepository(dataRepository);
 
         // Setup RecyclerView
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
@@ -90,63 +96,71 @@ public class CommunityFragment extends Fragment {
             startActivity(intent);
         });
 
-        // Show spinner and load reports from Firestore
-        progressSpinner.setVisibility(View.VISIBLE);
+        // Load reports using cache-first strategy
         loadReports();
 
         // Setup click listeners
         setupClickListeners(view);
     }
 
-    private void loadReports() {
-        ApiClient.getAllReports()
-                .addOnSuccessListener(reports -> {
-                    hazardCardList.clear();
-                    hazardCardList.addAll(reports);
-
-                    // Sort by date (newest first)
-                    hazardCardList.sort((c1, c2) ->
-                        Long.compare(c2.getCreatedAt(), c1.getCreatedAt()));
-
-                    // Fetch user votes for all reports
-                    fetchUserVotes();
-                })
-                .addOnFailureListener(e -> {
-                    progressSpinner.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), "Failed to load reports: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Reload reports when fragment comes back into focus
+        // This ensures vote/comment counts are updated if user modified them in ThreadActivity
+        loadReports();
     }
 
-    private void fetchUserVotes() {
-        String userId = com.gitgud.citywatch.util.SessionManager.getCurrentUserId();
-        if (userId == null || hazardCardList.isEmpty()) {
-            progressSpinner.setVisibility(View.GONE);
-            adapter.notifyDataSetChanged();
-            return;
-        }
+    private void loadReports() {
+        hasCachedData = false;
 
-        // Collect all report IDs
-        java.util.List<String> reportIds = new java.util.ArrayList<>();
-        for (com.gitgud.citywatch.model.HazardCard card : hazardCardList) {
-            reportIds.add(card.getDocumentId());
-        }
+        dataRepository.getAllReports(new DataRepository.DataCallback<List<HazardCard>>() {
+            @Override
+            public void onCacheData(List<HazardCard> data) {
+                // Show cached data immediately
+                if (getActivity() == null) return;
+                hasCachedData = true;
+                updateReportsList(data);
+                // Hide spinner since we have cached data to show
+                progressSpinner.setVisibility(View.GONE);
+            }
 
-        // Fetch user votes for all reports
-        ApiClient.getUserVotesForReports(reportIds, userId)
-                .addOnSuccessListener(votes -> {
-                    // Update each card with user's vote
-                    for (com.gitgud.citywatch.model.HazardCard card : hazardCardList) {
-                        Integer userVote = votes.get(card.getDocumentId());
-                        card.setUserVote(userVote != null ? userVote : 0);
-                    }
-                    progressSpinner.setVisibility(View.GONE);
-                    adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    // Still show cards even if votes failed to load
-                    progressSpinner.setVisibility(View.GONE);
-                    adapter.notifyDataSetChanged();
-                });
+            @Override
+            public void onFreshData(List<HazardCard> data) {
+                // Update with fresh data
+                if (getActivity() == null) return;
+                updateReportsList(data);
+                progressSpinner.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onLoading(boolean isLoading) {
+                if (getActivity() == null) return;
+                // Only show spinner if we don't have cached data
+                if (!hasCachedData) {
+                    progressSpinner.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (getActivity() == null) return;
+                progressSpinner.setVisibility(View.GONE);
+                Toast.makeText(getContext(), "Failed to load reports: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateReportsList(List<HazardCard> reports) {
+        hazardCardList.clear();
+        hazardCardList.addAll(reports);
+
+        // Sort by date (newest first)
+        hazardCardList.sort((c1, c2) ->
+            Long.compare(c2.getCreatedAt(), c1.getCreatedAt()));
+
+        adapter.notifyDataSetChanged();
     }
 
     private void setupClickListeners(View view) {

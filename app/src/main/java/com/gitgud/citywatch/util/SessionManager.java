@@ -1,6 +1,9 @@
 package com.gitgud.citywatch.util;
 
+import android.content.Context;
+
 import com.gitgud.citywatch.SignInActivity;
+import com.gitgud.citywatch.data.cache.CacheManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -59,6 +62,17 @@ public class SessionManager {
      */
     public static void logout() {
         auth.signOut();
+    }
+
+    /**
+     * Logout current user and clear local cache
+     * @param context Context for accessing cache manager
+     */
+    public static void logout(Context context) {
+        auth.signOut();
+        if (context != null) {
+            CacheManager.getInstance(context).clearAllCaches();
+        }
     }
 
     /**

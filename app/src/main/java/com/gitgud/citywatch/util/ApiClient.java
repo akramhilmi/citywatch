@@ -761,4 +761,114 @@ public class ApiClient {
         additionalData.put(key, value);
         return buildAuthenticatedData(additionalData);
     }
+
+    // ==================== Cache Checksum Methods ====================
+
+    // ==================== Cache Checksum Methods ====================
+
+    /**
+     * Get all checksums from server in a single lightweight call
+     * Checksums are pre-calculated on server-side on every data change
+     * @return Task with map of checksum keys to checksum values
+     */
+    public static com.google.android.gms.tasks.Task<java.util.Map<String, String>> getAllChecksums() {
+        HttpsCallableReference getChecksumsFunc = functions.getHttpsCallable("getChecksums");
+
+        return getChecksumsFunc.call(new java.util.HashMap<>())
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.Map<String, Object> result =
+                                (java.util.Map<String, Object>) task.getResult().getData();
+                        java.util.Map<String, String> checksums = new java.util.HashMap<>();
+                        if (result != null) {
+                            for (java.util.Map.Entry<String, Object> entry : result.entrySet()) {
+                                if (entry.getValue() != null) {
+                                    checksums.put(entry.getKey(), entry.getValue().toString());
+                                }
+                            }
+                        }
+                        return checksums;
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to get checksums");
+                });
+    }
+
+    /**
+     * Result class for cache checksum operation (kept for compatibility)
+     */
+    public static class CacheChecksum {
+        public final String checksum;
+        public final int count;
+        public final long latestTimestamp;
+
+        public CacheChecksum(String checksum, int count, long latestTimestamp) {
+            this.checksum = checksum;
+            this.count = count;
+            this.latestTimestamp = latestTimestamp;
+        }
+    }
+
+    /**
+     * Get cache checksum for reports to efficiently check for updates
+     * @return Task with CacheChecksum containing checksum, count, and latest timestamp
+     * @deprecated Use getAllChecksums() instead for better efficiency
+     */
+    public static com.google.android.gms.tasks.Task<CacheChecksum> getReportsCacheChecksum() {
+        HttpsCallableReference getCacheChecksumFunc = functions.getHttpsCallable("getCacheChecksum");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("dataType", "reports");
+
+        return getCacheChecksumFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.Map<String, Object> result =
+                                (java.util.Map<String, Object>) task.getResult().getData();
+                        String checksum = (String) result.get("checksum");
+                        Number countNum = (Number) result.get("count");
+                        Number timestampNum = (Number) result.get("latestTimestamp");
+                        return new CacheChecksum(
+                                checksum,
+                                countNum != null ? countNum.intValue() : 0,
+                                timestampNum != null ? timestampNum.longValue() : 0
+                        );
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to get cache checksum");
+                });
+    }
+
+    /**
+     * Get cache checksum for comments to efficiently check for updates
+     * @param reportId The report document ID
+     * @return Task with CacheChecksum containing checksum, count, and latest timestamp
+     * @deprecated Use getAllChecksums() instead for better efficiency
+     */
+    public static com.google.android.gms.tasks.Task<CacheChecksum> getCommentsCacheChecksum(
+            String reportId) {
+        HttpsCallableReference getCacheChecksumFunc = functions.getHttpsCallable("getCacheChecksum");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("dataType", "comments");
+        data.put("reportId", reportId);
+
+        return getCacheChecksumFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.Map<String, Object> result =
+                                (java.util.Map<String, Object>) task.getResult().getData();
+                        String checksum = (String) result.get("checksum");
+                        Number countNum = (Number) result.get("count");
+                        Number timestampNum = (Number) result.get("latestTimestamp");
+                        return new CacheChecksum(
+                                checksum,
+                                countNum != null ? countNum.intValue() : 0,
+                                timestampNum != null ? timestampNum.longValue() : 0
+                        );
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to get cache checksum");
+                });
+    }
 }

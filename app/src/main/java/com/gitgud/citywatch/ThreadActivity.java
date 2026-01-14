@@ -2,7 +2,6 @@ package com.gitgud.citywatch;
 
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.gitgud.citywatch.model.Comment;
 import com.gitgud.citywatch.ui.thread.CommentAdapter;
+import com.gitgud.citywatch.data.repository.DataRepository;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
@@ -61,12 +61,16 @@ public class ThreadActivity extends AppCompatActivity {
     private int currentUserVote;
     private double latitude;
     private double longitude;
+    private DataRepository dataRepository;
+    private boolean hasCachedComments = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_thread);
+
+        dataRepository = DataRepository.getInstance(this);
 
         initViews();
 
@@ -122,10 +126,14 @@ public class ThreadActivity extends AppCompatActivity {
         rvComments.setAdapter(commentAdapter);
         rvComments.setNestedScrollingEnabled(false);
 
-        // Auto-scroll to bottom when typing a comment
+        // Auto-scroll to bottom when typing a comment (without stealing focus)
         etComment.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
-                nestedScrollView.postDelayed(() -> nestedScrollView.fullScroll(View.FOCUS_DOWN), 300);
+                // Use smoothScrollTo instead of fullScroll to avoid transferring focus
+                nestedScrollView.postDelayed(() -> {
+                    // Scroll to the comment input layout position
+                    nestedScrollView.smoothScrollTo(0, llCommentInput.getBottom());
+                }, 300);
             }
         });
     }
@@ -171,7 +179,11 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            // Invalidate reports cache since vote/comment counts might have changed
+            dataRepository.invalidateReportsCache();
+            finish();
+        });
 
         TextView tvThreadLocation = findViewById(R.id.tvThreadLocation);
         if (tvThreadLocation != null) tvThreadLocation.setOnClickListener(v -> openMapApp());
@@ -198,17 +210,23 @@ public class ThreadActivity extends AppCompatActivity {
         currentUserVote = actualVoteType;
         tvVotes.setText(String.valueOf(currentScore));
 
-        ApiClient.voteReport(documentId, userId, actualVoteType)
-                .addOnSuccessListener(result -> {
-                    currentScore = result.score;
-                    currentUserVote = result.userVote;
-                    tvVotes.setText(String.valueOf(currentScore));
-                })
-                .addOnFailureListener(e -> {
-                    currentScore = previousScore;
-                    currentUserVote = previousVote;
-                    tvVotes.setText(String.valueOf(currentScore));
-                    Toast.makeText(this, "Failed to vote", Toast.LENGTH_SHORT).show();
+        dataRepository.voteReport(documentId, actualVoteType,
+                new DataRepository.VoteCallback() {
+                    @Override
+                    public void onSuccess(long score, int userVote) {
+                        currentScore = score;
+                        currentUserVote = userVote;
+                        tvVotes.setText(String.valueOf(currentScore));
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        currentScore = previousScore;
+                        currentUserVote = previousVote;
+                        tvVotes.setText(String.valueOf(currentScore));
+                        Toast.makeText(ThreadActivity.this, "Failed to vote",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
@@ -245,39 +263,40 @@ public class ThreadActivity extends AppCompatActivity {
 
     private void loadComments() {
         if (documentId == null) return;
-        tvCommentsLoading.setVisibility(View.VISIBLE);
-        ApiClient.getCommentsForReport(documentId)
-                .addOnSuccessListener(comments -> {
-                    commentList.clear();
-                    commentList.addAll(comments);
-                    tvComments.setText(String.valueOf(comments.size()));
-                    loadUserVotesForComments(comments);
-                })
-                .addOnFailureListener(e -> tvCommentsLoading.setVisibility(View.GONE));
-    }
+        hasCachedComments = false;
 
-    private void loadUserVotesForComments(List<Comment> comments) {
-        String userId = SessionManager.getCurrentUserId();
-        if (userId == null || comments.isEmpty()) {
-            commentAdapter.notifyDataSetChanged();
-            tvCommentsLoading.setVisibility(View.GONE);
-            return;
-        }
-        List<String> ids = new ArrayList<>();
-        for (Comment c : comments) ids.add(c.getCommentId());
-        ApiClient.getUserVotesForComments(ids, userId)
-                .addOnSuccessListener(votes -> {
-                    for (Comment c : commentList) {
-                        Integer v = votes.get(c.getCommentId());
-                        c.setUserVote(v != null ? v : 0);
-                    }
-                    commentAdapter.notifyDataSetChanged();
-                    tvCommentsLoading.setVisibility(View.GONE);
-                })
-                .addOnFailureListener(e -> {
-                    commentAdapter.notifyDataSetChanged();
-                    tvCommentsLoading.setVisibility(View.GONE);
-                });
+        dataRepository.getCommentsForReport(documentId, new DataRepository.DataCallback<List<Comment>>() {
+            @Override
+            public void onCacheData(List<Comment> data) {
+                hasCachedComments = true;
+                commentList.clear();
+                commentList.addAll(data);
+                tvComments.setText(String.valueOf(data.size()));
+                commentAdapter.notifyDataSetChanged();
+                tvCommentsLoading.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFreshData(List<Comment> data) {
+                commentList.clear();
+                commentList.addAll(data);
+                tvComments.setText(String.valueOf(data.size()));
+                commentAdapter.notifyDataSetChanged();
+                tvCommentsLoading.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onLoading(boolean isLoading) {
+                if (!hasCachedComments) {
+                    tvCommentsLoading.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                tvCommentsLoading.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void submitComment() {
@@ -290,16 +309,23 @@ public class ThreadActivity extends AppCompatActivity {
         if (content.isEmpty()) return;
 
         tilComment.setEnabled(false);
-        ApiClient.submitComment(content, documentId, userId)
-                .addOnSuccessListener(id -> {
-                    etComment.setText("");
-                    tilComment.setEnabled(true);
-                    loadComments();
-                    Toast.makeText(this, "Comment posted", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    tilComment.setEnabled(true);
-                    Toast.makeText(this, "Failed to post", Toast.LENGTH_SHORT).show();
+        dataRepository.submitComment(content, documentId,
+                new DataRepository.CommentSubmitCallback() {
+                    @Override
+                    public void onSuccess(String commentId) {
+                        etComment.setText("");
+                        tilComment.setEnabled(true);
+                        loadComments();
+                        Toast.makeText(ThreadActivity.this, "Comment posted",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        tilComment.setEnabled(true);
+                        Toast.makeText(ThreadActivity.this, "Failed to post",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 }

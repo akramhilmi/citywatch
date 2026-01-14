@@ -1,6 +1,10 @@
 const {setGlobalOptions} = require("firebase-functions");
 const {onCall} = require("firebase-functions/v2/https");
-const {onDocumentDeleted} = require("firebase-functions/v2/firestore");
+const {
+  onDocumentDeleted,
+  onDocumentCreated,
+  onDocumentWritten,
+} = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const logger = require("firebase-functions/logger");
 
@@ -14,6 +18,237 @@ setGlobalOptions({
 const db = admin.firestore();
 const auth = admin.auth();
 const bucket = admin.storage().bucket();
+
+// ==================== Checksum Management ====================
+// Checksums are stored in /metadata/checksums document
+// Updated automatically via Firestore triggers on every change
+
+/**
+ * Update reports checksum when a report is created
+ */
+exports.onReportCreated = onDocumentCreated("reports/{reportId}", async () => {
+  await updateReportsChecksum();
+});
+
+/**
+ * Update reports checksum when a report is modified
+ */
+exports.onReportWritten = onDocumentWritten("reports/{reportId}", async () => {
+  await updateReportsChecksum();
+});
+
+/**
+ * Update comments checksum when a comment is created
+ */
+exports.onCommentCreated = onDocumentCreated(
+    "comments/{commentId}",
+    async (event) => {
+      const data = event.data.data();
+      if (data && data.report) {
+        const reportId = data.report.id;
+        await updateCommentsChecksum(reportId);
+      }
+      await updateGlobalCommentsChecksum();
+    },
+);
+
+/**
+ * Update comments checksum when a comment is modified
+ */
+exports.onCommentWritten = onDocumentWritten(
+    "comments/{commentId}",
+    async (event) => {
+      const afterData = event.data.after.data();
+      const beforeData = event.data.before.data();
+      const reportId = afterData?.report?.id || beforeData?.report?.id;
+      if (reportId) {
+        await updateCommentsChecksum(reportId);
+      }
+      await updateGlobalCommentsChecksum();
+    },
+);
+
+/**
+ * Update user profile checksum when user data changes
+ * Also updates global usersVersion to invalidate caches that reference users
+ */
+exports.onUserWritten = onDocumentWritten(
+    "users/{userId}",
+    async (event) => {
+      const userId = event.params.userId;
+      await updateUserChecksum(userId);
+      // Update global users version - this will invalidate reports/comments
+      // caches since they reference user data
+      await updateUsersVersion();
+    },
+);
+
+/**
+ * Helper: Update reports checksum in metadata
+ * Includes usersVersion so cache is invalidated when referenced user data changes
+ */
+async function updateReportsChecksum() {
+  try {
+    const snapshot = await db.collection("reports")
+        .orderBy("createdAt", "desc")
+        .limit(1)
+        .get();
+    const countSnapshot = await db.collection("reports").count().get();
+    const count = countSnapshot.data().count;
+
+    let latestTimestamp = 0;
+    if (!snapshot.empty) {
+      const data = snapshot.docs[0].data();
+      if (data.createdAt) {
+        latestTimestamp = data.createdAt.toMillis ?
+            data.createdAt.toMillis() : data.createdAt;
+      }
+    }
+
+    // Get current usersVersion to include in reports checksum
+    const checksumDoc = await db.collection("metadata").doc("checksums").get();
+    const usersVersion = checksumDoc.exists ?
+        (checksumDoc.data().usersVersion || 0) : 0;
+
+    // Composite checksum includes reports data + users version
+    const checksum = `${count}_${latestTimestamp}_u${usersVersion}`;
+    await db.collection("metadata").doc("checksums").set({
+      reports: checksum,
+      reportsUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, {merge: true});
+
+    logger.info(`Reports checksum updated: ${checksum}`);
+  } catch (error) {
+    logger.error("Error updating reports checksum:", error);
+  }
+}
+
+/**
+ * Helper: Update comments checksum for a specific report
+ * Includes usersVersion so cache is invalidated when referenced user data changes
+ */
+async function updateCommentsChecksum(reportId) {
+  try {
+    const reportRef = db.collection("reports").doc(reportId);
+    const countSnapshot = await db.collection("comments")
+        .where("report", "==", reportRef)
+        .count()
+        .get();
+    const count = countSnapshot.data().count;
+
+    const snapshot = await db.collection("comments")
+        .where("report", "==", reportRef)
+        .orderBy("datetime", "desc")
+        .limit(1)
+        .get();
+
+    let latestTimestamp = 0;
+    if (!snapshot.empty) {
+      const data = snapshot.docs[0].data();
+      if (data.datetime) {
+        latestTimestamp = data.datetime.toMillis ?
+            data.datetime.toMillis() : data.datetime;
+      }
+    }
+
+    // Get current usersVersion to include in comments checksum
+    const checksumDoc = await db.collection("metadata").doc("checksums").get();
+    const usersVersion = checksumDoc.exists ?
+        (checksumDoc.data().usersVersion || 0) : 0;
+
+    // Composite checksum includes comments data + users version
+    const checksum = `${count}_${latestTimestamp}_u${usersVersion}`;
+
+    // Store in metadata/checksums under comments.{reportId}
+    await db.collection("metadata").doc("checksums").set({
+      [`comments_${reportId}`]: checksum,
+    }, {merge: true});
+
+    logger.info(`Comments checksum for ${reportId} updated: ${checksum}`);
+  } catch (error) {
+    logger.error(`Error updating comments checksum for ${reportId}:`, error);
+  }
+}
+
+/**
+ * Helper: Update global comments checksum
+ */
+async function updateGlobalCommentsChecksum() {
+  try {
+    const countSnapshot = await db.collection("comments").count().get();
+    const count = countSnapshot.data().count;
+    const checksum = `global_${count}_${Date.now()}`;
+
+    await db.collection("metadata").doc("checksums").set({
+      commentsGlobal: checksum,
+    }, {merge: true});
+  } catch (error) {
+    logger.error("Error updating global comments checksum:", error);
+  }
+}
+
+/**
+ * Helper: Update usersVersion - triggers invalidation of caches
+ * that reference user data (reports, comments)
+ */
+async function updateUsersVersion() {
+  try {
+    const newVersion = Date.now();
+
+    await db.collection("metadata").doc("checksums").set({
+      usersVersion: newVersion,
+    }, {merge: true});
+
+    logger.info(`Users version updated: ${newVersion}`);
+
+    // Also update reports checksum since it includes usersVersion
+    await updateReportsChecksum();
+
+    // Update global comments checksum
+    await updateGlobalCommentsChecksum();
+  } catch (error) {
+    logger.error("Error updating users version:", error);
+  }
+}
+
+/**
+ * Helper: Update user profile checksum
+ */
+async function updateUserChecksum(userId) {
+  try {
+    const userDoc = await db.collection("users").doc(userId).get();
+    if (!userDoc.exists) return;
+
+    const checksum = `${userId}_${Date.now()}`;
+
+    await db.collection("metadata").doc("checksums").set({
+      [`user_${userId}`]: checksum,
+    }, {merge: true});
+
+    logger.info(`User checksum for ${userId} updated: ${checksum}`);
+  } catch (error) {
+    logger.error(`Error updating user checksum for ${userId}:`, error);
+  }
+}
+
+/**
+ * Lightweight function to get all checksums
+ * Client compares these with locally stored checksums
+ * @param {Object} request - The request object
+ * @return {Promise<Object>} All checksums
+ */
+exports.getChecksums = onCall(async (request) => {
+  try {
+    const checksumDoc = await db.collection("metadata").doc("checksums").get();
+    if (!checksumDoc.exists) {
+      return {};
+    }
+    return checksumDoc.data();
+  } catch (error) {
+    logger.error("Error fetching checksums:", error);
+    throw new Error(`Failed to fetch checksums: ${error.message}`);
+  }
+});
 
 /**
  * Retrieve user name from Firestore
@@ -767,3 +1002,86 @@ exports.getCommentCount = onCall(async (request) => {
     throw new Error(`Failed to get comment count: ${error.message}`);
   }
 });
+
+/**
+ * Get cache checksums for efficient data update checking
+ * Returns lightweight metadata about reports and comments
+ * that clients can use to determine if cache needs refresh
+ * @param {Object} request - The request object
+ * @return {Promise<Object>} Cache checksums and counts
+ */
+exports.getCacheChecksum = onCall(async (request) => {
+  try {
+    const {dataType, reportId} = request.data;
+
+    if (dataType === "reports") {
+      // Get report count and latest update timestamp
+      const reportsSnapshot = await db.collection("reports")
+          .orderBy("createdAt", "desc")
+          .limit(1)
+          .get();
+
+      const countSnapshot = await db.collection("reports").count().get();
+      const reportCount = countSnapshot.data().count;
+
+      let latestTimestamp = 0;
+      if (!reportsSnapshot.empty) {
+        const latestDoc = reportsSnapshot.docs[0];
+        const data = latestDoc.data();
+        if (data.createdAt) {
+          latestTimestamp = data.createdAt.toMillis ?
+              data.createdAt.toMillis() : data.createdAt;
+        }
+      }
+
+      // Generate a simple checksum based on count + latest timestamp
+      const checksum = `${reportCount}_${latestTimestamp}`;
+
+      return {
+        checksum,
+        count: reportCount,
+        latestTimestamp,
+      };
+    } else if (dataType === "comments" && reportId) {
+      const reportRef = db.collection("reports").doc(reportId);
+
+      // Get comment count for this report
+      const countSnapshot = await db.collection("comments")
+          .where("report", "==", reportRef)
+          .count()
+          .get();
+      const commentCount = countSnapshot.data().count;
+
+      // Get latest comment timestamp
+      const commentsSnapshot = await db.collection("comments")
+          .where("report", "==", reportRef)
+          .orderBy("datetime", "desc")
+          .limit(1)
+          .get();
+
+      let latestTimestamp = 0;
+      if (!commentsSnapshot.empty) {
+        const latestDoc = commentsSnapshot.docs[0];
+        const data = latestDoc.data();
+        if (data.datetime) {
+          latestTimestamp = data.datetime.toMillis ?
+              data.datetime.toMillis() : data.datetime;
+        }
+      }
+
+      const checksum = `${commentCount}_${latestTimestamp}`;
+
+      return {
+        checksum,
+        count: commentCount,
+        latestTimestamp,
+      };
+    } else {
+      throw new Error("Invalid dataType or missing reportId for comments");
+    }
+  } catch (error) {
+    logger.error("Error getting cache checksum:", error);
+    throw new Error(`Failed to get cache checksum: ${error.message}`);
+  }
+});
+
