@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import com.gitgud.citywatch.R;
 import com.gitgud.citywatch.SignInActivity;
+import com.gitgud.citywatch.data.repository.DataRepository;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
 import com.google.android.material.materialswitch.MaterialSwitch;
@@ -31,6 +32,8 @@ public class ProfileFragment extends Fragment {
     private ActivityResultLauncher<String> pickImageLauncher;
     private FrameLayout loadingOverlay;
     private int pendingFetches = 0; // tracks pending data fetches from Firebase
+    private DataRepository dataRepository;
+    private boolean hasCachedData = false;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -52,6 +55,7 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         sessionManager = new SessionManager();
+        dataRepository = DataRepository.getInstance(requireContext());
 
         // Initialize image picker launcher
         pickImageLauncher = registerForActivityResult(
@@ -78,9 +82,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadUserData() {
-        // Show loading spinner
-        pendingFetches = 3; // name, phone, and profile picture
-        loadingOverlay.setVisibility(View.VISIBLE);
+        hasCachedData = false;
 
         com.google.firebase.auth.FirebaseUser user = ApiClient.getCurrentUser();
         if (user != null) {
@@ -89,42 +91,77 @@ public class ProfileFragment extends Fragment {
 
             // Set email immediately (from Firebase Auth)
             tvEmailValue.setText(email != null ? email : "Not set");
-            decrementPendingFetches(); // Email doesn't require a fetch
 
-            // Load profile picture from Firebase Storage
-            loadProfilePicture(userId);
+            // Use DataRepository with cache-first strategy
+            dataRepository.getUserProfile(userId, new DataRepository.UserProfileCallback() {
+                @Override
+                public void onCacheData(String name, String phone, String profilePictureUrl) {
+                    if (getActivity() == null) return;
+                    hasCachedData = true;
+                    loadingOverlay.setVisibility(View.GONE);
 
-            // Fetch name and phone from Firestore
-            ApiClient.getUserName(userId).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    String name = task.getResult();
+                    // Display cached data immediately
                     String displayName = name != null && !name.isEmpty() ? name : "User";
                     tvNameHeader.setText(displayName);
                     tvNameValue.setText(displayName);
-                } else {
+                    tvPhoneValue.setText(phone != null && !phone.isEmpty() ? phone : "Not set");
+
+                    // Load cached profile picture
+                    if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
+                        Glide.with(ProfileFragment.this)
+                                .load(profilePictureUrl)
+                                .placeholder(R.drawable.ic_profile)
+                                .error(R.drawable.ic_profile)
+                                .centerCrop()
+                                .into(ivProfileImage);
+                    }
+                }
+
+                @Override
+                public void onFreshData(String name, String phone, String profilePictureUrl) {
+                    if (getActivity() == null) return;
+                    loadingOverlay.setVisibility(View.GONE);
+
+                    // Update with fresh data
+                    String displayName = name != null && !name.isEmpty() ? name : "User";
+                    tvNameHeader.setText(displayName);
+                    tvNameValue.setText(displayName);
+                    tvPhoneValue.setText(phone != null && !phone.isEmpty() ? phone : "Not set");
+
+                    // Load fresh profile picture
+                    Glide.with(ProfileFragment.this)
+                            .load(profilePictureUrl)
+                            .placeholder(R.drawable.ic_profile)
+                            .error(R.drawable.ic_profile)
+                            .centerCrop()
+                            .into(ivProfileImage);
+                }
+
+                @Override
+                public void onLoading(boolean isLoading) {
+                    if (getActivity() == null) return;
+                    // Only show loading overlay if we don't have cached data
+                    if (!hasCachedData) {
+                        loadingOverlay.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    if (getActivity() == null) return;
+                    loadingOverlay.setVisibility(View.GONE);
                     tvNameHeader.setText("User");
                     tvNameValue.setText("Not set");
-                }
-                decrementPendingFetches();
-            });
-
-            ApiClient.getUserPhone(userId).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    String phone = task.getResult();
-                    tvPhoneValue.setText(phone != null && !phone.isEmpty() ? phone : "Not set");
-                } else {
                     tvPhoneValue.setText("Not set");
                 }
-                decrementPendingFetches();
             });
         } else {
-            // Hide spinner if user is not available
-            pendingFetches = 0;
             loadingOverlay.setVisibility(View.GONE);
         }
     }
 
     private void decrementPendingFetches() {
+        // Kept for compatibility with loadProfilePicture if called directly
         pendingFetches--;
         if (pendingFetches <= 0) {
             loadingOverlay.setVisibility(View.GONE);
@@ -134,7 +171,7 @@ public class ProfileFragment extends Fragment {
     private void setupClickListeners(View view) {
         //sign out
         view.findViewById(R.id.btnSignOut).setOnClickListener(v -> {
-            sessionManager.logout();
+            SessionManager.logout(requireContext());
             Intent intent = new Intent(requireActivity(), SignInActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -192,7 +229,7 @@ public class ProfileFragment extends Fragment {
                 if (user != null) {
                     ApiClient.deleteAccount(user.getUid()).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            sessionManager.logout();
+                            SessionManager.logout(requireContext());
                             startActivity(new Intent(requireActivity(), SignInActivity.class));
                             requireActivity().finish();
                         }
@@ -214,20 +251,24 @@ public class ProfileFragment extends Fragment {
             .setPositiveButton("Save", (dialog, which) -> {
                 String newName = input.getText().toString().trim();
                 if (!newName.isEmpty()) {
-                    com.google.firebase.auth.FirebaseUser user = ApiClient.getCurrentUser();
-                    if (user != null) {
-                        ApiClient.updateUserName(user.getUid(), newName).addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                tvNameHeader.setText(newName);
-                                tvNameValue.setText(newName);
-                                Toast.makeText(requireActivity(), "Name updated successfully", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(requireActivity(), "Failed to update name", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    dataRepository.updateUserName(newName, new DataRepository.SimpleCallback() {
+                        @Override
+                        public void onSuccess() {
+                            tvNameHeader.setText(newName);
+                            tvNameValue.setText(newName);
+                            Toast.makeText(requireActivity(), "Name updated successfully",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Toast.makeText(requireActivity(), "Failed to update name",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } else {
-                    Toast.makeText(requireActivity(), "Name cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity(), "Name cannot be empty",
+                            Toast.LENGTH_SHORT).show();
                 }
             })
             .setNegativeButton("Cancel", null)
@@ -245,19 +286,23 @@ public class ProfileFragment extends Fragment {
             .setPositiveButton("Save", (dialog, which) -> {
                 String newPhone = input.getText().toString().trim();
                 if (!newPhone.isEmpty()) {
-                    com.google.firebase.auth.FirebaseUser user = ApiClient.getCurrentUser();
-                    if (user != null) {
-                        ApiClient.updateUserPhone(user.getUid(), newPhone).addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                tvPhoneValue.setText(newPhone);
-                                Toast.makeText(requireActivity(), "Phone number updated successfully", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(requireActivity(), "Failed to update phone number", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    dataRepository.updateUserPhone(newPhone, new DataRepository.SimpleCallback() {
+                        @Override
+                        public void onSuccess() {
+                            tvPhoneValue.setText(newPhone);
+                            Toast.makeText(requireActivity(), "Phone number updated successfully",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Toast.makeText(requireActivity(), "Failed to update phone number",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } else {
-                    Toast.makeText(requireActivity(), "Phone number cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity(), "Phone number cannot be empty",
+                            Toast.LENGTH_SHORT).show();
                 }
             })
             .setNegativeButton("Cancel", null)
@@ -332,21 +377,27 @@ public class ProfileFragment extends Fragment {
     }
 
     private void uploadProfilePicture(Uri imageUri) {
-        com.google.firebase.auth.FirebaseUser user = ApiClient.getCurrentUser();
-        if (user != null) {
-            Toast.makeText(requireActivity(), "Uploading profile picture...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireActivity(), "Uploading profile picture...", Toast.LENGTH_SHORT).show();
 
-            ApiClient.uploadProfilePicture(user.getUid(), imageUri).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(requireActivity(), "Profile picture uploaded successfully", Toast.LENGTH_SHORT).show();
-                    // Refresh the fragment to reload user data
-                    loadUserData();
-                } else {
-                    Exception error = task.getException();
-                    String errorMessage = error != null ? error.getMessage() : "Failed to upload profile picture";
-                    showErrorDialog("Upload Failed", errorMessage);
-                }
-            });
-        }
+        dataRepository.uploadProfilePicture(imageUri, new DataRepository.ProfilePictureCallback() {
+            @Override
+            public void onSuccess(String downloadUrl) {
+                Toast.makeText(requireActivity(), "Profile picture uploaded successfully",
+                        Toast.LENGTH_SHORT).show();
+                // Load the new profile picture
+                Glide.with(ProfileFragment.this)
+                        .load(downloadUrl)
+                        .placeholder(R.drawable.ic_profile)
+                        .error(R.drawable.ic_profile)
+                        .centerCrop()
+                        .into(ivProfileImage);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                String errorMessage = e != null ? e.getMessage() : "Failed to upload profile picture";
+                showErrorDialog("Upload Failed", errorMessage);
+            }
+        });
     }
 }

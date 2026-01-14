@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.gitgud.citywatch.data.repository.DataRepository;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
 
@@ -34,6 +35,7 @@ public class ReportActivity extends AppCompatActivity {
     private android.net.Uri selectedImageUri = null; // for image upload
     private android.graphics.Bitmap selectedImageBitmap = null; // for image upload
     private AlertDialog progressDialog; // for submission progress
+    private DataRepository dataRepository;
 
     //setup gallery launcher
     private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
@@ -73,6 +75,8 @@ public class ReportActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
+
+        dataRepository = DataRepository.getInstance(this);
 
         ivPhotoPlaceholder = findViewById(R.id.ivPhotoPlaceholder);
         etMapsLocation = findViewById(R.id.etMapsLocation);
@@ -167,18 +171,24 @@ public class ReportActivity extends AppCompatActivity {
         // Show progress dialog
         showProgressDialog("Submitting report...");
 
-        // Submit report via ApiClient with user ID
-        ApiClient.submitReport(description, hazardType, localGov, locationDetails,
-                selectedLatitude, selectedLongitude, userId)
-                .addOnSuccessListener(documentId -> {
-                    // Update progress dialog
-                    updateProgressDialog("Uploading photo...");
-                    // Upload image with document ID as filename
-                    uploadReportImage(documentId);
-                })
-                .addOnFailureListener(e -> {
-                    dismissProgressDialog();
-                    Toast.makeText(ReportActivity.this, "Failed to submit report", Toast.LENGTH_SHORT).show();
+        // Submit report via DataRepository (automatically invalidates cache)
+        dataRepository.submitReport(description, hazardType, localGov, locationDetails,
+                selectedLatitude, selectedLongitude,
+                new DataRepository.ReportSubmitCallback() {
+                    @Override
+                    public void onSuccess(String documentId) {
+                        // Update progress dialog
+                        updateProgressDialog("Uploading photo...");
+                        // Upload image with document ID as filename
+                        uploadReportImage(documentId);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        dismissProgressDialog();
+                        Toast.makeText(ReportActivity.this, "Failed to submit report",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
