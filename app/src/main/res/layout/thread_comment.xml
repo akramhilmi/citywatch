@@ -32,6 +32,20 @@
     app:layout_constraintTop_toTopOf="@id/ivThreadCommentProfile" />
 
   <TextView
+    android:id="@+id/tvThreadCommentAdminTag"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="5dp"
+    android:background="@drawable/admin_tag"
+    android:text="ADMIN"
+    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+    android:textColor="@color/md_theme_onPrimary"
+    android:visibility="gone"
+    app:layout_constraintBottom_toBottomOf="@id/tvThreadCommentName"
+    app:layout_constraintStart_toEndOf="@id/tvThreadCommentName"
+    app:layout_constraintTop_toTopOf="@id/tvThreadCommentName" />
+
+  <TextView
     android:id="@+id/tvThreadCommentContent"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
