@@ -1,263 +1,270 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/activity_thread"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:background="@color/md_theme_surface"
-  android:fillViewport="true"
-  tools:context=".ThreadActivity">
-
-  <androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_thread"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/md_theme_surface"
-    android:padding="20dp">
+    android:background="@color/md_theme_surface">
 
     <ImageButton
-      android:id="@+id/btnThreadBack"
-      android:layout_width="48dp"
-      android:layout_height="48dp"
-      android:background="?attr/selectableItemBackgroundBorderless"
-      android:contentDescription="Back"
-      android:padding="12dp"
-      android:scaleType="fitCenter"
-      android:src="@drawable/ic_arrowback"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:tint="@color/md_theme_onBackground" />
+        android:id="@+id/btnThreadBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Back"
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_arrowback"
+        app:tint="@color/md_theme_onBackground" />
 
-    <com.google.android.material.imageview.ShapeableImageView
-      android:id="@+id/ivThreadProfile"
-      android:layout_width="30dp"
-      android:layout_height="30dp"
-      android:layout_marginTop="20dp"
-      android:scaleType="centerCrop"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/btnThreadBack"
-      app:shapeAppearanceOverlay="@style/CircleImage"
-      app:srcCompat="@drawable/ic_profile"
-      app:strokeColor="@color/md_theme_outline"
-      app:strokeWidth="2dp" />
-
-    <TextView
-      android:id="@+id/tvThreadName"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="8dp"
-      android:text="Name"
-      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-      app:layout_constraintBottom_toBottomOf="@+id/ivThreadProfile"
-      app:layout_constraintStart_toEndOf="@+id/ivThreadProfile"
-      app:layout_constraintTop_toTopOf="@+id/ivThreadProfile" />
-
-    <TextView
-      android:id="@+id/tvThreadTitle"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="10dp"
-      android:text="Title"
-      android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/ivThreadProfile" />
-
-    <TextView
-      android:id="@+id/tvThreadTagTertiary"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="10dp"
-      android:background="@drawable/hazard_tag_tertiary"
-      android:text="Resolved"
-      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-      android:textColor="@color/md_theme_onTertiary"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/tvThreadTitle" />
-
-    <TextView
-      android:id="@+id/tvThreadTagSecondary"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="5dp"
-      android:background="@drawable/hazard_tag_secondary"
-      android:text="DBKL"
-      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-      android:textColor="@color/md_theme_onSecondary"
-      app:layout_constraintBottom_toBottomOf="@+id/tvThreadTagTertiary"
-      app:layout_constraintStart_toEndOf="@+id/tvThreadTagTertiary"
-      app:layout_constraintTop_toTopOf="@+id/tvThreadTagTertiary" />
-
-    <androidx.cardview.widget.CardView
-      android:id="@+id/cvPhoto"
-      android:layout_width="332dp"
-      android:layout_height="332dp"
-      android:layout_marginTop="20dp"
-      app:cardCornerRadius="8dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/tvThreadTagTertiary">
-
-      <ImageView
-        android:id="@+id/ivThreadPhoto"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
-    </androidx.cardview.widget.CardView>
+        android:layout_above="@+id/llCommentInput"
+        android:layout_below="@id/btnThreadBack"
+        android:fillViewport="true">
 
-    <TextView
-      android:id="@+id/tvThreadDesc"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="20dp"
-      android:text="Description"
-      android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/cvPhoto" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
 
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivThreadProfile"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/CircleImage"
+                app:srcCompat="@drawable/ic_profile"
+                app:strokeColor="@color/md_theme_outline"
+                app:strokeWidth="2dp" />
 
-    <ImageButton
-      android:id="@+id/btnThreadLocation"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="10dp"
-      android:background="@null"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/tvThreadDesc"
-      app:srcCompat="@drawable/ic_location"
-      app:tint="@color/md_theme_onSurfaceVariant" />
+            <TextView
+                android:id="@+id/tvThreadName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Name"
+                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                app:layout_constraintBottom_toBottomOf="@+id/ivThreadProfile"
+                app:layout_constraintStart_toEndOf="@+id/ivThreadProfile"
+                app:layout_constraintTop_toTopOf="@+id/ivThreadProfile" />
 
-    <com.google.android.material.button.MaterialButton
-      android:id="@+id/btnThreadUpvote"
-      style="@style/Widget.Material3.Button.IconButton"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="20dp"
-      android:background="@null"
-      android:checkable="true"
-      app:icon="@drawable/ic_thumb_up_selector"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation" />
+            <TextView
+                android:id="@+id/tvThreadTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Title"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge.Emphasized"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ivThreadProfile" />
 
-    <TextView
-      android:id="@+id/tvThreadVotes"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="8dp"
-      android:text="67"
-      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-      app:layout_constraintBottom_toBottomOf="@id/btnThreadUpvote"
-      app:layout_constraintStart_toEndOf="@+id/btnThreadUpvote"
-      app:layout_constraintTop_toTopOf="@+id/btnThreadUpvote" />
+            <TextView
+                android:id="@+id/tvThreadTagTertiary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/hazard_tag_tertiary"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="Status"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textColor="@color/md_theme_onTertiary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvThreadTitle" />
 
-    <com.google.android.material.button.MaterialButton
-      android:id="@+id/btnThreadDownvote"
-      style="@style/Widget.Material3.Button.IconButton"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="8dp"
-      android:layout_marginTop="20dp"
-      android:background="@null"
-      android:checkable="true"
-      app:icon="@drawable/ic_thumb_down_selector"
-      app:layout_constraintStart_toEndOf="@+id/tvThreadVotes"
-      app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation" />
+            <TextView
+                android:id="@+id/tvThreadTagSecondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/hazard_tag_secondary"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="LocalGov"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textColor="@color/md_theme_onSecondary"
+                app:layout_constraintBottom_toBottomOf="@+id/tvThreadTagTertiary"
+                app:layout_constraintStart_toEndOf="@+id/tvThreadTagTertiary"
+                app:layout_constraintTop_toTopOf="@+id/tvThreadTagTertiary" />
 
-    <TextView
-      android:id="@+id/tvThreadComments"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="67"
-      android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-      app:layout_constraintBottom_toBottomOf="@id/btnThreadComments"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="@+id/btnThreadComments" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvPhoto"
+                android:layout_width="0dp"
+                android:layout_height="300dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvThreadTagTertiary">
 
-    <ImageButton
-      android:id="@+id/btnThreadComments"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="20dp"
-      android:layout_marginEnd="8dp"
-      android:background="@null"
-      app:layout_constraintEnd_toStartOf="@+id/tvThreadComments"
-      app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation"
-      app:srcCompat="@drawable/ic_comment"
-      app:tint="@color/md_theme_onSurfaceVariant" />
+                <ImageView
+                    android:id="@+id/ivThreadPhoto"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    tools:srcCompat="@tools:sample/backgrounds/scenic" />
+            </androidx.cardview.widget.CardView>
 
-    <TextView
-      android:id="@+id/tvThreadLocation"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="8dp"
-      android:background="?attr/selectableItemBackgroundBorderless"
-      android:clickable="true"
-      android:focusable="true"
-      android:text="View on map"
-      android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-      android:textColor="@color/md_theme_primary"
-      app:layout_constraintBottom_toBottomOf="@+id/btnThreadLocation"
-      app:layout_constraintStart_toEndOf="@+id/btnThreadLocation"
-      app:layout_constraintTop_toTopOf="@+id/btnThreadLocation" />
+            <TextView
+                android:id="@+id/tvThreadDesc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Description"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cvPhoto" />
 
-    <com.google.android.material.divider.MaterialDivider
-      android:id="@+id/divider"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="20dp"
-      android:background="@color/md_theme_outlineVariant"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/btnThreadUpvote" />
+            <ImageButton
+                android:id="@+id/btnThreadLocation"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvThreadDesc"
+                app:srcCompat="@drawable/ic_location"
+                app:tint="@color/md_theme_primary" />
 
-    <TextView
-      android:id="@+id/tvCommentsLoading"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="20dp"
-      android:text="Loading comments..."
-      android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-      android:textColor="@color/md_theme_onSurfaceVariant"
-      android:visibility="gone"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/divider" />
+            <TextView
+                android:id="@+id/tvThreadLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="View on map"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textColor="@color/md_theme_primary"
+                app:layout_constraintBottom_toBottomOf="@+id/btnThreadLocation"
+                app:layout_constraintStart_toEndOf="@+id/btnThreadLocation"
+                app:layout_constraintTop_toTopOf="@+id/btnThreadLocation" />
 
-    <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/rvComments"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="20dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/divider" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnThreadUpvote"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:icon="@drawable/ic_thumb_up_selector"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnThreadLocation" />
 
-    <com.google.android.material.textfield.TextInputLayout
-      android:id="@+id/tilComment"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="10dp"
-      android:layout_marginEnd="12dp"
-      app:layout_constraintEnd_toStartOf="@+id/btnCommentSubmit"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/rvComments">
+            <TextView
+                android:id="@+id/tvThreadVotes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="0"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                app:layout_constraintBottom_toBottomOf="@id/btnThreadUpvote"
+                app:layout_constraintStart_toEndOf="@+id/btnThreadUpvote"
+                app:layout_constraintTop_toTopOf="@+id/btnThreadUpvote" />
 
-      <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/etComment"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnThreadDownvote"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:icon="@drawable/ic_thumb_down_selector"
+                app:layout_constraintBottom_toBottomOf="@id/btnThreadUpvote"
+                app:layout_constraintStart_toEndOf="@+id/tvThreadVotes"
+                app:layout_constraintTop_toTopOf="@id/btnThreadUpvote" />
+
+            <ImageButton
+                android:id="@+id/btnThreadComments"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="@id/btnThreadUpvote"
+                app:layout_constraintEnd_toStartOf="@+id/tvThreadComments"
+                app:layout_constraintTop_toTopOf="@id/btnThreadUpvote"
+                app:srcCompat="@drawable/ic_comment"
+                app:tint="@color/md_theme_onSurfaceVariant" />
+
+            <TextView
+                android:id="@+id/tvThreadComments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                app:layout_constraintBottom_toBottomOf="@id/btnThreadComments"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnThreadComments" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@+id/btnThreadUpvote" />
+
+            <TextView
+                android:id="@+id/tvCommentsLoading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Loading comments..."
+                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvComments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                app:layout_constraintTop_toBottomOf="@+id/divider" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/llCommentInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Add a comment..." />
+        android:layout_alignParentBottom="true"
+        android:background="@color/md_theme_surface"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
 
-    </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilComment"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
 
-    <com.google.android.material.button.MaterialButton
-      android:id="@+id/btnCommentSubmit"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="10dp"
-      android:text="Post"
-      android:textSize="12sp"
-      app:icon="@drawable/ic_send"
-      app:iconGravity="textStart"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/rvComments" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Add a comment..."
+                android:maxLines="4" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-  </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCommentSubmit"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Post"
+            app:icon="@drawable/ic_send" />
+    </LinearLayout>
 
-</androidx.core.widget.NestedScrollView>
+</RelativeLayout>

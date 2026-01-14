@@ -38,6 +38,7 @@
     <activity
       android:name=".ThreadActivity"
       android:exported="false"
+      android:windowSoftInputMode="adjustResize"
       android:theme="@style/Theme.CityWatch" />
     <activity
       android:name=".LocationPickerActivity"
