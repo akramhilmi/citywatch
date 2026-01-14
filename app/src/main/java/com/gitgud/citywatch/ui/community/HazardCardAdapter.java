@@ -120,7 +120,24 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
 
             // Set score and update vote button states
             tvVotes.setText(String.valueOf(hazard.getScore()));
-            updateVoteButtonStates(hazard.getUserVote());
+
+            // Set vote button colors immediately based on cached user vote
+            int activeColor = itemView.getContext().getColor(R.color.md_theme_primary);
+            int inactiveColor = itemView.getContext().getColor(R.color.md_theme_onSurfaceVariant);
+
+            if (hazard.getUserVote() == 1) {
+                // Upvoted
+                btnUpvote.setColorFilter(activeColor);
+                btnDownvote.setColorFilter(inactiveColor);
+            } else if (hazard.getUserVote() == -1) {
+                // Downvoted
+                btnUpvote.setColorFilter(inactiveColor);
+                btnDownvote.setColorFilter(activeColor);
+            } else {
+                // No vote
+                btnUpvote.setColorFilter(inactiveColor);
+                btnDownvote.setColorFilter(inactiveColor);
+            }
 
             // Set comment count
             tvComments.setText(String.valueOf(hazard.getComments()));

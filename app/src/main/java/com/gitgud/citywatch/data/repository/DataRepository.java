@@ -50,6 +50,40 @@ public class DataRepository {
         return INSTANCE;
     }
 
+    /**
+     * Initialize local cache with user's all votings on app startup
+     * This ensures votes are available immediately without network calls
+     */
+    public void initializeUserVotes() {
+        String userId = SessionManager.getCurrentUserId();
+        if (userId == null) {
+            Log.w(TAG, "Cannot initialize votes: user not logged in");
+            return;
+        }
+
+        Log.d(TAG, "Initializing user votes for: " + userId);
+
+        // Load all report votes
+        ApiClient.getAllReportVotesForUser(userId)
+                .addOnSuccessListener(reportVotes -> {
+                    if (!reportVotes.isEmpty()) {
+                        cacheManager.cacheReportVotes(userId, reportVotes);
+                        Log.d(TAG, "Cached " + reportVotes.size() + " report votes");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to load report votes", e));
+
+        // Load all comment votes
+        ApiClient.getAllCommentVotesForUser(userId)
+                .addOnSuccessListener(commentVotes -> {
+                    if (!commentVotes.isEmpty()) {
+                        cacheManager.cacheCommentVotes(userId, commentVotes);
+                        Log.d(TAG, "Cached " + commentVotes.size() + " comment votes");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to load comment votes", e));
+    }
+
     // ==================== Navigation-Triggered Checksum Validation ====================
 
     /**
@@ -394,7 +428,7 @@ public class DataRepository {
             return;
         }
 
-        // Try cached votes first
+        // Try cached votes first - apply immediately
         cacheManager.getCachedCommentVotes(userId, cachedVotes -> {
             if (!cachedVotes.isEmpty()) {
                 for (Comment comment : comments) {
@@ -403,7 +437,11 @@ public class DataRepository {
                 }
             }
 
-            // Fetch fresh votes
+            // Call callback immediately with cached votes applied
+            callback.onFreshData(comments);
+            callback.onLoading(false);
+
+            // Fetch fresh votes in background
             java.util.List<String> commentIds = new java.util.ArrayList<>();
             for (Comment comment : comments) {
                 commentIds.add(comment.getCommentId());
@@ -416,12 +454,12 @@ public class DataRepository {
                             Integer vote = freshVotes.get(comment.getCommentId());
                             comment.setUserVote(vote != null ? vote : 0);
                         }
+                        // Update UI with fresh votes
                         callback.onFreshData(comments);
-                        callback.onLoading(false);
                     })
                     .addOnFailureListener(e -> {
-                        callback.onFreshData(comments);
-                        callback.onLoading(false);
+                        Log.e(TAG, "Failed to fetch fresh comment votes", e);
+                        // Keep using cached votes, no need to call callback again
                     });
         });
     }

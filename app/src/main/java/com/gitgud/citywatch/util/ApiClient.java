@@ -871,4 +871,72 @@ public class ApiClient {
                             task.getException() : new Exception("Failed to get cache checksum");
                 });
     }
+
+    /**
+     * Get all report votes for the current user
+     * Used to initialize vote cache on app startup
+     * @param userId The current user's ID
+     * @return Task with map of reportId to vote type
+     */
+    public static com.google.android.gms.tasks.Task<java.util.Map<String, Integer>> getAllReportVotesForUser(
+            String userId) {
+        HttpsCallableReference getAllVotesFunc = functions.getHttpsCallable("getAllReportVotesForUser");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("userId", userId);
+
+        return getAllVotesFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.Map<String, Object> result =
+                                (java.util.Map<String, Object>) task.getResult().getData();
+                        java.util.Map<String, Object> votesRaw =
+                                (java.util.Map<String, Object>) result.get("votes");
+
+                        java.util.Map<String, Integer> votes = new java.util.HashMap<>();
+                        if (votesRaw != null) {
+                            for (java.util.Map.Entry<String, Object> entry : votesRaw.entrySet()) {
+                                votes.put(entry.getKey(), ((Number) entry.getValue()).intValue());
+                            }
+                        }
+                        return votes;
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to get report votes");
+                });
+    }
+
+    /**
+     * Get all comment votes for the current user
+     * Used to initialize vote cache on app startup
+     * @param userId The current user's ID
+     * @return Task with map of commentId to vote type
+     */
+    public static com.google.android.gms.tasks.Task<java.util.Map<String, Integer>> getAllCommentVotesForUser(
+            String userId) {
+        HttpsCallableReference getAllVotesFunc = functions.getHttpsCallable("getAllCommentVotesForUser");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("userId", userId);
+
+        return getAllVotesFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        java.util.Map<String, Object> result =
+                                (java.util.Map<String, Object>) task.getResult().getData();
+                        java.util.Map<String, Object> votesRaw =
+                                (java.util.Map<String, Object>) result.get("votes");
+
+                        java.util.Map<String, Integer> votes = new java.util.HashMap<>();
+                        if (votesRaw != null) {
+                            for (java.util.Map.Entry<String, Object> entry : votesRaw.entrySet()) {
+                                votes.put(entry.getKey(), ((Number) entry.getValue()).intValue());
+                            }
+                        }
+                        return votes;
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to get comment votes");
+                });
+    }
 }

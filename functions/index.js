@@ -61,6 +61,12 @@ const {
   getUserVotesForComments,
 } = require("./src/commentVoting");
 
+// User Voting (fetch all votes on startup)
+const {
+  getAllReportVotesForUser,
+  getAllCommentVotesForUser,
+} = require("./src/userVoting");
+
 // Caching
 const {
   getChecksums,
@@ -104,6 +110,10 @@ exports.getCommentCount = getCommentCount;
 // Comment Voting
 exports.voteComment = voteComment;
 exports.getUserVotesForComments = getUserVotesForComments;
+
+// User Voting
+exports.getAllReportVotesForUser = getAllReportVotesForUser;
+exports.getAllCommentVotesForUser = getAllCommentVotesForUser;
 
 // Caching
 exports.getChecksums = getChecksums;

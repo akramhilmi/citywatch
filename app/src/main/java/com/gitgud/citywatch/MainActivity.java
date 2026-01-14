@@ -44,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
         // Setup bottom navigation after view hierarchy is created
         setupBottomNavMenu();
 
+        // Initialize user votes cache on startup
+        dataRepository.initializeUserVotes();
+
         // Trigger initial checksum validation
         validateCachesOnStart();
     }

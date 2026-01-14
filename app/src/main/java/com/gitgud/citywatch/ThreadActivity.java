@@ -172,6 +172,18 @@ public class ThreadActivity extends AppCompatActivity {
         tvVotes.setText(String.valueOf(currentScore));
         tvComments.setText(String.valueOf(commentCount));
 
+        // Highlight vote buttons based on cached user vote
+        if (currentUserVote == 1) {
+            btnUpvote.setIconTintResource(R.color.md_theme_primary);
+            btnDownvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+        } else if (currentUserVote == -1) {
+            btnUpvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+            btnDownvote.setIconTintResource(R.color.md_theme_primary);
+        } else {
+            btnUpvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+            btnDownvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+        }
+
         TextView tvThreadLocation = findViewById(R.id.tvThreadLocation);
         if (tvThreadLocation != null) {
             tvThreadLocation.setPaintFlags(tvThreadLocation.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
@@ -203,12 +215,19 @@ public class ThreadActivity extends AppCompatActivity {
             Toast.makeText(this, "Please log in to vote", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // Determine actual vote type (toggle if same vote)
         int actualVoteType = currentUserVote == voteType ? 0 : voteType;
+
+        // Store previous state for rollback
         long previousScore = currentScore;
         int previousVote = currentUserVote;
+
+        // Optimistic UI update - update immediately before server response
         currentScore = previousScore - previousVote + actualVoteType;
         currentUserVote = actualVoteType;
         tvVotes.setText(String.valueOf(currentScore));
+        updateVoteButtonStates(currentUserVote);
 
         dataRepository.voteReport(documentId, actualVoteType,
                 new DataRepository.VoteCallback() {
@@ -217,17 +236,37 @@ public class ThreadActivity extends AppCompatActivity {
                         currentScore = score;
                         currentUserVote = userVote;
                         tvVotes.setText(String.valueOf(currentScore));
+                        updateVoteButtonStates(currentUserVote);
                     }
 
                     @Override
                     public void onError(Exception e) {
+                        // Rollback UI on error
                         currentScore = previousScore;
                         currentUserVote = previousVote;
                         tvVotes.setText(String.valueOf(currentScore));
+                        updateVoteButtonStates(currentUserVote);
                         Toast.makeText(ThreadActivity.this, "Failed to vote",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    /**
+     * Update vote button visual states based on user's current vote
+     * @param userVote 1 = upvoted, -1 = downvoted, 0 = no vote
+     */
+    private void updateVoteButtonStates(int userVote) {
+        if (userVote == 1) {
+            btnUpvote.setIconTintResource(R.color.md_theme_primary);
+            btnDownvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+        } else if (userVote == -1) {
+            btnUpvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+            btnDownvote.setIconTintResource(R.color.md_theme_primary);
+        } else {
+            btnUpvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+            btnDownvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+        }
     }
 
     private String getTimeAgoEstimate(long createdAtTimestamp) {
