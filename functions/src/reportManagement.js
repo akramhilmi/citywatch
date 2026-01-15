@@ -343,10 +343,88 @@ const deleteReport = onCall(async (request) => {
   }
 });
 
+/**
+ * Update report status (admin only)
+ * Changes the status and updates stats accordingly
+ */
+const updateReportStatus = onCall(async (request) => {
+  try {
+    const {reportId, newStatus, userId} = request.data;
+
+    // Validate required fields
+    if (!reportId || !newStatus || !userId) {
+      throw new Error("reportId, newStatus, and userId are required");
+    }
+
+    // Validate status value
+    const validStatuses = ["Submitted", "Confirmed", "In progress", "Resolved"];
+    if (!validStatuses.includes(newStatus)) {
+      throw new Error(`Invalid status. Must be one of: ${validStatuses.join(", ")}`);
+    }
+
+    // Check if user is admin
+    const userDoc = await db.collection("users").doc(userId).get();
+    if (!userDoc.exists || !userDoc.data().isAdmin) {
+      throw new Error("Permission denied: Only admins can update report status");
+    }
+
+    // Get current report
+    const reportRef = db.collection("reports").doc(reportId);
+    const reportDoc = await reportRef.get();
+
+    if (!reportDoc.exists) {
+      throw new Error("Report not found");
+    }
+
+    const reportData = reportDoc.data();
+    const oldStatus = reportData.status || "Submitted";
+
+    // If status hasn't changed, do nothing
+    if (oldStatus === newStatus) {
+      logger.info(`Status already set to ${newStatus}, no change needed`);
+      return {success: true, message: "Status unchanged"};
+    }
+
+    // Update report status
+    await reportRef.update({
+      status: newStatus,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Update stats: decrement old status, increment new status
+    try {
+      const oldStatField = getStatFieldFromStatus(oldStatus);
+      const newStatField = getStatFieldFromStatus(newStatus);
+
+      // Decrement old status
+      await statsRef.update({
+        [oldStatField]: admin.firestore.FieldValue.increment(-1),
+      });
+      logger.info(`Decremented ${oldStatField} stat`);
+
+      // Increment new status
+      await statsRef.update({
+        [newStatField]: admin.firestore.FieldValue.increment(1),
+      });
+      logger.info(`Incremented ${newStatField} stat`);
+    } catch (statsError) {
+      logger.warn(`Failed to update stats for status change: ${statsError.message}`);
+      // Don't throw - status was updated successfully
+    }
+
+    logger.info(`Report ${reportId} status updated from ${oldStatus} to ${newStatus} by admin ${userId}`);
+    return {success: true, message: "Status updated successfully"};
+  } catch (error) {
+    logger.error("Error updating report status:", error);
+    throw new Error(`Failed to update status: ${error.message}`);
+  }
+});
+
 module.exports = {
   submitReport,
   uploadReportPhoto,
   getAllReports,
   editReport,
   deleteReport,
+  updateReportStatus,
 };

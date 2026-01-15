@@ -41,6 +41,7 @@ const {
   getAllReports,
   editReport,
   deleteReport,
+  updateReportStatus,
 } = require("./src/reportManagement");
 
 // Report Voting
@@ -109,6 +110,7 @@ exports.uploadReportPhoto = uploadReportPhoto;
 exports.getAllReports = getAllReports;
 exports.editReport = editReport;
 exports.deleteReport = deleteReport;
+exports.updateReportStatus = updateReportStatus;
 
 // Report Voting
 exports.voteReport = voteReport;

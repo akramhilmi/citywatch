@@ -21,6 +21,8 @@ public class HazardCard {
     private long score;
     private int userVote; // 1 = upvoted, -1 = downvoted, 0 = no vote
     private long comments; // Number of comments on this report
+    private boolean userIsAdmin; // Whether the user is an admin
+
 
     public HazardCard() {
         // Required for Firestore deserialization
@@ -60,6 +62,8 @@ public class HazardCard {
     public long getScore() { return score; }
     public int getUserVote() { return userVote; }
     public long getComments() { return comments; }
+    public boolean isUserIsAdmin() { return userIsAdmin; }
+
 
     // Setters
     public void setDocumentId(String documentId) { this.documentId = documentId; }
@@ -79,5 +83,6 @@ public class HazardCard {
     public void setScore(long score) { this.score = score; }
     public void setUserVote(int userVote) { this.userVote = userVote; }
     public void setComments(long comments) { this.comments = comments; }
+    public void setUserIsAdmin(boolean userIsAdmin) { this.userIsAdmin = userIsAdmin; }
 }
 

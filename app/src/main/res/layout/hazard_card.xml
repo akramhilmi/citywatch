@@ -165,6 +165,21 @@
       app:srcCompat="@drawable/ic_comment"
       app:tint="@color/md_theme_onSurfaceVariant" />
 
+    <!-- Admin-only status selector -->
+    <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/rvAdminStatusSelector"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="12dp"
+      android:orientation="horizontal"
+      android:visibility="gone"
+      app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/btnUpvote"
+      tools:itemCount="4"
+      tools:listitem="@layout/item_status_chip" />
+
   </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

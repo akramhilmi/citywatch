@@ -88,6 +88,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
     static class HazardViewHolder extends RecyclerView.ViewHolder {
         private final ShapeableImageView ivCardProfile;
         private final TextView tvCardName;
+        private final TextView tvCardAdminTag;
         private final TextView tvCardTitle;
         private final TextView tvTagTertiary;
         private final TextView tvTagSecondary;
@@ -98,11 +99,13 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
         private final ImageButton btnMenu;
         private final TextView tvVotes;
         private final TextView tvComments;
+        private final RecyclerView rvAdminStatusSelector;
 
         HazardViewHolder(@NonNull View itemView) {
             super(itemView);
             ivCardProfile = itemView.findViewById(R.id.ivCardProfile);
             tvCardName = itemView.findViewById(R.id.tvCardName);
+            tvCardAdminTag = itemView.findViewById(R.id.tvCardAdminTag);
             tvCardTitle = itemView.findViewById(R.id.tvCardTitle);
             tvTagTertiary = itemView.findViewById(R.id.tvTagTertiary);
             tvTagSecondary = itemView.findViewById(R.id.tvTagSecondary);
@@ -113,6 +116,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             btnMenu = itemView.findViewById(R.id.btnCardMenu);
             tvVotes = itemView.findViewById(R.id.tvVotes);
             tvComments = itemView.findViewById(R.id.tvComments);
+            rvAdminStatusSelector = itemView.findViewById(R.id.rvAdminStatusSelector);
         }
 
         void bind(HazardCard hazard, OnCardClickListener listener, OnReportActionListener actionListener, DataRepository dataRepository) {
@@ -120,6 +124,9 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             String userName = hazard.getUserName() != null ? hazard.getUserName() : "Anonymous";
             String timeAgo = getTimeAgoEstimate(hazard.getCreatedAt());
             tvCardName.setText(userName + " • " + timeAgo);
+
+            // Show/hide admin tag based on user's admin status
+            tvCardAdminTag.setVisibility(hazard.isUserIsAdmin() ? View.VISIBLE : View.GONE);
 
             // Load report author's profile picture
             loadProfilePicture(hazard.getProfilePictureUrl());
@@ -168,6 +175,9 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             } else {
                 btnMenu.setVisibility(View.GONE);
             }
+
+            // Setup admin status selector (only visible if current user is admin)
+            setupAdminStatusSelector(hazard, dataRepository);
 
             // Upvote button listener
             btnUpvote.setOnClickListener(v -> {
@@ -408,6 +418,118 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             // Convert to years
             long years = days / 365;
             return years + "y ago";
+        }
+
+        /**
+         * Setup admin-only status selector
+         * Shows status selector only if current user is an admin
+         */
+        private void setupAdminStatusSelector(HazardCard hazard, DataRepository dataRepository) {
+            // Check if current user is admin
+            Boolean isAdmin = com.gitgud.citywatch.util.AdminContext.getIsAdminCached();
+
+            if (isAdmin == null) {
+                // Admin status not yet determined, hide selector and load status
+                rvAdminStatusSelector.setVisibility(View.GONE);
+                com.gitgud.citywatch.util.AdminContext.loadAdminStatus(
+                    new com.gitgud.citywatch.util.AdminContext.AdminStatusCallback() {
+                        @Override
+                        public void onAdminStatusLoaded(boolean isAdminLoaded) {
+                            if (isAdminLoaded) {
+                                // Show selector now that we know user is admin
+                                initializeStatusSelector(hazard, dataRepository);
+                            }
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            // Hide on error
+                            rvAdminStatusSelector.setVisibility(View.GONE);
+                        }
+                    });
+            } else if (isAdmin) {
+                // User is admin, show selector
+                initializeStatusSelector(hazard, dataRepository);
+            } else {
+                // User is not admin, hide selector
+                rvAdminStatusSelector.setVisibility(View.GONE);
+            }
+        }
+
+        /**
+         * Initialize the status selector with status options
+         */
+        private void initializeStatusSelector(HazardCard hazard, DataRepository dataRepository) {
+            rvAdminStatusSelector.setVisibility(View.VISIBLE);
+
+            // Status options
+            java.util.List<String> statusOptions = java.util.Arrays.asList(
+                "Submitted", "Confirmed", "In progress", "Resolved"
+            );
+
+            // Create adapter with current status
+            StatusChipAdapter statusAdapter = new StatusChipAdapter(
+                statusOptions,
+                hazard.getStatus() != null ? hazard.getStatus() : "Submitted"
+            );
+
+            // Setup RecyclerView
+            rvAdminStatusSelector.setLayoutManager(
+                new androidx.recyclerview.widget.LinearLayoutManager(
+                    itemView.getContext(),
+                    androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL,
+                    false
+                )
+            );
+            rvAdminStatusSelector.setAdapter(statusAdapter);
+
+            // Handle status selection
+            statusAdapter.setOnStatusSelectedListener(newStatus -> {
+                if (!newStatus.equals(hazard.getStatus())) {
+                    updateReportStatus(hazard, newStatus, statusAdapter, dataRepository);
+                }
+            });
+        }
+
+        /**
+         * Update report status via API
+         */
+        private void updateReportStatus(HazardCard hazard, String newStatus,
+                                       StatusChipAdapter adapter, DataRepository dataRepository) {
+            String userId = com.gitgud.citywatch.util.SessionManager.getCurrentUserId();
+            if (userId == null) {
+                android.widget.Toast.makeText(itemView.getContext(),
+                    "Not logged in", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Optimistically update UI
+            String oldStatus = hazard.getStatus();
+            hazard.setStatus(newStatus);
+            tvTagTertiary.setText(newStatus);
+            adapter.setSelectedStatus(newStatus);
+
+            // Call API to update status
+            com.gitgud.citywatch.util.ApiClient.updateReportStatus(
+                hazard.getDocumentId(), newStatus, userId)
+                .addOnSuccessListener(aVoid -> {
+                    android.widget.Toast.makeText(itemView.getContext(),
+                        "Status updated to " + newStatus, android.widget.Toast.LENGTH_SHORT).show();
+
+                    // Update cache if dataRepository is available
+                    if (dataRepository != null) {
+                        dataRepository.updateReportInCache(hazard);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Rollback on failure
+                    hazard.setStatus(oldStatus);
+                    tvTagTertiary.setText(oldStatus);
+                    adapter.setSelectedStatus(oldStatus);
+                    android.widget.Toast.makeText(itemView.getContext(),
+                        "Failed to update status: " + e.getMessage(),
+                        android.widget.Toast.LENGTH_SHORT).show();
+                });
         }
     }
 }

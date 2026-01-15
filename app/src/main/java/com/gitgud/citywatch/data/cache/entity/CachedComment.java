@@ -20,6 +20,7 @@ public class CachedComment {
     private String profilePictureUrl;
     private long score;
     private long cachedAt;
+    private boolean userIsAdmin; // Whether the comment author is an admin
 
     public CachedComment() {
         this.commentId = "";
@@ -36,6 +37,7 @@ public class CachedComment {
     public String getProfilePictureUrl() { return profilePictureUrl; }
     public long getScore() { return score; }
     public long getCachedAt() { return cachedAt; }
+    public boolean isUserIsAdmin() { return userIsAdmin; }
 
     // Setters
     public void setCommentId(@NonNull String commentId) { this.commentId = commentId; }
@@ -47,5 +49,6 @@ public class CachedComment {
     public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
     public void setScore(long score) { this.score = score; }
     public void setCachedAt(long cachedAt) { this.cachedAt = cachedAt; }
+    public void setUserIsAdmin(boolean userIsAdmin) { this.userIsAdmin = userIsAdmin; }
 }
 

@@ -76,6 +76,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         private final ImageButton btnDownvote;
         private final ImageButton btnMenu;
         private final TextView tvVotes;
+        private final TextView tvAdminTag;
 
         CommentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -86,6 +87,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             btnDownvote = itemView.findViewById(R.id.btnThreadCommentDownvote);
             btnMenu = itemView.findViewById(R.id.btnThreadCommentMenu);
             tvVotes = itemView.findViewById(R.id.tvThreadCommentVotes);
+            tvAdminTag = itemView.findViewById(R.id.tvThreadCommentAdminTag);
         }
 
         void bind(Comment comment, OnCommentActionListener actionListener) {
@@ -93,6 +95,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             String userName = comment.getUserName() != null ? comment.getUserName() : "Anonymous";
             String timeAgo = getTimeAgoEstimate(comment.getDatetime());
             tvName.setText(userName + " • " + timeAgo);
+
+            // Show/hide admin tag based on user's admin status
+            tvAdminTag.setVisibility(comment.isUserIsAdmin() ? View.VISIBLE : View.GONE);
 
             // Set comment content
             tvContent.setText(comment.getContent());

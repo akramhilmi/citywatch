@@ -13,6 +13,8 @@ public class Comment {
     private String profilePictureUrl;
     private long score;
     private int userVote; // 1 = upvoted, -1 = downvoted, 0 = no vote
+    private boolean userIsAdmin; // Whether the user is an admin
+
 
     public Comment() {
         // Required for deserialization
@@ -28,6 +30,7 @@ public class Comment {
     public String getProfilePictureUrl() { return profilePictureUrl; }
     public long getScore() { return score; }
     public int getUserVote() { return userVote; }
+    public boolean isUserIsAdmin() { return userIsAdmin; }
 
     // Setters
     public void setCommentId(String commentId) { this.commentId = commentId; }
@@ -39,5 +42,6 @@ public class Comment {
     public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
     public void setScore(long score) { this.score = score; }
     public void setUserVote(int userVote) { this.userVote = userVote; }
+    public void setUserIsAdmin(boolean userIsAdmin) { this.userIsAdmin = userIsAdmin; }
 }
 

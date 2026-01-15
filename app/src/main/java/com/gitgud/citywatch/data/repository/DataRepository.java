@@ -277,10 +277,13 @@ public class DataRepository {
                             CacheManager.generateHash(freshReports);
 
                     Log.d(TAG, "Fetched " + freshReports.size() + " fresh reports");
-                    cacheManager.cacheReports(freshReports, hash);
 
-                    // Apply user votes and return fresh data
-                    applyUserVotesToReports(freshReports, callback);
+                    // Fetch admin status for each unique user, then cache and return
+                    fetchAndApplyAdminStatusToReports(freshReports, () -> {
+                        cacheManager.cacheReports(freshReports, hash);
+                        // Apply user votes and return fresh data
+                        applyUserVotesToReports(freshReports, callback);
+                    });
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to fetch reports", e);
@@ -289,6 +292,55 @@ public class DataRepository {
                         callback.onError(e);
                     }
                 });
+    }
+
+    /**
+     * Fetch admin status for each unique user in reports and apply to the reports
+     */
+    private void fetchAndApplyAdminStatusToReports(List<HazardCard> reports, Runnable onComplete) {
+        // Collect unique user IDs
+        java.util.Set<String> uniqueUserIds = new java.util.HashSet<>();
+        for (HazardCard card : reports) {
+            if (card.getUserId() != null && !card.getUserId().isEmpty()) {
+                uniqueUserIds.add(card.getUserId());
+            }
+        }
+
+        if (uniqueUserIds.isEmpty()) {
+            onComplete.run();
+            return;
+        }
+
+        // Map to store admin status for each user
+        java.util.Map<String, Boolean> adminStatusMap = new java.util.concurrent.ConcurrentHashMap<>();
+        java.util.concurrent.atomic.AtomicInteger pendingCount = new java.util.concurrent.atomic.AtomicInteger(uniqueUserIds.size());
+
+        for (String userId : uniqueUserIds) {
+            ApiClient.getIsAdmin(userId)
+                    .addOnSuccessListener(isAdmin -> {
+                        adminStatusMap.put(userId, isAdmin);
+                        if (pendingCount.decrementAndGet() == 0) {
+                            // All admin status fetched, apply to reports
+                            for (HazardCard card : reports) {
+                                Boolean isUserAdmin = adminStatusMap.get(card.getUserId());
+                                card.setUserIsAdmin(isUserAdmin != null && isUserAdmin);
+                            }
+                            onComplete.run();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w(TAG, "Failed to get admin status for user: " + userId, e);
+                        adminStatusMap.put(userId, false);
+                        if (pendingCount.decrementAndGet() == 0) {
+                            // All admin status fetched (some failed), apply to reports
+                            for (HazardCard card : reports) {
+                                Boolean isUserAdmin = adminStatusMap.get(card.getUserId());
+                                card.setUserIsAdmin(isUserAdmin != null && isUserAdmin);
+                            }
+                            onComplete.run();
+                        }
+                    });
+        }
     }
 
     private void applyUserVotesToReports(List<HazardCard> reports,
@@ -407,8 +459,12 @@ public class DataRepository {
                     String hash = newChecksum != null ? newChecksum :
                             CacheManager.generateHash(freshComments);
                     Log.d(TAG, "Fetched " + freshComments.size() + " fresh comments");
-                    cacheManager.cacheComments(reportId, freshComments, hash);
-                    applyUserVotesToComments(freshComments, callback);
+
+                    // Fetch admin status for each unique user, then cache and return
+                    fetchAndApplyAdminStatusToComments(freshComments, () -> {
+                        cacheManager.cacheComments(reportId, freshComments, hash);
+                        applyUserVotesToComments(freshComments, callback);
+                    });
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to fetch comments", e);
@@ -417,6 +473,55 @@ public class DataRepository {
                         callback.onError(e);
                     }
                 });
+    }
+
+    /**
+     * Fetch admin status for each unique user in comments and apply to the comments
+     */
+    private void fetchAndApplyAdminStatusToComments(List<Comment> comments, Runnable onComplete) {
+        // Collect unique user IDs
+        java.util.Set<String> uniqueUserIds = new java.util.HashSet<>();
+        for (Comment comment : comments) {
+            if (comment.getUserId() != null && !comment.getUserId().isEmpty()) {
+                uniqueUserIds.add(comment.getUserId());
+            }
+        }
+
+        if (uniqueUserIds.isEmpty()) {
+            onComplete.run();
+            return;
+        }
+
+        // Map to store admin status for each user
+        java.util.Map<String, Boolean> adminStatusMap = new java.util.concurrent.ConcurrentHashMap<>();
+        java.util.concurrent.atomic.AtomicInteger pendingCount = new java.util.concurrent.atomic.AtomicInteger(uniqueUserIds.size());
+
+        for (String userId : uniqueUserIds) {
+            ApiClient.getIsAdmin(userId)
+                    .addOnSuccessListener(isAdmin -> {
+                        adminStatusMap.put(userId, isAdmin);
+                        if (pendingCount.decrementAndGet() == 0) {
+                            // All admin status fetched, apply to comments
+                            for (Comment comment : comments) {
+                                Boolean isUserAdmin = adminStatusMap.get(comment.getUserId());
+                                comment.setUserIsAdmin(isUserAdmin != null && isUserAdmin);
+                            }
+                            onComplete.run();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w(TAG, "Failed to get admin status for user: " + userId, e);
+                        adminStatusMap.put(userId, false);
+                        if (pendingCount.decrementAndGet() == 0) {
+                            // All admin status fetched (some failed), apply to comments
+                            for (Comment comment : comments) {
+                                Boolean isUserAdmin = adminStatusMap.get(comment.getUserId());
+                                comment.setUserIsAdmin(isUserAdmin != null && isUserAdmin);
+                            }
+                            onComplete.run();
+                        }
+                    });
+        }
     }
 
     private void applyUserVotesToComments(List<Comment> comments,
