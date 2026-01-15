@@ -956,4 +956,80 @@ public class ApiClient {
                             task.getException() : new Exception("Failed to get comment votes");
                 });
     }
+
+    /**
+     * Edit an existing report
+     * Only the report owner (userId) can edit their report
+     *
+     * @param reportId The report document ID
+     * @param userId The current user's ID (must be the owner)
+     * @param description Updated description
+     * @param hazardType Updated hazard type
+     * @param localGov Updated local government
+     * @param locationDetails Updated location details
+     * @param latitude Updated latitude
+     * @param longitude Updated longitude
+     * @param status Updated status
+     * @return Task that completes when edit is done
+     */
+    public static com.google.android.gms.tasks.Task<Void> editReport(
+            String reportId,
+            String userId,
+            String description,
+            String hazardType,
+            String localGov,
+            String locationDetails,
+            double latitude,
+            double longitude,
+            String status) {
+
+        HttpsCallableReference editReportFunc = functions.getHttpsCallable("editReport");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("reportId", reportId);
+        data.put("userId", userId);
+        data.put("description", description);
+        data.put("hazardType", hazardType);
+        data.put("localGov", localGov);
+        data.put("locationDetails", locationDetails);
+        data.put("latitude", latitude);
+        data.put("longitude", longitude);
+        data.put("status", status);
+
+        return editReportFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        return null;
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to edit report");
+                });
+    }
+
+    /**
+     * Delete a report and its associated photo
+     * Only the report owner (userId) can delete their report
+     *
+     * @param reportId The report document ID
+     * @param userId The current user's ID (must be the owner)
+     * @return Task that completes when delete is done
+     */
+    public static com.google.android.gms.tasks.Task<Void> deleteReport(
+            String reportId, String userId) {
+
+        HttpsCallableReference deleteReportFunc = functions.getHttpsCallable("deleteReport");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("reportId", reportId);
+        data.put("userId", userId);
+
+        return deleteReportFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        return null;
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to delete report");
+                });
+    }
 }

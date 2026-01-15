@@ -39,6 +39,8 @@ const {
   submitReport,
   uploadReportPhoto,
   getAllReports,
+  editReport,
+  deleteReport,
 } = require("./src/reportManagement");
 
 // Report Voting
@@ -97,6 +99,8 @@ exports.sendPasswordResetEmail = sendPasswordResetEmail;
 exports.submitReport = submitReport;
 exports.uploadReportPhoto = uploadReportPhoto;
 exports.getAllReports = getAllReports;
+exports.editReport = editReport;
+exports.deleteReport = deleteReport;
 
 // Report Voting
 exports.voteReport = voteReport;

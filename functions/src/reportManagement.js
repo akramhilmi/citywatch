@@ -157,8 +157,128 @@ const getAllReports = onCall(async (request) => {
   }
 });
 
+/**
+ * Edit an existing report
+ * Only the report owner (userId) can edit their report
+ */
+const editReport = onCall(async (request) => {
+  try {
+    const {
+      reportId,
+      userId,
+      description,
+      hazardType,
+      localGov,
+      locationDetails,
+      latitude,
+      longitude,
+      status,
+    } = request.data;
+
+    if (!reportId || !userId) {
+      throw new Error("Report ID and user ID are required");
+    }
+
+    // Get the report document
+    const reportRef = db.collection("reports").doc(reportId);
+    const reportDoc = await reportRef.get();
+
+    if (!reportDoc.exists) {
+      throw new Error("Report not found");
+    }
+
+    const reportData = reportDoc.data();
+
+    // Verify ownership - check if userId matches the report's user reference
+    let reportUserId = "";
+    if (reportData.user) {
+      reportUserId = reportData.user.id;
+    }
+
+    if (reportUserId !== userId) {
+      throw new Error("Unauthorized: You can only edit your own reports");
+    }
+
+    // Prepare update data (only include fields that are provided)
+    const updateData = {};
+
+    if (description !== undefined) updateData.description = description;
+    if (hazardType !== undefined) updateData.hazardType = hazardType;
+    if (localGov !== undefined) updateData.localGov = localGov;
+    if (locationDetails !== undefined) updateData.locationDetails = locationDetails;
+    if (latitude !== undefined && longitude !== undefined) {
+      updateData.mapsLocation = new admin.firestore.GeoPoint(latitude, longitude);
+    }
+    if (status !== undefined) updateData.status = status;
+    updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+
+    // Update the report
+    await reportRef.update(updateData);
+
+    logger.info(`Report ${reportId} updated by user ${userId}`);
+    return {success: true, message: "Report updated successfully"};
+  } catch (error) {
+    logger.error("Error editing report:", error);
+    throw new Error(`Failed to edit report: ${error.message}`);
+  }
+});
+
+/**
+ * Delete a report and its associated photo
+ * Only the report owner (userId) can delete their report
+ */
+const deleteReport = onCall(async (request) => {
+  try {
+    const {reportId, userId} = request.data;
+
+    if (!reportId || !userId) {
+      throw new Error("Report ID and user ID are required");
+    }
+
+    // Get the report document
+    const reportRef = db.collection("reports").doc(reportId);
+    const reportDoc = await reportRef.get();
+
+    if (!reportDoc.exists) {
+      throw new Error("Report not found");
+    }
+
+    const reportData = reportDoc.data();
+
+    // Verify ownership - check if userId matches the report's user reference
+    let reportUserId = "";
+    if (reportData.user) {
+      reportUserId = reportData.user.id;
+    }
+
+    if (reportUserId !== userId) {
+      throw new Error("Unauthorized: You can only delete your own reports");
+    }
+
+    // Delete associated photo from Storage (if it exists)
+    try {
+      const photoFile = bucket.file(`report_photos/${reportId}.jpg`);
+      await photoFile.delete();
+      logger.info(`Deleted photo for report ${reportId}`);
+    } catch (photoError) {
+      logger.warn(`Could not delete photo for report ${reportId}`, photoError);
+    }
+
+    // Delete the report document
+    await reportRef.delete();
+
+    logger.info(`Report ${reportId} deleted by user ${userId}`);
+    return {success: true, message: "Report deleted successfully"};
+  } catch (error) {
+    logger.error("Error deleting report:", error);
+    throw new Error(`Failed to delete report: ${error.message}`);
+  }
+});
+
 module.exports = {
   submitReport,
   uploadReportPhoto,
   getAllReports,
+  editReport,
+  deleteReport,
 };
