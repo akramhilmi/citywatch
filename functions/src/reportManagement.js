@@ -40,7 +40,7 @@ const submitReport = onCall(async (request) => {
       localGov,
       locationDetails,
       mapsLocation: new admin.firestore.GeoPoint(latitude, longitude),
-      status: "In progress",
+      status: "Submitted",
       user: db.collection("users").doc(userId),
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       score: 0,
