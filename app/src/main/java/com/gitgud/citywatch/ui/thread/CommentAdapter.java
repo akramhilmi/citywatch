@@ -15,6 +15,7 @@ import com.gitgud.citywatch.R;
 import com.gitgud.citywatch.model.Comment;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
+import com.gitgud.citywatch.util.VoteButtonAnimationHelper;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
@@ -25,9 +26,22 @@ import java.util.List;
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
 
     private List<Comment> comments;
+    private OnCommentActionListener actionListener;
+
+    /**
+     * Interface for comment action callbacks (edit/delete)
+     */
+    public interface OnCommentActionListener {
+        void onEditComment(Comment comment);
+        void onDeleteComment(Comment comment);
+    }
 
     public CommentAdapter(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public void setOnCommentActionListener(OnCommentActionListener listener) {
+        this.actionListener = listener;
     }
 
     @NonNull
@@ -41,7 +55,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = comments.get(position);
-        holder.bind(comment);
+        holder.bind(comment, actionListener);
     }
 
     @Override
@@ -60,6 +74,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         private final TextView tvContent;
         private final ImageButton btnUpvote;
         private final ImageButton btnDownvote;
+        private final ImageButton btnMenu;
         private final TextView tvVotes;
 
         CommentViewHolder(@NonNull View itemView) {
@@ -69,10 +84,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             tvContent = itemView.findViewById(R.id.tvThreadCommentContent);
             btnUpvote = itemView.findViewById(R.id.btnThreadCommentUpvote);
             btnDownvote = itemView.findViewById(R.id.btnThreadCommentDownvote);
+            btnMenu = itemView.findViewById(R.id.btnThreadCommentMenu);
             tvVotes = itemView.findViewById(R.id.tvThreadCommentVotes);
         }
 
-        void bind(Comment comment) {
+        void bind(Comment comment, OnCommentActionListener actionListener) {
             // Set user name with time ago
             String userName = comment.getUserName() != null ? comment.getUserName() : "Anonymous";
             String timeAgo = getTimeAgoEstimate(comment.getDatetime());
@@ -97,11 +113,49 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             tvVotes.setText(String.valueOf(comment.getScore()));
             updateVoteButtonStates(comment.getUserVote());
 
+            // Show menu button only for current user's comments
+            String currentUserId = SessionManager.getCurrentUserId();
+            if (currentUserId != null && currentUserId.equals(comment.getUserId())) {
+                btnMenu.setVisibility(View.VISIBLE);
+                btnMenu.setOnClickListener(v -> showCommentMenu(v, comment, actionListener));
+            } else {
+                btnMenu.setVisibility(View.GONE);
+            }
+
             // Upvote button listener
-            btnUpvote.setOnClickListener(v -> handleVote(comment, 1));
+            btnUpvote.setOnClickListener(v -> {
+                VoteButtonAnimationHelper.animateVoteButton(btnUpvote);
+                handleVote(comment, 1);
+            });
 
             // Downvote button listener
-            btnDownvote.setOnClickListener(v -> handleVote(comment, -1));
+            btnDownvote.setOnClickListener(v -> {
+                VoteButtonAnimationHelper.animateVoteButton(btnDownvote);
+                handleVote(comment, -1);
+            });
+        }
+
+        private void showCommentMenu(View anchor, Comment comment, OnCommentActionListener actionListener) {
+            android.widget.PopupMenu popup = new android.widget.PopupMenu(itemView.getContext(), anchor);
+            popup.getMenuInflater().inflate(R.menu.comment_menu, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.action_edit_comment) {
+                    if (actionListener != null) {
+                        actionListener.onEditComment(comment);
+                    }
+                    return true;
+                } else if (itemId == R.id.action_delete_comment) {
+                    if (actionListener != null) {
+                        actionListener.onDeleteComment(comment);
+                    }
+                    return true;
+                }
+                return false;
+            });
+
+            popup.show();
         }
 
         private void handleVote(Comment comment, int voteType) {

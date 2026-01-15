@@ -17,157 +17,174 @@
       android:layout_height="wrap_content"
       android:orientation="vertical">
 
-      <LinearLayout
-        android:id="@+id/linearLayout"
+      <!-- Report Statistics Section with contained spinner -->
+      <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/md_theme_primary"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:minHeight="280dp">
 
-        <TextView
-          android:id="@+id/tvReportStatistics"
+        <LinearLayout
+          android:id="@+id/linearLayout"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@color/md_theme_primary"
+          android:orientation="vertical"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent">
+
+          <TextView
+            android:id="@+id/tvReportStatistics"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="@string/report_statistics"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
+            android:textColor="@color/md_theme_onPrimary" />
+
+          <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="30dp"
+            android:paddingTop="20dp"
+            android:paddingRight="30dp"
+            android:paddingBottom="20dp">
+
+            <TableRow
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+              <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/report_statistics_data"
+                android:orientation="vertical">
+
+                <TextView
+                  android:id="@+id/tvNumberSubmitted"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="-"
+                  android:textAlignment="center"
+                  android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                  android:textColor="@color/md_theme_onSurface" />
+
+                <TextView
+                  android:id="@+id/tvSubmitted"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="Submitted"
+                  android:textAlignment="center"
+                  android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                  android:textColor="@color/md_theme_onSurfaceVariant" />
+              </LinearLayout>
+
+              <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/report_statistics_data"
+                android:orientation="vertical">
+
+                <TextView
+                  android:id="@+id/tvNumberConfirmed"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="-"
+                  android:textAlignment="center"
+                  android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                  android:textColor="@color/md_theme_onSurface" />
+
+                <TextView
+                  android:id="@+id/tvConfirmed"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="Confirmed"
+                  android:textAlignment="center"
+                  android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                  android:textColor="@color/md_theme_onSurfaceVariant" />
+              </LinearLayout>
+
+            </TableRow>
+
+            <TableRow
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+              <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:layout_weight="1"
+                android:background="@drawable/report_statistics_data"
+                android:orientation="vertical">
+
+                <TextView
+                  android:id="@+id/tvNumberInProgress"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="-"
+                  android:textAlignment="center"
+                  android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                  android:textColor="@color/md_theme_onSurface" />
+
+                <TextView
+                  android:id="@+id/tvInProgress"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="In progress"
+                  android:textAlignment="center"
+                  android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                  android:textColor="@color/md_theme_onSurfaceVariant" />
+              </LinearLayout>
+
+              <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/report_statistics_data"
+                android:orientation="vertical">
+
+                <TextView
+                  android:id="@+id/tvNumberResolved"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="-"
+                  android:textAlignment="center"
+                  android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                  android:textColor="@color/md_theme_onSurface" />
+
+                <TextView
+                  android:id="@+id/tvResolved"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="Resolved"
+                  android:textAlignment="center"
+                  android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                  android:textColor="@color/md_theme_onSurfaceVariant" />
+              </LinearLayout>
+
+            </TableRow>
+
+          </TableLayout>
+
+        </LinearLayout>
+
+        <!-- Statistics Loading Spinner - contained within statistics section -->
+        <ProgressBar
+          android:id="@+id/statsProgressSpinner"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginStart="20dp"
-          android:layout_marginTop="20dp"
-          android:gravity="center"
-          android:text="@string/report_statistics"
-          android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium.Emphasized"
-          android:textColor="@color/md_theme_onPrimary" />
+          android:layout_gravity="center"
+          android:indeterminate="true"
+          android:visibility="gone" />
 
-        <TableLayout
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:paddingLeft="30dp"
-          android:paddingTop="20dp"
-          android:paddingRight="30dp"
-          android:paddingBottom="20dp">
-
-          <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginRight="30dp"
-              android:layout_marginBottom="20dp"
-              android:layout_weight="1"
-              android:background="@drawable/report_statistics_data"
-              android:orientation="vertical">
-
-              <TextView
-                android:id="@+id/tvNumberSubmitted"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="67"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textColor="@color/md_theme_onSurface" />
-
-              <TextView
-                android:id="@+id/tvSubmitted"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Submitted"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                android:textColor="@color/md_theme_onSurfaceVariant" />
-            </LinearLayout>
-
-            <LinearLayout
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginBottom="20dp"
-              android:layout_weight="1"
-              android:background="@drawable/report_statistics_data"
-              android:orientation="vertical">
-
-              <TextView
-                android:id="@+id/tvNumberConfirmed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="67"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textColor="@color/md_theme_onSurface" />
-
-              <TextView
-                android:id="@+id/tvConfirmed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Confirmed"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                android:textColor="@color/md_theme_onSurfaceVariant" />
-            </LinearLayout>
-
-          </TableRow>
-
-          <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginRight="30dp"
-              android:layout_weight="1"
-              android:background="@drawable/report_statistics_data"
-              android:orientation="vertical">
-
-              <TextView
-                android:id="@+id/tvNumberInProgress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="67"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textColor="@color/md_theme_onSurface" />
-
-              <TextView
-                android:id="@+id/tvInProgress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="In progress"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                android:textColor="@color/md_theme_onSurfaceVariant" />
-            </LinearLayout>
-
-            <LinearLayout
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              android:background="@drawable/report_statistics_data"
-              android:orientation="vertical">
-
-              <TextView
-                android:id="@+id/tvNumberResolved"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="67"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textColor="@color/md_theme_onSurface" />
-
-              <TextView
-                android:id="@+id/tvResolved"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Resolved"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                android:textColor="@color/md_theme_onSurfaceVariant" />
-            </LinearLayout>
-
-          </TableRow>
-
-        </TableLayout>
-
-      </LinearLayout>
+      </FrameLayout>
 
       <RelativeLayout
         android:layout_width="match_parent"

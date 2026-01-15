@@ -22,6 +22,7 @@ import com.gitgud.citywatch.ui.thread.CommentAdapter;
 import com.gitgud.citywatch.data.repository.DataRepository;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
+import com.gitgud.citywatch.util.VoteButtonAnimationHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -33,7 +34,6 @@ import java.util.List;
 public class ThreadActivity extends AppCompatActivity {
 
     // Views
-    private ImageButton btnBack;
     private ShapeableImageView ivProfile;
     private TextView tvName;
     private TextView tvTitle;
@@ -52,6 +52,7 @@ public class ThreadActivity extends AppCompatActivity {
     private TextInputEditText etComment;
     private View llCommentInput;
     private androidx.core.widget.NestedScrollView nestedScrollView;
+    private com.google.android.material.appbar.MaterialToolbar toolbar;
 
     // Comments
     private CommentAdapter commentAdapter;
@@ -77,16 +78,12 @@ public class ThreadActivity extends AppCompatActivity {
 
         initViews();
 
-        // Handle window insets manually for EdgeToEdge and Keyboard
+        // Handle window insets manually for Keyboard
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_thread), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
 
-            // 1. Apply status bar height to top navigation
-            btnBack.setPadding(btnBack.getPaddingLeft(), systemBars.top,
-                    btnBack.getPaddingRight(), btnBack.getPaddingBottom());
-
-            // 2. Apply keyboard height (IME) to the comment input layout
+            // Apply keyboard height (IME) to the comment input layout
             // We use the MAX of navigation bar or keyboard height
             int bottomPadding = Math.max(systemBars.bottom, imeInsets.bottom);
             llCommentInput.setPadding(llCommentInput.getPaddingLeft(),
@@ -103,7 +100,7 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        btnBack = findViewById(R.id.btnThreadBack);
+        toolbar = findViewById(R.id.toolbar);
         ivProfile = findViewById(R.id.ivThreadProfile);
         tvName = findViewById(R.id.tvThreadName);
         tvTitle = findViewById(R.id.tvThreadTitle);
@@ -126,6 +123,17 @@ public class ThreadActivity extends AppCompatActivity {
         // Setup RecyclerView for comments
         commentList = new ArrayList<>();
         commentAdapter = new CommentAdapter(commentList);
+        commentAdapter.setOnCommentActionListener(new CommentAdapter.OnCommentActionListener() {
+            @Override
+            public void onEditComment(Comment comment) {
+                showEditCommentDialog(comment);
+            }
+
+            @Override
+            public void onDeleteComment(Comment comment) {
+                showDeleteCommentDialog(comment);
+            }
+        });
         rvComments.setLayoutManager(new LinearLayoutManager(this));
         rvComments.setAdapter(commentAdapter);
         rvComments.setNestedScrollingEnabled(false);
@@ -179,6 +187,18 @@ public class ThreadActivity extends AppCompatActivity {
         tvVotes.setText(String.valueOf(currentScore));
         tvComments.setText(String.valueOf(commentCount));
 
+        // Highlight vote buttons based on cached user vote
+        if (currentUserVote == 1) {
+            btnUpvote.setIconTintResource(R.color.md_theme_primary);
+            btnDownvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+        } else if (currentUserVote == -1) {
+            btnUpvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+            btnDownvote.setIconTintResource(R.color.md_theme_primary);
+        } else {
+            btnUpvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+            btnDownvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+        }
+
         TextView tvThreadLocation = findViewById(R.id.tvThreadLocation);
         if (tvThreadLocation != null) {
             tvThreadLocation.setPaintFlags(tvThreadLocation.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
@@ -186,7 +206,7 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        btnBack.setOnClickListener(v -> {
+        toolbar.setNavigationOnClickListener(v -> {
             // Invalidate reports cache since vote/comment counts might have changed
             dataRepository.invalidateReportsCache();
             finish();
@@ -207,8 +227,14 @@ public class ThreadActivity extends AppCompatActivity {
         ImageButton btnLocation = findViewById(R.id.btnThreadLocation);
         if (btnLocation != null) btnLocation.setOnClickListener(v -> openMapApp());
 
-        btnUpvote.setOnClickListener(v -> handleVote(1));
-        btnDownvote.setOnClickListener(v -> handleVote(-1));
+        btnUpvote.setOnClickListener(v -> {
+            VoteButtonAnimationHelper.animateVoteButton(btnUpvote);
+            handleVote(1);
+        });
+        btnDownvote.setOnClickListener(v -> {
+            VoteButtonAnimationHelper.animateVoteButton(btnDownvote);
+            handleVote(-1);
+        });
 
         findViewById(R.id.btnCommentSubmit).setOnClickListener(v -> submitComment());
     }
@@ -219,12 +245,19 @@ public class ThreadActivity extends AppCompatActivity {
             Toast.makeText(this, "Please log in to vote", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // Determine actual vote type (toggle if same vote)
         int actualVoteType = currentUserVote == voteType ? 0 : voteType;
+
+        // Store previous state for rollback
         long previousScore = currentScore;
         int previousVote = currentUserVote;
+
+        // Optimistic UI update - update immediately before server response
         currentScore = previousScore - previousVote + actualVoteType;
         currentUserVote = actualVoteType;
         tvVotes.setText(String.valueOf(currentScore));
+        updateVoteButtonStates(currentUserVote);
 
         dataRepository.voteReport(documentId, actualVoteType,
                 new DataRepository.VoteCallback() {
@@ -233,17 +266,37 @@ public class ThreadActivity extends AppCompatActivity {
                         currentScore = score;
                         currentUserVote = userVote;
                         tvVotes.setText(String.valueOf(currentScore));
+                        updateVoteButtonStates(currentUserVote);
                     }
 
                     @Override
                     public void onError(Exception e) {
+                        // Rollback UI on error
                         currentScore = previousScore;
                         currentUserVote = previousVote;
                         tvVotes.setText(String.valueOf(currentScore));
+                        updateVoteButtonStates(currentUserVote);
                         Toast.makeText(ThreadActivity.this, "Failed to vote",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    /**
+     * Update vote button visual states based on user's current vote
+     * @param userVote 1 = upvoted, -1 = downvoted, 0 = no vote
+     */
+    private void updateVoteButtonStates(int userVote) {
+        if (userVote == 1) {
+            btnUpvote.setIconTintResource(R.color.md_theme_primary);
+            btnDownvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+        } else if (userVote == -1) {
+            btnUpvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+            btnDownvote.setIconTintResource(R.color.md_theme_primary);
+        } else {
+            btnUpvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+            btnDownvote.setIconTintResource(R.color.md_theme_onSurfaceVariant);
+        }
     }
 
     private String getTimeAgoEstimate(long createdAtTimestamp) {
@@ -342,6 +395,120 @@ public class ThreadActivity extends AppCompatActivity {
                         Toast.makeText(ThreadActivity.this, "Failed to post",
                                 Toast.LENGTH_SHORT).show();
                     }
+                });
+    }
+
+    private void showEditCommentDialog(Comment comment) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Edit Comment");
+
+        // Create EditText for comment input
+        final android.widget.EditText input = new android.widget.EditText(this);
+        input.setText(comment.getContent());
+        input.setSelection(comment.getContent().length()); // Place cursor at end
+        builder.setView(input);
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            String newContent = input.getText().toString().trim();
+            if (!newContent.isEmpty()) {
+                editComment(comment, newContent);
+            } else {
+                Toast.makeText(this, "Comment cannot be empty", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void editComment(Comment comment, String newContent) {
+        String userId = SessionManager.getCurrentUserId();
+        if (userId == null) {
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Store old content for rollback
+        String oldContent = comment.getContent();
+
+        // Optimistic update - update UI immediately
+        comment.setContent(newContent);
+        int position = commentList.indexOf(comment);
+        if (position != -1) {
+            commentAdapter.notifyItemChanged(position);
+        }
+
+        // Update in local cache immediately
+        dataRepository.updateCommentInCache(comment);
+
+        // Call API
+        ApiClient.editComment(comment.getCommentId(), userId, newContent)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Comment updated", Toast.LENGTH_SHORT).show();
+                    // Reload comments to ensure consistency with server
+                    loadComments();
+                })
+                .addOnFailureListener(e -> {
+                    // Rollback on failure
+                    comment.setContent(oldContent);
+                    if (position != -1) {
+                        commentAdapter.notifyItemChanged(position);
+                    }
+                    dataRepository.updateCommentInCache(comment);
+                    Toast.makeText(this, "Failed to update: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void showDeleteCommentDialog(Comment comment) {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Delete Comment")
+                .setMessage("Are you sure you want to delete this comment?")
+                .setPositiveButton("Delete", (dialog, which) -> deleteComment(comment))
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void deleteComment(Comment comment) {
+        String userId = SessionManager.getCurrentUserId();
+        if (userId == null) {
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Store position for potential rollback
+        int position = commentList.indexOf(comment);
+
+        // Optimistic update - remove from UI immediately
+        if (position != -1) {
+            commentList.remove(position);
+            commentAdapter.notifyItemRemoved(position);
+        }
+
+        // Update comment count immediately
+        long currentCount = Long.parseLong(tvComments.getText().toString());
+        tvComments.setText(String.valueOf(currentCount - 1));
+
+        // Remove from local cache immediately
+        dataRepository.removeCommentFromCache(comment.getCommentId(), documentId);
+
+        // Call API
+        ApiClient.deleteComment(comment.getCommentId(), userId)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Comment deleted", Toast.LENGTH_SHORT).show();
+                    // Reload comments to ensure consistency with server
+                    loadComments();
+                })
+                .addOnFailureListener(e -> {
+                    // Rollback on failure
+                    if (position != -1) {
+                        commentList.add(position, comment);
+                        commentAdapter.notifyItemInserted(position);
+                    }
+                    tvComments.setText(String.valueOf(currentCount));
+                    dataRepository.updateCommentInCache(comment);
+                    Toast.makeText(this, "Failed to delete: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
                 });
     }
 }
