@@ -30,9 +30,6 @@ public interface CommentDao {
     @Query("DELETE FROM comments WHERE reportId = :reportId")
     void deleteByReportId(String reportId);
 
-    @Query("DELETE FROM comments WHERE commentId = :commentId")
-    void deleteById(String commentId);
-
     @Query("DELETE FROM comments")
     void deleteAll();
 
@@ -41,5 +38,10 @@ public interface CommentDao {
 
     @Query("UPDATE comments SET score = :score WHERE commentId = :commentId")
     void updateScore(String commentId, long score);
-}
 
+    @Query("UPDATE comments SET content = :content WHERE commentId = :commentId")
+    void updateComment(String commentId, String content);
+
+    @Query("DELETE FROM comments WHERE commentId = :commentId")
+    void deleteByCommentId(String commentId);
+}

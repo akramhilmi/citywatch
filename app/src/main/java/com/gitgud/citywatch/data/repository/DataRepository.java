@@ -794,6 +794,24 @@ public class DataRepository {
     }
 
     /**
+     * Update a specific comment in the cache
+     * Used for optimistic UI updates after editing
+     */
+    public void updateCommentInCache(Comment comment) {
+        cacheManager.updateCachedComment(comment);
+        Log.d(TAG, "Updated comment in cache: " + comment.getCommentId());
+    }
+
+    /**
+     * Remove a specific comment from the cache
+     * Used for optimistic UI updates after deletion
+     */
+    public void removeCommentFromCache(String commentId, String reportId) {
+        cacheManager.removeCachedComment(commentId);
+        Log.d(TAG, "Removed comment from cache: " + commentId);
+    }
+
+    /**
      * Clear all caches (e.g., on logout)
      */
     public void clearAllCaches() {
@@ -879,4 +897,3 @@ public class DataRepository {
         void onError(Exception e);
     }
 }
-

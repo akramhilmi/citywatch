@@ -119,6 +119,17 @@ public class ThreadActivity extends AppCompatActivity {
         // Setup RecyclerView for comments
         commentList = new ArrayList<>();
         commentAdapter = new CommentAdapter(commentList);
+        commentAdapter.setOnCommentActionListener(new CommentAdapter.OnCommentActionListener() {
+            @Override
+            public void onEditComment(Comment comment) {
+                showEditCommentDialog(comment);
+            }
+
+            @Override
+            public void onDeleteComment(Comment comment) {
+                showDeleteCommentDialog(comment);
+            }
+        });
         rvComments.setLayoutManager(new LinearLayoutManager(this));
         rvComments.setAdapter(commentAdapter);
         rvComments.setNestedScrollingEnabled(false);
@@ -368,6 +379,120 @@ public class ThreadActivity extends AppCompatActivity {
                         Toast.makeText(ThreadActivity.this, "Failed to post",
                                 Toast.LENGTH_SHORT).show();
                     }
+                });
+    }
+
+    private void showEditCommentDialog(Comment comment) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Edit Comment");
+
+        // Create EditText for comment input
+        final android.widget.EditText input = new android.widget.EditText(this);
+        input.setText(comment.getContent());
+        input.setSelection(comment.getContent().length()); // Place cursor at end
+        builder.setView(input);
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            String newContent = input.getText().toString().trim();
+            if (!newContent.isEmpty()) {
+                editComment(comment, newContent);
+            } else {
+                Toast.makeText(this, "Comment cannot be empty", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void editComment(Comment comment, String newContent) {
+        String userId = SessionManager.getCurrentUserId();
+        if (userId == null) {
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Store old content for rollback
+        String oldContent = comment.getContent();
+
+        // Optimistic update - update UI immediately
+        comment.setContent(newContent);
+        int position = commentList.indexOf(comment);
+        if (position != -1) {
+            commentAdapter.notifyItemChanged(position);
+        }
+
+        // Update in local cache immediately
+        dataRepository.updateCommentInCache(comment);
+
+        // Call API
+        ApiClient.editComment(comment.getCommentId(), userId, newContent)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Comment updated", Toast.LENGTH_SHORT).show();
+                    // Reload comments to ensure consistency with server
+                    loadComments();
+                })
+                .addOnFailureListener(e -> {
+                    // Rollback on failure
+                    comment.setContent(oldContent);
+                    if (position != -1) {
+                        commentAdapter.notifyItemChanged(position);
+                    }
+                    dataRepository.updateCommentInCache(comment);
+                    Toast.makeText(this, "Failed to update: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void showDeleteCommentDialog(Comment comment) {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Delete Comment")
+                .setMessage("Are you sure you want to delete this comment?")
+                .setPositiveButton("Delete", (dialog, which) -> deleteComment(comment))
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void deleteComment(Comment comment) {
+        String userId = SessionManager.getCurrentUserId();
+        if (userId == null) {
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Store position for potential rollback
+        int position = commentList.indexOf(comment);
+
+        // Optimistic update - remove from UI immediately
+        if (position != -1) {
+            commentList.remove(position);
+            commentAdapter.notifyItemRemoved(position);
+        }
+
+        // Update comment count immediately
+        long currentCount = Long.parseLong(tvComments.getText().toString());
+        tvComments.setText(String.valueOf(currentCount - 1));
+
+        // Remove from local cache immediately
+        dataRepository.removeCommentFromCache(comment.getCommentId(), documentId);
+
+        // Call API
+        ApiClient.deleteComment(comment.getCommentId(), userId)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Comment deleted", Toast.LENGTH_SHORT).show();
+                    // Reload comments to ensure consistency with server
+                    loadComments();
+                })
+                .addOnFailureListener(e -> {
+                    // Rollback on failure
+                    if (position != -1) {
+                        commentList.add(position, comment);
+                        commentAdapter.notifyItemInserted(position);
+                    }
+                    tvComments.setText(String.valueOf(currentCount));
+                    dataRepository.updateCommentInCache(comment);
+                    Toast.makeText(this, "Failed to delete: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
                 });
     }
 }
