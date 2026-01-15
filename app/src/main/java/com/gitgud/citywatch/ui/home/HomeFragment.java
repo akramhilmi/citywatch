@@ -36,6 +36,13 @@ public class HomeFragment extends Fragment {
     private boolean hasCachedData = false;
     private androidx.activity.result.ActivityResultLauncher<Intent> editReportLauncher;
 
+    // Statistics TextViews
+    private android.widget.TextView tvNumberSubmitted;
+    private android.widget.TextView tvNumberConfirmed;
+    private android.widget.TextView tvNumberInProgress;
+    private android.widget.TextView tvNumberResolved;
+    private ProgressBar statsProgressSpinner;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -109,6 +116,14 @@ public class HomeFragment extends Fragment {
         // Initialize views
         rvYourReports = view.findViewById(R.id.rvCards);
         progressSpinner = view.findViewById(R.id.progressSpinner);
+
+        // Initialize statistics TextViews
+        tvNumberSubmitted = view.findViewById(R.id.tvNumberSubmitted);
+        tvNumberConfirmed = view.findViewById(R.id.tvNumberConfirmed);
+        tvNumberInProgress = view.findViewById(R.id.tvNumberInProgress);
+        tvNumberResolved = view.findViewById(R.id.tvNumberResolved);
+        statsProgressSpinner = view.findViewById(R.id.statsProgressSpinner);
+
         userReportsList = new ArrayList<>();
         adapter = new HazardCardAdapter(userReportsList);
         adapter.setDataRepository(dataRepository);
@@ -157,6 +172,8 @@ public class HomeFragment extends Fragment {
 
         // Load reports using cache-first strategy
         loadUserReports();
+        // Load statistics
+        loadStatistics();
         setupClickListeners(view);
     }
 
@@ -166,6 +183,8 @@ public class HomeFragment extends Fragment {
         // Reload user reports when fragment comes back into focus
         // This ensures vote/comment counts are updated if user modified them in ThreadActivity
         loadUserReports();
+        // Reload statistics to reflect any changes
+        loadStatistics();
     }
 
     private void loadUserReports() {
@@ -277,6 +296,8 @@ public class HomeFragment extends Fragment {
                         android.widget.Toast.LENGTH_SHORT).show();
                     // Reload reports to ensure consistency with server
                     loadUserReports();
+                    // Reload statistics immediately to reflect the deletion
+                    loadStatistics();
                 })
                 .addOnFailureListener(e -> {
                     // Rollback on failure
@@ -289,5 +310,44 @@ public class HomeFragment extends Fragment {
                         "Failed to delete: " + e.getMessage(),
                         android.widget.Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    /**
+     * Load statistics from Firebase Cloud Function
+     */
+    private void loadStatistics() {
+        // Show loading spinner
+        statsProgressSpinner.setVisibility(View.VISIBLE);
+
+        com.gitgud.citywatch.util.ApiClient.getStats()
+            .addOnSuccessListener(stats -> {
+                if (getActivity() == null) return;
+
+                // Hide loading spinner
+                statsProgressSpinner.setVisibility(View.GONE);
+
+                // Update TextViews with real statistics
+                if (stats.containsKey("submitted")) {
+                    tvNumberSubmitted.setText(String.valueOf(stats.get("submitted")));
+                }
+                if (stats.containsKey("confirmed")) {
+                    tvNumberConfirmed.setText(String.valueOf(stats.get("confirmed")));
+                }
+                if (stats.containsKey("inProgress")) {
+                    tvNumberInProgress.setText(String.valueOf(stats.get("inProgress")));
+                }
+                if (stats.containsKey("resolved")) {
+                    tvNumberResolved.setText(String.valueOf(stats.get("resolved")));
+                }
+            })
+            .addOnFailureListener(e -> {
+                if (getActivity() == null) return;
+
+                // Hide loading spinner
+                statsProgressSpinner.setVisibility(View.GONE);
+
+                // Keep default values on error, optionally show a toast
+                android.util.Log.e("HomeFragment", "Failed to load statistics: " + e.getMessage());
+            });
     }
 }
