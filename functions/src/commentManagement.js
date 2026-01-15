@@ -97,6 +97,50 @@ const deleteComment = onCall(async (request) => {
 });
 
 /**
+ * Edit an existing comment
+ * Only the comment author (userId) can edit their comment
+ */
+const editComment = onCall(async (request) => {
+  try {
+    const {commentId, userId, content} = request.data;
+
+    if (!commentId || !userId || !content) {
+      throw new Error("Comment ID, user ID, and content are required");
+    }
+
+    // Get the comment document
+    const commentDoc = await db.collection("comments").doc(commentId).get();
+    if (!commentDoc.exists) {
+      throw new Error("Comment not found");
+    }
+
+    const commentData = commentDoc.data();
+
+    // Verify user is the comment author
+    let commentUserId = "";
+    if (commentData.user) {
+      commentUserId = commentData.user.id;
+    }
+
+    if (commentUserId !== userId) {
+      throw new Error("Unauthorized: You can only edit your own comments");
+    }
+
+    // Update the comment content and timestamp
+    await db.collection("comments").doc(commentId).update({
+      content,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    logger.info(`Comment ${commentId} edited by user ${userId}`);
+    return {success: true, message: "Comment edited successfully"};
+  } catch (error) {
+    logger.error("Error editing comment:", error);
+    throw new Error(`Failed to edit comment: ${error.message}`);
+  }
+});
+
+/**
  * Get all comments for a specific report
  */
 const getCommentsForReport = onCall(async (request) => {
@@ -189,6 +233,7 @@ const getCommentCount = onCall(async (request) => {
 module.exports = {
   submitComment,
   deleteComment,
+  editComment,
   getCommentsForReport,
   getCommentCount,
 };

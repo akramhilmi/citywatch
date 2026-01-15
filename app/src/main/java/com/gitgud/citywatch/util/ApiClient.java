@@ -679,6 +679,35 @@ public class ApiClient {
     }
 
     /**
+     * Edit an existing comment
+     * Only the comment author (userId) can edit their comment
+     *
+     * @param commentId The comment document ID
+     * @param userId The current user's ID (must be the author)
+     * @param content The new comment content
+     * @return Task that completes when edit is done
+     */
+    public static com.google.android.gms.tasks.Task<Void> editComment(
+            String commentId, String userId, String content) {
+
+        HttpsCallableReference editCommentFunc = functions.getHttpsCallable("editComment");
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("commentId", commentId);
+        data.put("userId", userId);
+        data.put("content", content);
+
+        return editCommentFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        return null;
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to edit comment");
+                });
+    }
+
+    /**
      * Get user's votes for multiple comments
      * @param commentIds List of comment document IDs
      * @param userId The current user's ID

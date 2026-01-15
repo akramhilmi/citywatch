@@ -54,6 +54,7 @@ const {
 const {
   submitComment,
   deleteComment,
+  editComment,
   getCommentsForReport,
   getCommentCount,
 } = require("./src/commentManagement");
@@ -110,6 +111,7 @@ exports.getUserVotesForReports = getUserVotesForReports;
 // Comment Management
 exports.submitComment = submitComment;
 exports.deleteComment = deleteComment;
+exports.editComment = editComment;
 exports.getCommentsForReport = getCommentsForReport;
 exports.getCommentCount = getCommentCount;
 
