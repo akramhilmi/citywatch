@@ -162,7 +162,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private void setupDropdowns() {
         //local government dropdown
-        String[] localGovs = {"Kuala Lumpur City Hall (DBKL)","Majlis Bandaraya Petaling Jaya(MBPJ)","Majlis Bandaraya Subang Jaya(MBSJ)"};
+        String[] localGovs = {"Dewan Bandaraya Kuala Lumpur (DBKL)","Majlis Bandaraya Petaling Jaya (MBPJ)","Majlis Bandaraya Subang Jaya (MBSJ)"};
         AutoCompleteTextView govSpinner = findViewById(R.id.spinnerLocalGov);
         if (govSpinner != null) {
             govSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, localGovs));
@@ -214,18 +214,30 @@ public class ReportActivity extends AppCompatActivity {
         }
     }
 
+    private String extractShortName(String fullName) {
+        if (fullName == null) return "";
+        int start = fullName.indexOf('(');
+        int end = fullName.indexOf(')');
+        if (start != -1 && end != -1 && end > start) {
+            return fullName.substring(start + 1, end).trim();
+        }
+        return fullName.trim();
+    }
+
     private void editReport() {
         // Validate required fields
         String description = etDescription.getText() != null ? etDescription.getText().toString().trim() : "";
         String hazardType = etHazardType.getText() != null ? etHazardType.getText().toString().trim() : "";
-        String localGov = spinnerLocalGov.getText() != null ? spinnerLocalGov.getText().toString().trim() : "";
+        String localGovFull = spinnerLocalGov.getText() != null ? spinnerLocalGov.getText().toString().trim() : "";
         String locationDetails = etLocationDetails.getText() != null ? etLocationDetails.getText().toString().trim() : "";
 
-        if (description.isEmpty() || hazardType.isEmpty() || localGov.isEmpty() ||
+        if (description.isEmpty() || hazardType.isEmpty() || localGovFull.isEmpty() ||
             locationDetails.isEmpty() || selectedLatitude == 0 || selectedLongitude == 0) {
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        String localGov = extractShortName(localGovFull);
 
         // Get current user ID from SessionManager
         String userId = SessionManager.getCurrentUserId();
@@ -272,14 +284,16 @@ public class ReportActivity extends AppCompatActivity {
         // Validate required fields
         String description = etDescription.getText() != null ? etDescription.getText().toString().trim() : "";
         String hazardType = etHazardType.getText() != null ? etHazardType.getText().toString().trim() : "";
-        String localGov = spinnerLocalGov.getText() != null ? spinnerLocalGov.getText().toString().trim() : "";
+        String localGovFull = spinnerLocalGov.getText() != null ? spinnerLocalGov.getText().toString().trim() : "";
         String locationDetails = etLocationDetails.getText() != null ? etLocationDetails.getText().toString().trim() : "";
 
-        if (description.isEmpty() || hazardType.isEmpty() || localGov.isEmpty() ||
+        if (description.isEmpty() || hazardType.isEmpty() || localGovFull.isEmpty() ||
             locationDetails.isEmpty() || selectedLatitude == 0 || selectedLongitude == 0) {
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        String localGov = extractShortName(localGovFull);
 
         // Check if image was selected
         if (selectedImageUri == null && selectedImageBitmap == null) {
