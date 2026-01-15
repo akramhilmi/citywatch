@@ -1,5 +1,6 @@
 package com.gitgud.citywatch;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -39,6 +40,7 @@ public class ThreadActivity extends AppCompatActivity {
     private TextView tvTagTertiary;
     private TextView tvTagSecondary;
     private ImageView ivPhoto;
+    private View cvPhoto;
     private TextView tvDescription;
     private MaterialButton btnUpvote;
     private MaterialButton btnDownvote;
@@ -61,6 +63,7 @@ public class ThreadActivity extends AppCompatActivity {
     private int currentUserVote;
     private double latitude;
     private double longitude;
+    private String photoUrl;
     private DataRepository dataRepository;
     private boolean hasCachedComments = false;
 
@@ -107,6 +110,7 @@ public class ThreadActivity extends AppCompatActivity {
         tvTagTertiary = findViewById(R.id.tvThreadTagTertiary);
         tvTagSecondary = findViewById(R.id.tvThreadTagSecondary);
         ivPhoto = findViewById(R.id.ivThreadPhoto);
+        cvPhoto = findViewById(R.id.cvPhoto);
         tvDescription = findViewById(R.id.tvThreadDesc);
         btnUpvote = findViewById(R.id.btnThreadUpvote);
         btnDownvote = findViewById(R.id.btnThreadDownvote);
@@ -146,7 +150,7 @@ public class ThreadActivity extends AppCompatActivity {
         String status = getIntent().getStringExtra("status");
         String localGov = getIntent().getStringExtra("localGov");
         String description = getIntent().getStringExtra("description");
-        String photoUrl = getIntent().getStringExtra("photoUrl");
+        photoUrl = getIntent().getStringExtra("photoUrl");
         String profilePictureUrl = getIntent().getStringExtra("profilePictureUrl");
         currentScore = getIntent().getLongExtra("score", 0);
         currentUserVote = getIntent().getIntExtra("userVote", 0);
@@ -166,7 +170,10 @@ public class ThreadActivity extends AppCompatActivity {
             Glide.with(this).load(profilePictureUrl).placeholder(R.drawable.ic_profile).circleCrop().into(ivProfile);
         }
         if (photoUrl != null && !photoUrl.isEmpty()) {
+            cvPhoto.setVisibility(View.VISIBLE);
             Glide.with(this).load(photoUrl).placeholder(R.drawable.ic_pic).centerCrop().into(ivPhoto);
+        } else {
+            cvPhoto.setVisibility(View.GONE);
         }
 
         tvVotes.setText(String.valueOf(currentScore));
@@ -183,6 +190,15 @@ public class ThreadActivity extends AppCompatActivity {
             // Invalidate reports cache since vote/comment counts might have changed
             dataRepository.invalidateReportsCache();
             finish();
+        });
+
+        // Show photo in full screen
+        cvPhoto.setOnClickListener(v -> {
+            if (photoUrl != null && !photoUrl.isEmpty()) {
+                Intent intent = new Intent(this, FullScreenImageActivity.class);
+                intent.putExtra("photoUrl", photoUrl);
+                startActivity(intent);
+            }
         });
 
         TextView tvThreadLocation = findViewById(R.id.tvThreadLocation);

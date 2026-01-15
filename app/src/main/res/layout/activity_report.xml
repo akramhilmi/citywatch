@@ -60,10 +60,12 @@
         android:textStyle="bold" />
 
       <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cvUploadPhoto"
         android:layout_width="match_parent"
         android:layout_height="320dp"
         android:layout_marginTop="12dp"
-        app:cardBackgroundColor="@color/md_theme_surfaceVariant"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/md_theme_surfaceContainerHigh"
         app:cardCornerRadius="28dp"
         app:strokeColor="@color/md_theme_outlineVariant"
         app:strokeWidth="1dp">
@@ -75,7 +77,6 @@
           android:padding="48dp"
           android:scaleType="centerInside"
           android:src="@drawable/ic_pic"
-          app:tint="@color/md_theme_outlineVariant"
           tools:ignore="ContentDescription" />
       </com.google.android.material.card.MaterialCardView>
 

@@ -44,6 +44,10 @@
       android:name=".LocationPickerActivity"
       android:exported="false"
       android:theme="@style/Theme.CityWatch" />
+    <activity
+      android:name=".FullScreenImageActivity"
+      android:exported="false"
+      android:theme="@style/Theme.CityWatch" />
   </application>
 
 </manifest>
