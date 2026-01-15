@@ -281,6 +281,17 @@ const deleteReport = onCall(async (request) => {
       logger.warn(`Could not delete photo for report ${reportId}`, photoError);
     }
 
+    // Delete the comment checksum from /metadata/checksums
+    try {
+      const checksumRef = db.collection("metadata").doc("checksums");
+      await checksumRef.update({
+        [`comment_${reportId}`]: admin.firestore.FieldValue.delete(),
+      });
+      logger.info(`Deleted checksum for report ${reportId}`);
+    } catch (checksumError) {
+      logger.warn(`Could not delete checksum for report ${reportId}`, checksumError);
+    }
+
     // Delete the report document
     await reportRef.delete();
 
