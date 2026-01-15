@@ -77,6 +77,13 @@ const {
   getCacheChecksum,
 } = require("./src/caching");
 
+// Stats
+const {
+  getStats,
+  incrementStat,
+  decrementStat,
+} = require("./src/stats");
+
 // ==================== Export all functions ====================
 
 // Triggers
@@ -126,3 +133,8 @@ exports.getAllCommentVotesForUser = getAllCommentVotesForUser;
 // Caching
 exports.getChecksums = getChecksums;
 exports.getCacheChecksum = getCacheChecksum;
+
+// Stats
+exports.getStats = getStats;
+exports.incrementStat = incrementStat;
+exports.decrementStat = decrementStat;
