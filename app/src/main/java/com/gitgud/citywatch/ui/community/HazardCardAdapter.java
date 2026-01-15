@@ -81,6 +81,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
         private final ImageView ivCardPhoto;
         private final ImageButton btnUpvote;
         private final ImageButton btnDownvote;
+        private final ImageButton btnComments;
         private final TextView tvVotes;
         private final TextView tvComments;
 
@@ -94,6 +95,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             ivCardPhoto = itemView.findViewById(R.id.ivCardPhoto);
             btnUpvote = itemView.findViewById(R.id.btnUpvote);
             btnDownvote = itemView.findViewById(R.id.btnDownvote);
+            btnComments = itemView.findViewById(R.id.btnComments);
             tvVotes = itemView.findViewById(R.id.tvVotes);
             tvComments = itemView.findViewById(R.id.tvComments);
         }
@@ -153,6 +155,13 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             btnDownvote.setOnClickListener(v -> {
                 VoteButtonAnimationHelper.animateVoteButton(btnDownvote);
                 handleVote(hazard, -1, dataRepository);
+            });
+
+            // Comment button listener - navigate to thread
+            btnComments.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onCardClick(hazard);
+                }
             });
 
             // Card click listener - navigate to thread
