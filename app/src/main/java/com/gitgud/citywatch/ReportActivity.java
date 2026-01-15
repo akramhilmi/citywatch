@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.gitgud.citywatch.data.repository.DataRepository;
@@ -36,6 +37,11 @@ public class ReportActivity extends AppCompatActivity {
     private android.graphics.Bitmap selectedImageBitmap = null; // for image upload
     private AlertDialog progressDialog; // for submission progress
     private DataRepository dataRepository;
+
+    // Edit mode fields
+    private boolean isEditMode = false;
+    private String editReportId = null;
+    private String editStatus = null;
 
     //setup gallery launcher
     private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
@@ -85,10 +91,57 @@ public class ReportActivity extends AppCompatActivity {
         etHazardType = findViewById(R.id.etHazardType);
         spinnerLocalGov = findViewById(R.id.spinnerLocalGov);
 
+        // Check if in edit mode
+        checkEditMode();
+
         setupHeader();
         setupDropdowns();
         setupLocation();
         setupButtons();
+
+        // Load existing data if in edit mode
+        if (isEditMode) {
+            loadExistingReportData();
+        }
+    }
+
+    private void checkEditMode() {
+        Intent intent = getIntent();
+        isEditMode = intent.getBooleanExtra("isEditMode", false);
+        if (isEditMode) {
+            editReportId = intent.getStringExtra("reportId");
+            editStatus = intent.getStringExtra("status");
+        }
+    }
+
+    private void loadExistingReportData() {
+        Intent intent = getIntent();
+
+        // Pre-fill all fields with existing data
+        String description = intent.getStringExtra("description");
+        String hazardType = intent.getStringExtra("hazardType");
+        String localGov = intent.getStringExtra("localGov");
+        String locationDetails = intent.getStringExtra("locationDetails");
+        selectedLatitude = intent.getDoubleExtra("latitude", 0);
+        selectedLongitude = intent.getDoubleExtra("longitude", 0);
+
+        if (description != null) etDescription.setText(description);
+        if (hazardType != null) etHazardType.setText(hazardType);
+        if (localGov != null) spinnerLocalGov.setText(localGov, false);
+        if (locationDetails != null) etLocationDetails.setText(locationDetails);
+        if (selectedLatitude != 0 && selectedLongitude != 0) {
+            etMapsLocation.setText(String.format(Locale.US, "%.4f, %.4f",
+                selectedLatitude, selectedLongitude));
+        }
+
+        // Load existing photo if available
+        String photoUrl = intent.getStringExtra("photoUrl");
+        if (photoUrl != null && !photoUrl.isEmpty()) {
+            com.bumptech.glide.Glide.with(this)
+                .load(photoUrl)
+                .into(ivPhotoPlaceholder);
+            prepareImageView();
+        }
     }
 
     private void prepareImageView() {
@@ -125,20 +178,77 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void setupButtons() {
-        //capture photo
-        findViewById(R.id.btnCapture).setOnClickListener(v -> takePhoto.launch(null));
+        MaterialButton btnCapture = findViewById(R.id.btnCapture);
+        MaterialButton btnGallery = findViewById(R.id.btnGallery);
 
-        //gallery
-        findViewById(R.id.btnGallery).setOnClickListener(v ->
-            pickMedia.launch(new PickVisualMediaRequest.Builder()
-                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                .build())
-        );
+        if (isEditMode) {
+            // Disable photo buttons in edit mode
+            btnCapture.setEnabled(false);
+            btnCapture.setAlpha(0.5f);
+            btnGallery.setEnabled(false);
+            btnGallery.setAlpha(0.5f);
+        } else {
+            // Enable photo buttons in create mode
+            btnCapture.setOnClickListener(v -> takePhoto.launch(null));
+            btnGallery.setOnClickListener(v ->
+                pickMedia.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build())
+            );
+        }
 
         MaterialCardView btnSubmit = findViewById(R.id.btnSubmit);
         if (btnSubmit != null) {
-            btnSubmit.setOnClickListener(v -> submitReport());
+            btnSubmit.setOnClickListener(v -> {
+                if (isEditMode) {
+                    editReport();
+                } else {
+                    submitReport();
+                }
+            });
         }
+    }
+
+    private void editReport() {
+        // Validate required fields
+        String description = etDescription.getText() != null ? etDescription.getText().toString().trim() : "";
+        String hazardType = etHazardType.getText() != null ? etHazardType.getText().toString().trim() : "";
+        String localGov = spinnerLocalGov.getText() != null ? spinnerLocalGov.getText().toString().trim() : "";
+        String locationDetails = etLocationDetails.getText() != null ? etLocationDetails.getText().toString().trim() : "";
+
+        if (description.isEmpty() || hazardType.isEmpty() || localGov.isEmpty() ||
+            locationDetails.isEmpty() || selectedLatitude == 0 || selectedLongitude == 0) {
+            Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Get current user ID from SessionManager
+        String userId = SessionManager.getCurrentUserId();
+
+        if (userId == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Show progress dialog
+        showProgressDialog("Updating report...");
+
+        // Call edit API
+        ApiClient.editReport(editReportId, userId, description, hazardType, localGov,
+                locationDetails, selectedLatitude, selectedLongitude, editStatus)
+                .addOnSuccessListener(aVoid -> {
+                    dismissProgressDialog();
+                    // Invalidate cache to reload with fresh data
+                    dataRepository.invalidateReportsCache();
+                    Toast.makeText(this, "Report updated successfully!", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    dismissProgressDialog();
+                    Toast.makeText(this, "Failed to update report: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void submitReport() {

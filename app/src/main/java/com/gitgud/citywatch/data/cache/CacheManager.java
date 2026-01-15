@@ -170,6 +170,45 @@ public class CacheManager {
         });
     }
 
+    /**
+     * Update a report's fields in cache
+     * Used for optimistic UI updates after editing
+     */
+    public void updateCachedReport(HazardCard report) {
+        executor.execute(() -> {
+            try {
+                database.reportDao().updateReport(
+                    report.getDocumentId(),
+                    report.getDescription(),
+                    report.getHazardType(),
+                    report.getLocalGov(),
+                    report.getLocationDetails(),
+                    report.getLatitude(),
+                    report.getLongitude(),
+                    report.getStatus()
+                );
+                Log.d(TAG, "Updated report in cache: " + report.getDocumentId());
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating report in cache", e);
+            }
+        });
+    }
+
+    /**
+     * Remove a report from cache
+     * Used for optimistic UI updates after deletion
+     */
+    public void removeCachedReport(String documentId) {
+        executor.execute(() -> {
+            try {
+                database.reportDao().deleteByDocumentId(documentId);
+                Log.d(TAG, "Removed report from cache: " + documentId);
+            } catch (Exception e) {
+                Log.e(TAG, "Error removing report from cache", e);
+            }
+        });
+    }
+
     // ==================== Comments ====================
 
     /**
@@ -251,7 +290,7 @@ public class CacheManager {
     public void updateCachedComment(Comment comment) {
         executor.execute(() -> {
             try {
-                database.commentDao().updateContent(comment.getCommentId(), comment.getContent());
+                database.commentDao().updateComment(comment.getCommentId(), comment.getContent());
                 Log.d(TAG, "Updated comment content in cache: " + comment.getCommentId());
             } catch (Exception e) {
                 Log.e(TAG, "Error updating comment content", e);

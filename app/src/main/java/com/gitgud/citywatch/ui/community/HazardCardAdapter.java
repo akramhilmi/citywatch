@@ -26,6 +26,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
 
     private List<HazardCard> hazardCards;
     private OnCardClickListener onCardClickListener;
+    private OnReportActionListener onReportActionListener;
     private DataRepository dataRepository;
 
     /**
@@ -33,6 +34,14 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
      */
     public interface OnCardClickListener {
         void onCardClick(HazardCard hazardCard);
+    }
+
+    /**
+     * Interface for report action callbacks (edit/delete)
+     */
+    public interface OnReportActionListener {
+        void onEditReport(HazardCard hazardCard);
+        void onDeleteReport(HazardCard hazardCard);
     }
 
     public HazardCardAdapter(List<HazardCard> hazardCards) {
@@ -48,6 +57,10 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
         this.onCardClickListener = listener;
     }
 
+    public void setOnReportActionListener(OnReportActionListener listener) {
+        this.onReportActionListener = listener;
+    }
+
     @NonNull
     @Override
     public HazardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -59,7 +72,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
     @Override
     public void onBindViewHolder(@NonNull HazardViewHolder holder, int position) {
         HazardCard hazard = hazardCards.get(position);
-        holder.bind(hazard, onCardClickListener, dataRepository);
+        holder.bind(hazard, onCardClickListener, onReportActionListener, dataRepository);
     }
 
     @Override
@@ -82,6 +95,7 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
         private final ImageButton btnUpvote;
         private final ImageButton btnDownvote;
         private final ImageButton btnComments;
+        private final ImageButton btnMenu;
         private final TextView tvVotes;
         private final TextView tvComments;
 
@@ -96,11 +110,12 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             btnUpvote = itemView.findViewById(R.id.btnUpvote);
             btnDownvote = itemView.findViewById(R.id.btnDownvote);
             btnComments = itemView.findViewById(R.id.btnComments);
+            btnMenu = itemView.findViewById(R.id.btnCardMenu);
             tvVotes = itemView.findViewById(R.id.tvVotes);
             tvComments = itemView.findViewById(R.id.tvComments);
         }
 
-        void bind(HazardCard hazard, OnCardClickListener listener, DataRepository dataRepository) {
+        void bind(HazardCard hazard, OnCardClickListener listener, OnReportActionListener actionListener, DataRepository dataRepository) {
             // Set user name with time ago estimate
             String userName = hazard.getUserName() != null ? hazard.getUserName() : "Anonymous";
             String timeAgo = getTimeAgoEstimate(hazard.getCreatedAt());
@@ -145,6 +160,15 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             // Set comment count
             tvComments.setText(String.valueOf(hazard.getComments()));
 
+            // Show menu button only for current user's reports
+            String currentUserId = com.gitgud.citywatch.util.SessionManager.getCurrentUserId();
+            if (currentUserId != null && currentUserId.equals(hazard.getUserId())) {
+                btnMenu.setVisibility(View.VISIBLE);
+                btnMenu.setOnClickListener(v -> showReportMenu(v, hazard, actionListener));
+            } else {
+                btnMenu.setVisibility(View.GONE);
+            }
+
             // Upvote button listener
             btnUpvote.setOnClickListener(v -> {
                 VoteButtonAnimationHelper.animateVoteButton(btnUpvote);
@@ -170,6 +194,29 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
                     listener.onCardClick(hazard);
                 }
             });
+        }
+
+        private void showReportMenu(View anchor, HazardCard hazard, OnReportActionListener actionListener) {
+            android.widget.PopupMenu popup = new android.widget.PopupMenu(itemView.getContext(), anchor);
+            popup.getMenuInflater().inflate(R.menu.report_menu, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.action_edit_report) {
+                    if (actionListener != null) {
+                        actionListener.onEditReport(hazard);
+                    }
+                    return true;
+                } else if (itemId == R.id.action_delete_report) {
+                    if (actionListener != null) {
+                        actionListener.onDeleteReport(hazard);
+                    }
+                    return true;
+                }
+                return false;
+            });
+
+            popup.show();
         }
 
         /**

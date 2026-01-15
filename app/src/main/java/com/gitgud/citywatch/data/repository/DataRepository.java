@@ -812,6 +812,24 @@ public class DataRepository {
     }
 
     /**
+     * Update a specific report in the cache
+     * Used for optimistic UI updates after editing
+     */
+    public void updateReportInCache(HazardCard report) {
+        cacheManager.updateCachedReport(report);
+        Log.d(TAG, "Updated report in cache: " + report.getDocumentId());
+    }
+
+    /**
+     * Remove a specific report from the cache
+     * Used for optimistic UI updates after deletion
+     */
+    public void removeReportFromCache(String reportId) {
+        cacheManager.removeCachedReport(reportId);
+        Log.d(TAG, "Removed report from cache: " + reportId);
+    }
+
+    /**
      * Clear all caches (e.g., on logout)
      */
     public void clearAllCaches() {
