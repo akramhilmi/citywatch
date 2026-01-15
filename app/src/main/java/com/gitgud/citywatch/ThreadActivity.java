@@ -33,7 +33,6 @@ import java.util.List;
 public class ThreadActivity extends AppCompatActivity {
 
     // Views
-    private ImageButton btnBack;
     private ShapeableImageView ivProfile;
     private TextView tvName;
     private TextView tvTitle;
@@ -51,6 +50,7 @@ public class ThreadActivity extends AppCompatActivity {
     private TextInputEditText etComment;
     private View llCommentInput;
     private androidx.core.widget.NestedScrollView nestedScrollView;
+    private com.google.android.material.appbar.MaterialToolbar toolbar;
 
     // Comments
     private CommentAdapter commentAdapter;
@@ -75,16 +75,12 @@ public class ThreadActivity extends AppCompatActivity {
 
         initViews();
 
-        // Handle window insets manually for EdgeToEdge and Keyboard
+        // Handle window insets manually for Keyboard
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_thread), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
 
-            // 1. Apply status bar height to top navigation
-            btnBack.setPadding(btnBack.getPaddingLeft(), systemBars.top,
-                    btnBack.getPaddingRight(), btnBack.getPaddingBottom());
-
-            // 2. Apply keyboard height (IME) to the comment input layout
+            // Apply keyboard height (IME) to the comment input layout
             // We use the MAX of navigation bar or keyboard height
             int bottomPadding = Math.max(systemBars.bottom, imeInsets.bottom);
             llCommentInput.setPadding(llCommentInput.getPaddingLeft(),
@@ -101,7 +97,7 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        btnBack = findViewById(R.id.btnThreadBack);
+        toolbar = findViewById(R.id.toolbar);
         ivProfile = findViewById(R.id.ivThreadProfile);
         tvName = findViewById(R.id.tvThreadName);
         tvTitle = findViewById(R.id.tvThreadTitle);
@@ -192,7 +188,7 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        btnBack.setOnClickListener(v -> {
+        toolbar.setNavigationOnClickListener(v -> {
             // Invalidate reports cache since vote/comment counts might have changed
             dataRepository.invalidateReportsCache();
             finish();
