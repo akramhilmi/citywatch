@@ -18,9 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.gitgud.citywatch.model.Comment;
+import com.gitgud.citywatch.model.SpacingItemDecoration;
 import com.gitgud.citywatch.ui.thread.CommentAdapter;
 import com.gitgud.citywatch.data.repository.DataRepository;
-import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
 import com.gitgud.citywatch.util.VoteButtonAnimationHelper;
 import com.google.android.material.button.MaterialButton;
@@ -137,6 +137,10 @@ public class ThreadActivity extends AppCompatActivity {
         rvComments.setLayoutManager(new LinearLayoutManager(this));
         rvComments.setAdapter(commentAdapter);
         rvComments.setNestedScrollingEnabled(false);
+
+        // Add 10dp spacing between comments
+        int spacingInPx = (int) (10 * getResources().getDisplayMetrics().density);
+        rvComments.addItemDecoration(new SpacingItemDecoration(spacingInPx));
 
         // Auto-scroll to bottom when typing a comment (without stealing focus)
         etComment.setOnFocusChangeListener((v, hasFocus) -> {

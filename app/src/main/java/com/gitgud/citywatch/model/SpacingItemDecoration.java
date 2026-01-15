@@ -1,4 +1,4 @@
-package com.gitgud.citywatch.ui.community;
+package com.gitgud.citywatch.model;
 
 import android.graphics.Rect;
 import android.view.View;
