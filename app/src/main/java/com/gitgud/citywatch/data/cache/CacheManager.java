@@ -599,6 +599,7 @@ public class CacheManager {
             card.setCreatedAt(cached.getCreatedAt());
             card.setScore(cached.getScore());
             card.setComments(cached.getComments());
+            card.setUserIsAdmin(cached.isUserIsAdmin());
             hazardCards.add(card);
         }
         return hazardCards;
@@ -625,6 +626,7 @@ public class CacheManager {
             cached.setCreatedAt(card.getCreatedAt());
             cached.setScore(card.getScore());
             cached.setComments(card.getComments());
+            cached.setUserIsAdmin(card.isUserIsAdmin());
             cached.setCachedAt(now);
             cachedReports.add(cached);
         }
@@ -643,6 +645,7 @@ public class CacheManager {
             comment.setUserName(cached.getUserName());
             comment.setProfilePictureUrl(cached.getProfilePictureUrl());
             comment.setScore(cached.getScore());
+            comment.setUserIsAdmin(cached.isUserIsAdmin());
             comments.add(comment);
         }
         return comments;
@@ -661,6 +664,7 @@ public class CacheManager {
             cached.setUserName(comment.getUserName());
             cached.setProfilePictureUrl(comment.getProfilePictureUrl());
             cached.setScore(comment.getScore());
+            cached.setUserIsAdmin(comment.isUserIsAdmin());
             cached.setCachedAt(now);
             cachedComments.add(cached);
         }

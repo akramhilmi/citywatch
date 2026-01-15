@@ -1066,8 +1066,34 @@ public class ApiClient {
     }
 
     /**
+     * Update report status (admin only)
+     * @param reportId The report document ID
+     * @param newStatus The new status (Submitted, Confirmed, In progress, Resolved)
+     * @param userId The current user's ID (must be an admin)
+     * @return Task that completes when update is done
+     */
+    public static com.google.android.gms.tasks.Task<Void> updateReportStatus(
+            String reportId, String newStatus, String userId) {
+
+        HttpsCallableReference updateStatusFunc = functions.getHttpsCallable("updateReportStatus");
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("reportId", reportId);
+        data.put("newStatus", newStatus);
+        data.put("userId", userId);
+
+        return updateStatusFunc.call(data)
+                .continueWith(task -> {
+                    if (task.isSuccessful()) {
+                        return null;
+                    }
+                    throw task.getException() != null ?
+                            task.getException() : new Exception("Failed to update status");
+                });
+    }
+
+    /**
      * Get report statistics
-     * @return String to Integer mappings of confirmed, inProgress, resolved, submitted
      */
     public static Task<java.util.Map<String, Integer>> getStats() {
         HttpsCallableReference getStatsFunc = functions.getHttpsCallable("getStats");

@@ -28,6 +28,7 @@ public class CachedReport {
     private long score;
     private long comments;
     private long cachedAt; // Timestamp when cached
+    private boolean userIsAdmin; // Whether the user is an admin
 
     public CachedReport() {
         this.documentId = "";
@@ -52,6 +53,8 @@ public class CachedReport {
     public long getScore() { return score; }
     public long getComments() { return comments; }
     public long getCachedAt() { return cachedAt; }
+    public boolean isUserIsAdmin() { return userIsAdmin; }
+
 
     // Setters
     public void setDocumentId(@NonNull String documentId) { this.documentId = documentId; }
@@ -71,5 +74,6 @@ public class CachedReport {
     public void setScore(long score) { this.score = score; }
     public void setComments(long comments) { this.comments = comments; }
     public void setCachedAt(long cachedAt) { this.cachedAt = cachedAt; }
+    public void setUserIsAdmin(boolean userIsAdmin) { this.userIsAdmin = userIsAdmin; }
 }
 
