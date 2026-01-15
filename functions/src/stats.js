@@ -73,6 +73,6 @@ const decrementStat = onCall(async (request) => {
 
 module.exports = {
     getStats,
-    incrementStat,
-    decrementStat,
+//    incrementStat,
+//    decrementStat,
 };

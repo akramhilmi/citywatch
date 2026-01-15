@@ -1095,33 +1095,33 @@ public class ApiClient {
      * Increment any of the four stats by one
      * @return Task that completes after the increment
      */
-    public static Task<Void> incrementStat(String stat) {
-        HttpsCallableReference incrementStatFunc = functions.getHttpsCallable("incrementStat");
-
-        return incrementStatFunc.call(new HashMap<String, String>().put("stat", stat))
-                .continueWith(task -> {
-                    if (task.isSuccessful()) {
-                        return null;
-                    }
-                    throw task.getException() != null ?
-                        task.getException() : new Exception("Failed to increment " + stat + " by 1");
-                });
-    }
+//    public static Task<Void> incrementStat(String stat) {
+//        HttpsCallableReference incrementStatFunc = functions.getHttpsCallable("incrementStat");
+//
+//        return incrementStatFunc.call(new HashMap<String, String>().put("stat", stat))
+//                .continueWith(task -> {
+//                    if (task.isSuccessful()) {
+//                        return null;
+//                    }
+//                    throw task.getException() != null ?
+//                        task.getException() : new Exception("Failed to increment " + stat + " by 1");
+//                });
+//    }
 
     /**
      * Decrement any of the four stats by one
      * @return Task that completes after the decrement
      */
-    public static Task<Void> decrementStat(String stat) {
-        HttpsCallableReference decrementStatFunc = functions.getHttpsCallable("decrementStat");
-
-        return decrementStatFunc.call(new HashMap<String, String>().put("stat", stat))
-            .continueWith(task -> {
-                if (task.isSuccessful()) {
-                    return null;
-                }
-                throw task.getException() != null ?
-                    task.getException() : new Exception("Failed to decrement " + stat + " by 1");
-            });
-    }
+//    public static Task<Void> decrementStat(String stat) {
+//        HttpsCallableReference decrementStatFunc = functions.getHttpsCallable("decrementStat");
+//
+//        return decrementStatFunc.call(new HashMap<String, String>().put("stat", stat))
+//            .continueWith(task -> {
+//                if (task.isSuccessful()) {
+//                    return null;
+//                }
+//                throw task.getException() != null ?
+//                    task.getException() : new Exception("Failed to decrement " + stat + " by 1");
+//            });
+//    }
 }

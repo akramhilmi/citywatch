@@ -80,8 +80,8 @@ const {
 // Stats
 const {
   getStats,
-  incrementStat,
-  decrementStat,
+//  incrementStat,
+//  decrementStat,
 } = require("./src/stats");
 
 // ==================== Export all functions ====================
@@ -136,5 +136,5 @@ exports.getCacheChecksum = getCacheChecksum;
 
 // Stats
 exports.getStats = getStats;
-exports.incrementStat = incrementStat;
-exports.decrementStat = decrementStat;
+//exports.incrementStat = incrementStat;
+//exports.decrementStat = decrementStat;

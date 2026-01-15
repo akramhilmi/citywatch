@@ -4,6 +4,22 @@ const logger = require("firebase-functions/logger");
 
 const db = admin.firestore();
 const bucket = admin.storage().bucket();
+const statsRef = db.collection("metadata").doc("stats");
+
+/**
+ * Helper function to convert report status to stat field name
+ * @param {string} status - Report status (e.g., "Submitted", "Confirmed")
+ * @return {string} - Stat field name (e.g., "submitted", "confirmed")
+ */
+function getStatFieldFromStatus(status) {
+  const statusMap = {
+    "Submitted": "submitted",
+    "Confirmed": "confirmed",
+    "In progress": "inProgress",
+    "Resolved": "resolved",
+  };
+  return statusMap[status] || "submitted";
+}
 
 /**
  * Submit a new report to Firestore
@@ -49,6 +65,18 @@ const submitReport = onCall(async (request) => {
 
     // Add to Firestore and get document ID
     const docRef = await db.collection("reports").add(reportData);
+
+    // Increment stats counter for "Submitted" status
+    try {
+      const statField = getStatFieldFromStatus("Submitted");
+      await statsRef.update({
+        [statField]: admin.firestore.FieldValue.increment(1),
+      });
+      logger.info(`Incremented ${statField} stat for new report ${docRef.id}`);
+    } catch (statsError) {
+      logger.warn(`Could not update stats for report ${docRef.id}`, statsError);
+      // Don't throw - report was created successfully
+    }
 
     logger.info(`Report created with ID: ${docRef.id} by user: ${userId}`);
     return {documentId: docRef.id, success: true};
@@ -294,6 +322,18 @@ const deleteReport = onCall(async (request) => {
 
     // Delete the report document
     await reportRef.delete();
+
+    // Decrement stats counter based on report status
+    try {
+      const statField = getStatFieldFromStatus(reportData.status || "Submitted");
+      await statsRef.update({
+        [statField]: admin.firestore.FieldValue.increment(-1),
+      });
+      logger.info(`Decremented ${statField} stat for deleted report ${reportId}`);
+    } catch (statsError) {
+      logger.warn(`Could not update stats for deleted report ${reportId}`, statsError);
+      // Don't throw - report was already deleted
+    }
 
     logger.info(`Report ${reportId} deleted by user ${userId}`);
     return {success: true, message: "Report deleted successfully"};
