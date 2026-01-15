@@ -241,7 +241,19 @@ public class ReportActivity extends AppCompatActivity {
                     // Invalidate cache to reload with fresh data
                     dataRepository.invalidateReportsCache();
                     Toast.makeText(this, "Report updated successfully!", Toast.LENGTH_SHORT).show();
-                    setResult(RESULT_OK);
+
+                    // Return edited data to fragment for immediate UI update
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("reportId", editReportId);
+                    resultIntent.putExtra("description", description);
+                    resultIntent.putExtra("hazardType", hazardType);
+                    resultIntent.putExtra("localGov", localGov);
+                    resultIntent.putExtra("locationDetails", locationDetails);
+                    resultIntent.putExtra("latitude", selectedLatitude);
+                    resultIntent.putExtra("longitude", selectedLongitude);
+                    resultIntent.putExtra("status", editStatus);
+
+                    setResult(RESULT_OK, resultIntent);
                     finish();
                 })
                 .addOnFailureListener(e -> {

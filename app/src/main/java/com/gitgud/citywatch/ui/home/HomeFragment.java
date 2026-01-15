@@ -52,10 +52,40 @@ public class HomeFragment extends Fragment {
         editReportLauncher = registerForActivityResult(
             new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == android.app.Activity.RESULT_OK) {
-                    // Report was edited successfully, reload to show changes
-                    if (dataRepository != null) {
-                        loadUserReports();
+                if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
+                    // Report was edited successfully, update UI immediately
+                    Intent data = result.getData();
+                    String reportId = data.getStringExtra("reportId");
+
+                    if (reportId != null) {
+                        // Find the report in the list and update it
+                        for (int i = 0; i < userReportsList.size(); i++) {
+                            HazardCard card = userReportsList.get(i);
+                            if (card.getDocumentId().equals(reportId)) {
+                                // Update the report with new data
+                                card.setDescription(data.getStringExtra("description"));
+                                card.setHazardType(data.getStringExtra("hazardType"));
+                                card.setLocalGov(data.getStringExtra("localGov"));
+                                card.setLocationDetails(data.getStringExtra("locationDetails"));
+                                card.setLatitude(data.getDoubleExtra("latitude", 0));
+                                card.setLongitude(data.getDoubleExtra("longitude", 0));
+                                card.setStatus(data.getStringExtra("status"));
+
+                                // Update cache immediately
+                                if (dataRepository != null) {
+                                    dataRepository.updateReportInCache(card);
+                                }
+
+                                // Notify adapter that this item changed
+                                adapter.notifyItemChanged(i);
+                                break;
+                            }
+                        }
+
+                        // Reload in background to ensure consistency with server
+                        if (dataRepository != null) {
+                            loadUserReports();
+                        }
                     }
                 }
             }
