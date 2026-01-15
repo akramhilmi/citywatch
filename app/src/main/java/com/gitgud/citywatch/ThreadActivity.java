@@ -21,6 +21,7 @@ import com.gitgud.citywatch.model.Comment;
 import com.gitgud.citywatch.model.SpacingItemDecoration;
 import com.gitgud.citywatch.ui.thread.CommentAdapter;
 import com.gitgud.citywatch.data.repository.DataRepository;
+import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
 import com.gitgud.citywatch.util.VoteButtonAnimationHelper;
 import com.google.android.material.button.MaterialButton;
