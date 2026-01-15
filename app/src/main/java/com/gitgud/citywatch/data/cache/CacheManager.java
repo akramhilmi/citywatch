@@ -170,6 +170,45 @@ public class CacheManager {
         });
     }
 
+    /**
+     * Update a report's fields in cache
+     * Used for optimistic UI updates after editing
+     */
+    public void updateCachedReport(HazardCard report) {
+        executor.execute(() -> {
+            try {
+                database.reportDao().updateReport(
+                    report.getDocumentId(),
+                    report.getDescription(),
+                    report.getHazardType(),
+                    report.getLocalGov(),
+                    report.getLocationDetails(),
+                    report.getLatitude(),
+                    report.getLongitude(),
+                    report.getStatus()
+                );
+                Log.d(TAG, "Updated report in cache: " + report.getDocumentId());
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating report in cache", e);
+            }
+        });
+    }
+
+    /**
+     * Remove a report from cache
+     * Used for optimistic UI updates after deletion
+     */
+    public void removeCachedReport(String documentId) {
+        executor.execute(() -> {
+            try {
+                database.reportDao().deleteByDocumentId(documentId);
+                Log.d(TAG, "Removed report from cache: " + documentId);
+            } catch (Exception e) {
+                Log.e(TAG, "Error removing report from cache", e);
+            }
+        });
+    }
+
     // ==================== Comments ====================
 
     /**
@@ -232,7 +271,7 @@ public class CacheManager {
     }
 
     /**
-     * Update a single comment's score in cache
+     * Update a comment's score in cache
      */
     public void updateCommentScore(String commentId, long score) {
         executor.execute(() -> {
@@ -240,6 +279,36 @@ public class CacheManager {
                 database.commentDao().updateScore(commentId, score);
             } catch (Exception e) {
                 Log.e(TAG, "Error updating comment score", e);
+            }
+        });
+    }
+
+    /**
+     * Update a comment's content in cache
+     * Used for optimistic UI updates after editing
+     */
+    public void updateCachedComment(Comment comment) {
+        executor.execute(() -> {
+            try {
+                database.commentDao().updateComment(comment.getCommentId(), comment.getContent());
+                Log.d(TAG, "Updated comment content in cache: " + comment.getCommentId());
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating comment content", e);
+            }
+        });
+    }
+
+    /**
+     * Remove a comment from cache
+     * Used for optimistic UI updates after deletion
+     */
+    public void removeCachedComment(String commentId) {
+        executor.execute(() -> {
+            try {
+                database.commentDao().deleteByCommentId(commentId);
+                Log.d(TAG, "Removed comment from cache: " + commentId);
+            } catch (Exception e) {
+                Log.e(TAG, "Error removing comment from cache", e);
             }
         });
     }
@@ -605,4 +674,3 @@ public class CacheManager {
         void onResult(T result);
     }
 }
-

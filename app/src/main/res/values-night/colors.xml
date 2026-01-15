@@ -1,4 +1,5 @@
 <resources>
+    <color name="profile_icon_tint">#FFFFFF</color>
     <color name="md_theme_primary">#FCB974</color>
     <color name="md_theme_onPrimary">#492900</color>
     <color name="md_theme_primaryContainer">#693C00</color>

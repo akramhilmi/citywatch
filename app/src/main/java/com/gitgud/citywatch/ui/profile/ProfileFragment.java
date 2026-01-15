@@ -192,12 +192,25 @@ public class ProfileFragment extends Fragment {
         //delete account
         view.findViewById(R.id.btnDeleteAccount).setOnClickListener(v -> showDeleteConfirmation());
 
-        //contactUs(email)
+        //contactUs(GitHub)
         view.findViewById(R.id.btnContactUs).setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_SENDTO);
-            intent.setData(Uri.parse("mailto:support@citywatch.com"));
-            intent.putExtra(Intent.EXTRA_SUBJECT, "CityWatch Support Request");
-            startActivity(Intent.createChooser(intent, "Send Email"));
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://github.com/akramhilmi/citywatch"));
+            startActivity(intent);
+        });
+
+        //aboutUs(GitHub)
+        view.findViewById(R.id.btnAboutApp).setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://github.com/akramhilmi/citywatch"));
+            startActivity(intent);
+        });
+
+        //privacyPolicy(GitHub)
+        view.findViewById(R.id.btnPrivacyPolicy).setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://github.com/akramhilmi/citywatch"));
+            startActivity(intent);
         });
 
         //darkmode switch

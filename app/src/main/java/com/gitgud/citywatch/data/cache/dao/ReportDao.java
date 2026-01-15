@@ -41,5 +41,16 @@ public interface ReportDao {
 
     @Query("UPDATE reports SET comments = :commentCount WHERE documentId = :documentId")
     void updateCommentCount(String documentId, long commentCount);
+
+    @Query("UPDATE reports SET description = :description, hazardType = :hazardType, " +
+           "localGov = :localGov, locationDetails = :locationDetails, " +
+           "latitude = :latitude, longitude = :longitude, status = :status " +
+           "WHERE documentId = :documentId")
+    void updateReport(String documentId, String description, String hazardType,
+                     String localGov, String locationDetails, double latitude,
+                     double longitude, String status);
+
+    @Query("DELETE FROM reports WHERE documentId = :documentId")
+    void deleteByDocumentId(String documentId);
 }
 
