@@ -21,6 +21,7 @@ import com.gitgud.citywatch.ui.thread.CommentAdapter;
 import com.gitgud.citywatch.data.repository.DataRepository;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
+import com.gitgud.citywatch.util.VoteButtonAnimationHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -203,8 +204,14 @@ public class ThreadActivity extends AppCompatActivity {
         ImageButton btnLocation = findViewById(R.id.btnThreadLocation);
         if (btnLocation != null) btnLocation.setOnClickListener(v -> openMapApp());
 
-        btnUpvote.setOnClickListener(v -> handleVote(1));
-        btnDownvote.setOnClickListener(v -> handleVote(-1));
+        btnUpvote.setOnClickListener(v -> {
+            VoteButtonAnimationHelper.animateVoteButton(btnUpvote);
+            handleVote(1);
+        });
+        btnDownvote.setOnClickListener(v -> {
+            VoteButtonAnimationHelper.animateVoteButton(btnDownvote);
+            handleVote(-1);
+        });
 
         findViewById(R.id.btnCommentSubmit).setOnClickListener(v -> submitComment());
     }

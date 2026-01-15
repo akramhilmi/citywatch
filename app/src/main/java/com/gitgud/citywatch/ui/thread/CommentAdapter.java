@@ -15,6 +15,7 @@ import com.gitgud.citywatch.R;
 import com.gitgud.citywatch.model.Comment;
 import com.gitgud.citywatch.util.ApiClient;
 import com.gitgud.citywatch.util.SessionManager;
+import com.gitgud.citywatch.util.VoteButtonAnimationHelper;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
@@ -98,10 +99,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             updateVoteButtonStates(comment.getUserVote());
 
             // Upvote button listener
-            btnUpvote.setOnClickListener(v -> handleVote(comment, 1));
+            btnUpvote.setOnClickListener(v -> {
+                VoteButtonAnimationHelper.animateVoteButton(btnUpvote);
+                handleVote(comment, 1);
+            });
 
             // Downvote button listener
-            btnDownvote.setOnClickListener(v -> handleVote(comment, -1));
+            btnDownvote.setOnClickListener(v -> {
+                VoteButtonAnimationHelper.animateVoteButton(btnDownvote);
+                handleVote(comment, -1);
+            });
         }
 
         private void handleVote(Comment comment, int voteType) {

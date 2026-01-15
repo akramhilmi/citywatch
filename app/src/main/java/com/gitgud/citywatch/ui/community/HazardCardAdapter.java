@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.gitgud.citywatch.R;
 import com.gitgud.citywatch.model.HazardCard;
 import com.gitgud.citywatch.data.repository.DataRepository;
+import com.gitgud.citywatch.util.VoteButtonAnimationHelper;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
@@ -143,10 +144,16 @@ public class HazardCardAdapter extends RecyclerView.Adapter<HazardCardAdapter.Ha
             tvComments.setText(String.valueOf(hazard.getComments()));
 
             // Upvote button listener
-            btnUpvote.setOnClickListener(v -> handleVote(hazard, 1, dataRepository));
+            btnUpvote.setOnClickListener(v -> {
+                VoteButtonAnimationHelper.animateVoteButton(btnUpvote);
+                handleVote(hazard, 1, dataRepository);
+            });
 
             // Downvote button listener
-            btnDownvote.setOnClickListener(v -> handleVote(hazard, -1, dataRepository));
+            btnDownvote.setOnClickListener(v -> {
+                VoteButtonAnimationHelper.animateVoteButton(btnDownvote);
+                handleVote(hazard, -1, dataRepository);
+            });
 
             // Card click listener - navigate to thread
             itemView.setOnClickListener(v -> {
