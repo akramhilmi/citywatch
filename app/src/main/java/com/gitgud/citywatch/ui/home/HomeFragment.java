@@ -21,7 +21,7 @@ import com.gitgud.citywatch.model.HazardCard;
 import com.gitgud.citywatch.ui.community.HazardCardAdapter;
 import com.gitgud.citywatch.data.repository.DataRepository;
 import com.gitgud.citywatch.util.SessionManager;
-import com.gitgud.citywatch.ui.community.SpacingItemDecoration;
+import com.gitgud.citywatch.model.SpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;

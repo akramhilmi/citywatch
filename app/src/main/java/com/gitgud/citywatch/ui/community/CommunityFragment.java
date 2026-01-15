@@ -18,6 +18,7 @@ import com.gitgud.citywatch.R;
 import com.gitgud.citywatch.ReportActivity;
 import com.gitgud.citywatch.model.HazardCard;
 import com.gitgud.citywatch.data.repository.DataRepository;
+import com.gitgud.citywatch.model.SpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
