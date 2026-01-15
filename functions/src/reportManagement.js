@@ -224,7 +224,7 @@ const editReport = onCall(async (request) => {
 });
 
 /**
- * Delete a report and its associated photo
+ * Delete a report and its associated photo and comments
  * Only the report owner (userId) can delete their report
  */
 const deleteReport = onCall(async (request) => {
@@ -253,6 +253,23 @@ const deleteReport = onCall(async (request) => {
 
     if (reportUserId !== userId) {
       throw new Error("Unauthorized: You can only delete your own reports");
+    }
+
+    // Delete all comments associated with this report
+    try {
+      const commentsSnapshot = await db.collection("comments")
+          .where("report", "==", reportRef)
+          .get();
+
+      const batch = db.batch();
+      commentsSnapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      logger.info(`Deleted ${commentsSnapshot.size} comments for report ${reportId}`);
+    } catch (commentsError) {
+      logger.warn(`Could not delete comments for report ${reportId}`, commentsError);
     }
 
     // Delete associated photo from Storage (if it exists)
