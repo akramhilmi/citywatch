@@ -77,13 +77,7 @@ The goal is to create a faster and more transparent communication channel betwee
 
 ## Screenshots
 
-| Home Feed                     | Report Page                       | Community Thread                  |
-| ----------------------------- | --------------------------------- | --------------------------------- |
-| ![Home](screenshots/home.png) | ![Report](screenshots/report.png) | ![Thread](screenshots/thread.png) |
-
-| Profile                             | Dark Mode                         | Map Location                |
-| ----------------------------------- | --------------------------------- | --------------------------- |
-| ![Profile](screenshots/profile.png) | ![Dark](screenshots/darkmode.png) | ![Map](screenshots/map.png) |
+![CityWatch UI](screenshots/citywatch_ui.png)
 
 ---
 
